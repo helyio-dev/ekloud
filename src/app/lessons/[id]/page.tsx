@@ -3,7 +3,10 @@ import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, CheckCircle, Loader2 } from 'lucide-react';
-import { addXp } from '@/lib/gamification';
+import { addXp, XP_REWARDS } from '@/lib/gamification';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 
 type Lesson = {
     id: string;
@@ -11,11 +14,12 @@ type Lesson = {
     title: string;
     content: string;
     order_index: number;
+    difficulty: string;
 };
 
 export default function LessonPage() {
     const { id } = useParams();
-    const { user, isLoading: authLoading, xp, level } = useAuth();
+    const { user, isLoading: authLoading, xp, level, streak } = useAuth();
     const [lesson, setLesson] = useState<Lesson | null>(null);
     const [nextLessonId, setNextLessonId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +44,7 @@ export default function LessonPage() {
                 if (currentLesson) {
                     setLesson(currentLesson);
 
-                    
+
                     const { data: nextLesson } = await supabase
                         .from('lessons')
                         .select('id')
@@ -65,20 +69,27 @@ export default function LessonPage() {
         if (!user || !lesson) return;
         setIsCompleting(true);
 
-        await supabase.from('user_lesson_progress').upsert({
-            user_id: user.id,
-            lesson_id: lesson.id,
-            completed: true,
-            completed_at: new Date().toISOString()
-        });
+        try {
+            await supabase.from('user_lessons').upsert({
+                user_id: user.id,
+                lesson_id: lesson.id,
+                completed: true
+            }, { onConflict: 'user_id,lesson_id' });
 
-        
-        await addXp(supabase, user.id, xp || 0, 20);
+            const difficulty = (lesson as any).difficulty || 'easy';
+            const xpToAdd = (XP_REWARDS as any)[difficulty] || 20;
 
-        if (nextLessonId) {
-            navigate(`/lessons/${nextLessonId}`);
-        } else {
-            navigate(`/modules/${lesson.module_id}`);
+            await addXp(supabase, user.id, xp || 0, xpToAdd, streak || 0);
+
+            if (nextLessonId) {
+                navigate(`/lessons/${nextLessonId}`);
+            } else {
+                navigate(`/modules/${lesson.module_id}`);
+            }
+        } catch (err) {
+            console.error('Error completing lesson:', err);
+        } finally {
+            setIsCompleting(false);
         }
     };
 
@@ -107,10 +118,12 @@ export default function LessonPage() {
                     </header>
 
                     <main className="flex-grow max-w-4xl mx-auto w-full px-6 py-12">
-                        <article className="prose prose-invert prose-blue max-w-none">
-                            <h2 className="text-4xl font-extrabold mb-10">{lesson.title}</h2>
-                            <div className="text-text-muted text-lg space-y-6 leading-relaxed whitespace-pre-line">
-                                {lesson.content}
+                        <article className="prose prose-invert prose-indigo max-w-none">
+                            <h2 className="text-4xl font-extrabold mb-10 tracking-tight text-white">{lesson.title}</h2>
+                            <div className="text-text-muted text-lg leading-relaxed">
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                                    {lesson.content}
+                                </ReactMarkdown>
                             </div>
                         </article>
                     </main>

@@ -14,6 +14,7 @@ type AuthContextType = {
     clan: string | null;
     signOut: () => Promise<void>;
     refreshSession: () => Promise<Session | null>;
+    refreshProfile: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType>({
@@ -28,6 +29,7 @@ export const AuthContext = createContext<AuthContextType>({
     clan: null,
     signOut: async () => { },
     refreshSession: async () => null,
+    refreshProfile: async () => { },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -41,11 +43,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [username, setUsername] = useState<string | null>(null);
     const [clan, setClan] = useState<string | null>(null);
 
-    
+
     const lastFetchedIdRef = useRef<string | null>(null);
 
     const fetchProfile = async (userId: string, retry = true) => {
-        
+        setIsLoading(true);
         if (lastFetchedIdRef.current === userId) {
             setIsLoading(false);
             return;
@@ -86,8 +88,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        
-        
+
+
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
             const newUser = currentSession?.user ?? null;
 
@@ -97,7 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             if (newUser) {
                 fetchProfile(newUser.id);
             } else {
-                
+
                 lastFetchedIdRef.current = null;
                 setIsAdmin(false);
                 setXp(0);
@@ -109,7 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
         });
 
-        
+
         const safetyTimer = setTimeout(() => {
             setIsLoading(prev => {
                 if (prev) console.warn('AuthProvider: Safety timeout triggered.');
@@ -138,10 +140,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return session;
     };
 
+    const refreshProfile = async () => {
+        if (user) {
+            lastFetchedIdRef.current = null; // Force fetch
+            await fetchProfile(user.id);
+        }
+    };
+
     return (
         <AuthContext.Provider value={{
             user, session, isAdmin, isLoading, xp, level, streak, username, clan,
-            signOut, refreshSession
+            signOut, refreshSession, refreshProfile
         }}>
             {children}
         </AuthContext.Provider>

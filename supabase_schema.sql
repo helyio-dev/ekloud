@@ -28,7 +28,23 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='streak') THEN
     ALTER TABLE public.profiles ADD COLUMN streak INTEGER DEFAULT 0;
   END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='last_streak_at') THEN
+    ALTER TABLE public.profiles ADD COLUMN last_streak_at TIMESTAMP WITH TIME ZONE;
+  END IF;
 END $$;
+
+-- Create a secure function to check admin status (avoids recursion)
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN (
+    SELECT role = 'admin'
+    FROM public.profiles
+    WHERE id = auth.uid()
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
@@ -49,11 +65,7 @@ ALTER TABLE public.modules ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Tout le monde peut lire les modules" ON public.modules;
 CREATE POLICY "Tout le monde peut lire les modules" ON public.modules FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Les admins peuvent gérer les modules" ON public.modules;
-CREATE POLICY "Les admins peuvent gérer les modules" ON public.modules FOR ALL USING (
-  EXISTS (
-    SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
-  )
-);
+CREATE POLICY "Les admins peuvent gérer les modules" ON public.modules FOR ALL USING (public.is_admin());
 
 CREATE TABLE IF NOT EXISTS public.lessons (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -61,36 +73,45 @@ CREATE TABLE IF NOT EXISTS public.lessons (
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   order_index INTEGER NOT NULL,
+  difficulty TEXT DEFAULT 'easy' CHECK (difficulty IN ('easy', 'medium', 'hard', 'very_hard')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='lessons' AND column_name='difficulty') THEN
+    ALTER TABLE public.lessons ADD COLUMN difficulty TEXT DEFAULT 'easy' CHECK (difficulty IN ('easy', 'medium', 'hard', 'very_hard'));
+  END IF;
+END $$;
 
 ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Tout le monde peut lire les leçons" ON public.lessons;
 CREATE POLICY "Tout le monde peut lire les leçons" ON public.lessons FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Les admins peuvent gérer les leçons" ON public.lessons;
-CREATE POLICY "Les admins peuvent gérer les leçons" ON public.lessons FOR ALL USING (
-  EXISTS (
-    SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
-  )
-);
+CREATE POLICY "Les admins peuvent gérer les leçons" ON public.lessons FOR ALL USING (public.is_admin());
 
 CREATE TABLE IF NOT EXISTS public.questions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  module_id UUID REFERENCES public.modules(id) ON DELETE CASCADE NOT NULL,
+  module_id UUID REFERENCES public.modules(id) ON DELETE CASCADE,
+  skill_id UUID REFERENCES public.skills(id) ON DELETE CASCADE,
   question_text TEXT NOT NULL,
-  difficulty TEXT CHECK (difficulty IN ('easy', 'medium', 'hard', 'very_hard')),
+  difficulty TEXT DEFAULT 'easy' CHECK (difficulty IN ('easy', 'medium', 'hard', 'very_hard')),
+  type TEXT DEFAULT 'multiple_choice' CHECK (type IN ('multiple_choice', 'true_false')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='questions' AND column_name='difficulty') THEN
+    ALTER TABLE public.questions ADD COLUMN difficulty TEXT DEFAULT 'easy' CHECK (difficulty IN ('easy', 'medium', 'hard', 'very_hard'));
+  END IF;
+END $$;
 
 ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Tout le monde peut lire les questions" ON public.questions;
 CREATE POLICY "Tout le monde peut lire les questions" ON public.questions FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Les admins peuvent gérer les questions" ON public.questions;
-CREATE POLICY "Les admins peuvent gérer les questions" ON public.questions FOR ALL USING (
-  EXISTS (
-    SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
-  )
-);
+CREATE POLICY "Les admins peuvent gérer les questions" ON public.questions FOR ALL USING (public.is_admin());
 
 CREATE TABLE IF NOT EXISTS public.answers (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -104,11 +125,7 @@ ALTER TABLE public.answers ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Tout le monde peut lire les réponses" ON public.answers;
 CREATE POLICY "Tout le monde peut lire les réponses" ON public.answers FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Les admins peuvent gérer les réponses" ON public.answers;
-CREATE POLICY "Les admins peuvent gérer les réponses" ON public.answers FOR ALL USING (
-  EXISTS (
-    SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
-  )
-);
+CREATE POLICY "Les admins peuvent gérer les réponses" ON public.answers FOR ALL USING (public.is_admin());
 
 CREATE TABLE IF NOT EXISTS public.user_modules (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -150,8 +167,16 @@ CREATE TABLE IF NOT EXISTS public.quiz_attempts (
   module_id UUID REFERENCES public.modules(id) ON DELETE CASCADE NOT NULL,
   score NUMERIC NOT NULL,
   passed BOOLEAN NOT NULL,
+  is_exam BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='quiz_attempts' AND column_name='is_exam') THEN
+    ALTER TABLE public.quiz_attempts ADD COLUMN is_exam BOOLEAN DEFAULT false;
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS public.badges (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -258,25 +283,13 @@ DROP POLICY IF EXISTS "Les utilisateurs peuvent annuler ou supprimer une amitié
 CREATE POLICY "Les utilisateurs peuvent annuler ou supprimer une amitié" ON public.friendships FOR DELETE 
 USING (auth.uid() = user_id1 OR auth.uid() = user_id2);
 
-DROP POLICY IF EXISTS "Les admins lisent tous les profils" ON public.profiles;
-CREATE POLICY "Les admins lisent tous les profils" ON public.profiles FOR SELECT
-USING (
-  auth.uid() = id
-  OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
-);
-
-DROP POLICY IF EXISTS "Les admins modifient les profils" ON public.profiles;
-CREATE POLICY "Les admins modifient les profils" ON public.profiles FOR UPDATE
-USING (
-  auth.uid() = id
-  OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
-);
-
 DROP POLICY IF EXISTS "Les admins suppriment les profils" ON public.profiles;
-CREATE POLICY "Les admins suppriment les profils" ON public.profiles FOR DELETE
-USING (
-  EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
-);
+CREATE POLICY "Les admins suppriment les profils" ON public.profiles FOR DELETE USING (public.is_admin());
+
+DROP POLICY IF EXISTS "Les admins lisent tous les profils" ON public.profiles;
+-- We don't need a separate admin policy here if we have a "visibles par tous" or a owner policy.
+-- But let's keep it clean.
+CREATE POLICY "Les admins lisent tous les profils" ON public.profiles FOR SELECT USING (public.is_admin());
 
 DROP POLICY IF EXISTS "Les admins lisent tous les user_modules" ON public.user_modules;
 CREATE POLICY "Les admins lisent tous les user_modules" ON public.user_modules FOR SELECT
@@ -307,11 +320,7 @@ USING (
 );
 
 DROP POLICY IF EXISTS "Les admins lisent tous les quiz_attempts" ON public.quiz_attempts;
-CREATE POLICY "Les admins lisent tous les quiz_attempts" ON public.quiz_attempts FOR SELECT
-USING (
-  auth.uid() = user_id
-  OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
-);
+CREATE POLICY "Les admins lisent tous les quiz_attempts" ON public.quiz_attempts FOR SELECT USING (public.is_admin());
 
 DO $$
 BEGIN
@@ -324,3 +333,80 @@ DROP POLICY IF EXISTS "Les utilisateurs peuvent définir leur clan" ON public.pr
 CREATE POLICY "Les utilisateurs peuvent définir leur clan" ON public.profiles FOR UPDATE
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
+
+CREATE TABLE IF NOT EXISTS public.skills (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    description TEXT,
+    icon TEXT, -- Lucide icon name
+    x_pos INTEGER DEFAULT 0,
+    y_pos INTEGER DEFAULT 0,
+    is_final BOOLEAN DEFAULT false,
+    requires_exam BOOLEAN DEFAULT false,
+    exam_module_id UUID REFERENCES public.modules(id) ON DELETE SET NULL,
+    is_locked BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='skills' AND column_name='exam_module_id') THEN
+    ALTER TABLE public.skills ADD COLUMN exam_module_id UUID REFERENCES public.modules(id) ON DELETE SET NULL;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='skills' AND column_name='is_locked') THEN
+    ALTER TABLE public.skills ADD COLUMN is_locked BOOLEAN DEFAULT false;
+  END IF;
+END $$;
+
+-- Skill Prerequisites (for the tree structure)
+CREATE TABLE IF NOT EXISTS public.skill_prerequisites (
+    skill_id UUID REFERENCES public.skills(id) ON DELETE CASCADE,
+    prerequisite_skill_id UUID REFERENCES public.skills(id) ON DELETE CASCADE,
+    PRIMARY KEY (skill_id, prerequisite_skill_id)
+);
+
+-- Skill Modules (modules required to complete a skill)
+CREATE TABLE IF NOT EXISTS public.skill_modules (
+    skill_id UUID REFERENCES public.skills(id) ON DELETE CASCADE,
+    module_id UUID REFERENCES public.modules(id) ON DELETE CASCADE,
+    PRIMARY KEY (skill_id, module_id)
+);
+
+-- User Skills (mastered skills)
+CREATE TABLE IF NOT EXISTS public.user_skills (
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    skill_id UUID REFERENCES public.skills(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    PRIMARY KEY (user_id, skill_id)
+);
+
+-- RLS for Skills
+ALTER TABLE public.skills ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Skills are viewable by everyone" ON public.skills;
+CREATE POLICY "Skills are viewable by everyone" ON public.skills FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Skills are manageable by admins" ON public.skills;
+CREATE POLICY "Skills are manageable by admins" ON public.skills FOR ALL USING (public.is_admin());
+
+-- RLS for Skill Prerequisites
+ALTER TABLE public.skill_prerequisites ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Skill prerequisites are viewable by everyone" ON public.skill_prerequisites;
+CREATE POLICY "Skill prerequisites are viewable by everyone" ON public.skill_prerequisites FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Skill prerequisites are manageable by admins" ON public.skill_prerequisites;
+CREATE POLICY "Skill prerequisites are manageable by admins" ON public.skill_prerequisites FOR ALL USING (public.is_admin());
+
+-- RLS for Skill Modules
+ALTER TABLE public.skill_modules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Skill modules are viewable by everyone" ON public.skill_modules;
+CREATE POLICY "Skill modules are viewable by everyone" ON public.skill_modules FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Skill modules are manageable by admins" ON public.skill_modules;
+CREATE POLICY "Skill modules are manageable by admins" ON public.skill_modules FOR ALL USING (public.is_admin());
+
+-- RLS for User Skills
+ALTER TABLE public.user_skills ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User skills are viewable by the user" ON public.user_skills;
+CREATE POLICY "User skills are viewable by the user" ON public.user_skills FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "User skills can be inserted by the user" ON public.user_skills;
+CREATE POLICY "User skills can be inserted by the user" ON public.user_skills FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "User skills are viewable by admins" ON public.user_skills;
+CREATE POLICY "User skills are viewable by admins" ON public.user_skills FOR SELECT
+USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));

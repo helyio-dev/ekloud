@@ -4,8 +4,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Plus, BookOpen, Users, Loader2, LayoutDashboard } from 'lucide-react';
 import UserManagementTab from './components/UserManagementTab';
+import SkillManagementTab from './components/SkillManagementTab';
 
-type TabId = 'modules' | 'users';
+type TabId = 'modules' | 'skills' | 'users';
 
 export default function AdminDashboard() {
     const { user, isAdmin, isLoading } = useAuth();
@@ -41,17 +42,33 @@ export default function AdminDashboard() {
         fetchData();
     }, [isAdmin]);
 
+    const handleDeleteModule = async (id: string, title: string) => {
+        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le module "${title}" ? Cette action est irréversible.`)) {
+            return;
+        }
+
+        try {
+            const { error } = await supabase.from('modules').delete().eq('id', id);
+            if (error) throw error;
+            setModules(modules.filter(m => m.id !== id));
+        } catch (err) {
+            console.error('Error deleting module:', err);
+            alert('Erreur lors de la suppression du module.');
+        }
+    };
+
     if (!isLoading && !isAdmin) return null;
 
     const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
         { id: 'modules', label: 'Modules', icon: <BookOpen className="w-4 h-4" /> },
+        { id: 'skills', label: 'Arbre de Compétences', icon: <LayoutDashboard className="w-4 h-4" /> },
         { id: 'users', label: 'Utilisateurs', icon: <Users className="w-4 h-4" /> },
     ];
 
     return (
         <div className="min-h-screen bg-background p-6 md:p-8">
             <div className="max-w-7xl mx-auto space-y-8">
-                {}
+                {/* Header Section */}
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -74,23 +91,7 @@ export default function AdminDashboard() {
                     </div>
                 </header>
 
-                {}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <StatCard
-                        title="Total Modules"
-                        value={isFetching ? '—' : String(modules.length)}
-                        icon={<BookOpen className="w-5 h-5 text-blue-400" />}
-                        color="blue"
-                    />
-                    <StatCard
-                        title="Total Utilisateurs"
-                        value={isFetching ? '—' : String(userCount ?? 0)}
-                        icon={<Users className="w-5 h-5 text-purple-400" />}
-                        color="purple"
-                    />
-                </div>
-
-                {}
+                {/* Main Content Sections */}
                 <div>
                     <div className="flex gap-1 p-1 bg-surface/50 border border-white/5 rounded-xl w-fit mb-6">
                         {tabs.map(tab => (
@@ -108,7 +109,7 @@ export default function AdminDashboard() {
                         ))}
                     </div>
 
-                    {}
+                    {/* Content Section */}
                     {isFetching && activeTab === 'modules' ? (
                         <div className="flex justify-center py-20">
                             <Loader2 className="w-10 h-10 text-accent animate-spin" />
@@ -129,10 +130,22 @@ export default function AdminDashboard() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
-                                            <button className="px-3 py-1.5 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors text-sm">
+                                            <Link
+                                                to={`/admin/modules/${mod.id}/content`}
+                                                className="px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg text-accent hover:bg-accent hover:text-white transition-all text-xs font-black uppercase tracking-wider"
+                                            >
+                                                Gérer le contenu
+                                            </Link>
+                                            <Link
+                                                to={`/admin/modules/${mod.id}/edit`}
+                                                className="px-3 py-1.5 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors text-sm font-bold"
+                                            >
                                                 Éditer
-                                            </button>
-                                            <button className="px-3 py-1.5 hover:bg-red-400/10 rounded-lg text-text-muted hover:text-red-400 transition-colors text-sm">
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDeleteModule(mod.id, mod.title)}
+                                                className="px-3 py-1.5 hover:bg-red-400/10 rounded-lg text-text-muted hover:text-red-400 transition-colors text-sm font-bold"
+                                            >
                                                 Supprimer
                                             </button>
                                         </div>
@@ -142,6 +155,10 @@ export default function AdminDashboard() {
                                     <p className="text-center text-text-muted py-12">Aucun module créé.</p>
                                 )}
                             </div>
+                        </section>
+                    ) : activeTab === 'skills' ? (
+                        <section className="bg-surface border border-white/5 rounded-3xl p-6 md:p-8">
+                            <SkillManagementTab />
                         </section>
                     ) : (
                         <section className="bg-surface border border-white/5 rounded-3xl p-6 md:p-8">

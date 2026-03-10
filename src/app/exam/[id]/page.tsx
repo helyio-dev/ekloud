@@ -2,7 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, HelpCircle, CheckCircle, XCircle, Loader2, Award } from 'lucide-react';
+import { ChevronLeft, HelpCircle, CheckCircle, XCircle, Loader2, Award, Shield } from 'lucide-react';
 import { addXp } from '@/lib/gamification';
 
 type Question = {
@@ -16,7 +16,7 @@ type Question = {
     }[];
 };
 
-export default function QuizPage() {
+export default function ExamPage() {
     const { id } = useParams();
     const { user, isLoading: authLoading, xp } = useAuth();
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -38,6 +38,7 @@ export default function QuizPage() {
             if (!user || !id) return;
 
             try {
+                // Fetch up to 20 questions for the final exam
                 const { data: qData } = await supabase
                     .from('questions')
                     .select(`
@@ -47,16 +48,17 @@ export default function QuizPage() {
           answers (id, answer_text, is_correct)
         `)
                     .eq('module_id', id)
-                    .limit(10);
-
+                    .limit(20);
 
                 const shuffled = (qData || []).map(q => ({
                     ...q,
                     answers: [...q.answers].sort(() => Math.random() - 0.5)
                 }));
-                setQuestions(shuffled);
+                // Also shuffle the questions themselves
+                const completelyShuffled = shuffled.sort(() => Math.random() - 0.5);
+                setQuestions(completelyShuffled);
             } catch (err) {
-                console.error("Quiz fetchQuestions error:", err);
+                console.error("Exam fetchQuestions error:", err);
             } finally {
                 setIsLoading(false);
             }
@@ -73,7 +75,7 @@ export default function QuizPage() {
         const answer = currentQ.answers.find(a => a.id === answerId);
         if (answer?.is_correct) {
             setScore(prev => prev + 1);
-            setEarnedXp(prev => prev + 1);
+            setEarnedXp(prev => prev + 2); // Double XP for exams
         }
     };
 
@@ -89,14 +91,15 @@ export default function QuizPage() {
     const submitResults = async () => {
         setIsSubmitting(true);
         const finalScore = (score / questions.length) * 100;
-        const passed = finalScore >= 70;
+        // Exam pass threshold is 80%
+        const passed = finalScore >= 80;
 
         await supabase.from('quiz_attempts').insert({
             user_id: user?.id,
             module_id: id,
             score: finalScore,
             passed: passed,
-            is_exam: false
+            is_exam: true
         });
 
         if (passed && earnedXp > 0 && user) {
@@ -107,8 +110,7 @@ export default function QuizPage() {
         setIsSubmitting(false);
     };
 
-
-    const currentQ = questions[currentIndex]!;
+    const currentQ = questions[currentIndex];
 
     return (
         <div className="min-h-screen bg-background text-text flex flex-col">
@@ -119,27 +121,27 @@ export default function QuizPage() {
             ) : questions.length === 0 ? (
                 <div className="flex-grow flex items-center justify-center p-6 text-center">
                     <div className="max-w-md w-full">
-                        <HelpCircle className="w-16 h-16 text-text-muted mx-auto mb-6" />
-                        <h1 className="text-2xl font-bold mb-4">Quiz non disponible</h1>
-                        <p className="text-text-muted mb-8">Désolé, aucune question n'a été trouvée pour ce module.</p>
+                        <Shield className="w-16 h-16 text-text-muted mx-auto mb-6" />
+                        <h1 className="text-2xl font-bold mb-4">Examen non disponible</h1>
+                        <p className="text-text-muted mb-8">Désolé, aucune question trouvée pour cet examen.</p>
                         <Link to={`/modules/${id}`} className="inline-block px-8 py-3 bg-accent text-white rounded-xl font-bold">Retour au module</Link>
                     </div>
                 </div>
             ) : showResult ? (
                 <div className="flex-grow flex items-center justify-center p-6">
                     <div className="max-w-md w-full bg-surface/50 border border-white/5 rounded-3xl p-8 text-center shadow-2xl backdrop-blur-md">
-                        <div className={`w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center ${((score / questions.length) * 100) >= 70 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                            {((score / questions.length) * 100) >= 70 ? <Award className="w-10 h-10" /> : <XCircle className="w-10 h-10" />}
+                        <div className={`w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center ${((score / questions.length) * 100) >= 80 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                            {((score / questions.length) * 100) >= 80 ? <Shield className="w-10 h-10" /> : <XCircle className="w-10 h-10" />}
                         </div>
-                        <h1 className="text-3xl font-bold mb-2">{((score / questions.length) * 100) >= 70 ? "Félicitations !" : "Dommage..."}</h1>
-                        <p className="text-text-muted mb-6">Vous avez obtenu un score de {((score / questions.length) * 100).toFixed(0)}%</p>
+                        <h1 className="text-3xl font-bold mb-2">{((score / questions.length) * 100) >= 80 ? "Examen Réussi !" : "Échec à l'Examen"}</h1>
+                        <p className="text-text-muted mb-6">Vous avez obtenu un score de {((score / questions.length) * 100).toFixed(0)}% (80% requis)</p>
 
                         <div className="space-y-4">
                             <div className="p-4 bg-background/50 rounded-xl border border-white/5 flex justify-between items-center">
                                 <span className="text-sm font-medium">Réponses correctes</span>
                                 <span className="font-bold text-accent">{score} / {questions.length}</span>
                             </div>
-                            {((score / questions.length) * 100) >= 70 && earnedXp > 0 && (
+                            {((score / questions.length) * 100) >= 80 && earnedXp > 0 && (
                                 <div className="p-4 bg-orange-500/10 rounded-xl border border-orange-500/20 flex justify-between items-center animate-in zoom-in">
                                     <span className="text-sm font-medium text-orange-400">XP Gagnée</span>
                                     <span className="font-bold text-orange-400">+{earnedXp} XP 🚀</span>
@@ -149,17 +151,17 @@ export default function QuizPage() {
 
                         <div className="mt-10 flex flex-col gap-3">
                             <Link
-                                to={`/modules/${id}`}
+                                to={`/dashboard`}
                                 className="w-full py-4 bg-accent text-white rounded-xl font-bold transition-all hover:bg-accent/90"
                             >
-                                Retour au module
+                                Retour au Dashboard
                             </Link>
-                            {((score / questions.length) * 100) < 70 && (
+                            {((score / questions.length) * 100) < 80 && (
                                 <button
                                     onClick={() => window.location.reload()}
                                     className="w-full py-4 bg-surface text-text rounded-xl font-bold border border-white/5 hover:bg-white/5"
                                 >
-                                    Réessayer
+                                    Repasser l'Examen
                                 </button>
                             )}
                         </div>
@@ -172,7 +174,7 @@ export default function QuizPage() {
                             <Link to={`/modules/${id}`} className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-muted hover:text-white">
                                 <ChevronLeft className="w-5 h-5" />
                             </Link>
-                            <h1 className="text-xs font-bold text-text-muted uppercase tracking-widest">Question {currentIndex + 1} / {questions.length}</h1>
+                            <h1 className="text-xs font-bold text-text-muted uppercase tracking-widest">Question d'Examen {currentIndex + 1} / {questions.length}</h1>
                         </div>
                         <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden">
                             <div
@@ -184,11 +186,11 @@ export default function QuizPage() {
 
                     <main className="flex-grow max-w-2xl mx-auto w-full px-6 py-12 flex flex-col justify-center">
                         <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center leading-tight">
-                            {currentQ.question_text}
+                            {currentQ?.question_text}
                         </h2>
 
                         <div className="grid gap-4">
-                            {currentQ.answers.map((answer: Question['answers'][number]) => {
+                            {currentQ?.answers?.map((answer: Question['answers'][number]) => {
                                 const isSelected = selectedAnswer === answer.id;
                                 const isCorrect = isSelected && answer.is_correct;
 
@@ -220,8 +222,9 @@ export default function QuizPage() {
                                 <button
                                     onClick={nextQuestion}
                                     className="px-10 py-4 bg-accent text-white rounded-xl font-bold shadow-lg shadow-accent/20 animate-in fade-in slide-in-from-bottom-4"
+                                    disabled={isSubmitting}
                                 >
-                                    {currentIndex + 1 === questions.length ? "Voir le résultat" : "Question suivante"}
+                                    {isSubmitting ? "Validation..." : (currentIndex + 1 === questions.length ? "Terminer l'Examen" : "Question suivante")}
                                 </button>
                             )}
                         </div>

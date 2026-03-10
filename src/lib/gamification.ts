@@ -55,16 +55,52 @@ export async function addXp(
     supabase: any,
     userId: string,
     currentXp: number,
-    amountToAdd: number
+    amountToAdd: number,
+    currentStreak: number = 0
 ) {
     const newXp = currentXp + amountToAdd;
     const newLevel = calculateLevelFromXp(newXp);
 
-    
+    // Fetch profile for streak logic
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('last_streak_at')
+        .eq('id', userId)
+        .single();
+
+    let newStreak = currentStreak;
+    const now = new Date();
+    const lastStreak = profile?.last_streak_at ? new Date(profile.last_streak_at) : null;
+
+    if (!lastStreak) {
+        newStreak = 1;
+    } else {
+        const diffInHours = (now.getTime() - lastStreak.getTime()) / (1000 * 60 * 60);
+        const isSameDay = now.toDateString() === lastStreak.toDateString();
+
+        if (!isSameDay) {
+            if (diffInHours <= 48) {
+                newStreak += 1;
+            } else {
+                newStreak = 1;
+            }
+        }
+    }
+
+    const updatePayload: any = {
+        xp: newXp,
+        level: newLevel
+    };
+
+    if (newStreak !== currentStreak || !lastStreak || (now.toDateString() !== lastStreak?.toDateString())) {
+        updatePayload.streak = newStreak;
+        updatePayload.last_streak_at = now.toISOString();
+    }
+
     const { error } = await supabase
         .from('profiles')
-        .update({ xp: newXp, level: newLevel })
+        .update(updatePayload)
         .eq('id', userId);
 
-    return { newXp, newLevel, error };
+    return { newXp, newLevel, newStreak, error };
 }

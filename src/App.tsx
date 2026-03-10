@@ -11,6 +11,9 @@ import SignupPage from '@/app/signup/page';
 import ModulePage from '@/app/modules/[id]/page';
 import LessonPage from '@/app/lessons/[id]/page';
 import QuizPage from '@/app/quiz/[id]/page';
+import ExamPage from '@/app/exam/[id]/page';
+import AccountPage from '@/app/account/page';
+import CoursesPage from '@/app/courses/page';
 
 
 import AuthCallbackPage from '@/app/auth/callback/page';
@@ -18,14 +21,19 @@ import AdminDashboard from '@/app/admin/page';
 import CreateModulePage from '@/app/admin/modules/new/page';
 import CreateLessonPage from '@/app/admin/lessons/new/page';
 import CreateQuizPage from '@/app/admin/quizzes/new/page';
+import EditModulePage from '@/app/admin/modules/[id]/edit/page';
+import ModuleContentPage from '@/app/admin/modules/[id]/content/page';
+import EditLessonPage from '@/app/admin/lessons/[id]/edit/page';
+import EditQuestionPage from '@/app/admin/quizzes/[id]/edit/page';
+import SkillExamQuestionsPage from '@/app/admin/skills/[id]/exam/page';
 import ClanQuizPage from '@/app/clan-quiz/page';
 
 const AppContent = () => {
     const { isLoading, user } = useAuth();
 
-    
-    
-    
+
+
+
     if (isLoading && !user) {
         return (
             <div className="min-h-screen flex flex-col bg-background animate-in fade-in duration-700 delay-300 fill-mode-both">
@@ -54,11 +62,19 @@ const AppContent = () => {
                     <Route path="/modules/:id" element={<ModulePage />} />
                     <Route path="/lessons/:id" element={<LessonPage />} />
                     <Route path="/quiz/:id" element={<QuizPage />} />
+                    <Route path="/exam/:id" element={<ExamPage />} />
+                    <Route path="/courses" element={<CoursesPage />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/modules/new" element={<CreateModulePage />} />
+                    <Route path="/admin/modules/:id/edit" element={<EditModulePage />} />
+                    <Route path="/admin/modules/:id/content" element={<ModuleContentPage />} />
                     <Route path="/admin/lessons/new" element={<CreateLessonPage />} />
+                    <Route path="/admin/lessons/:id/edit" element={<EditLessonPage />} />
                     <Route path="/admin/quizzes/new" element={<CreateQuizPage />} />
+                    <Route path="/admin/quizzes/:id/edit" element={<EditQuestionPage />} />
+                    <Route path="/admin/skills/:id/exam" element={<SkillExamQuestionsPage />} />
                     <Route path="/clan-quiz" element={<ClanQuizPage />} />
+                    <Route path="/account" element={<AccountPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>

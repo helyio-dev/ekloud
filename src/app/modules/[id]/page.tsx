@@ -27,6 +27,8 @@ export default function ModulePage() {
     const [module, setModule] = useState<Module | null>(null);
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const [progress, setProgress] = useState<Record<string, boolean>>({});
+    const [quizPassed, setQuizPassed] = useState(false);
+    const [examPassed, setExamPassed] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -42,7 +44,7 @@ export default function ModulePage() {
                 const [{ data: mod }, { data: lessonList }, { data: progressList }] = await Promise.all([
                     supabase.from('modules').select('*').eq('id', id).single(),
                     supabase.from('lessons').select('id, title, order_index').eq('module_id', id).order('order_index', { ascending: true }),
-                    supabase.from('user_lesson_progress').select('lesson_id, completed').eq('user_id', user.id)
+                    supabase.from('user_lessons').select('lesson_id, completed').eq('user_id', user.id)
                 ]);
 
                 if (mod) setModule(mod);
@@ -51,6 +53,18 @@ export default function ModulePage() {
                 const progMap: Record<string, boolean> = {};
                 progressList?.forEach(p => { progMap[p.lesson_id] = p.completed; });
                 setProgress(progMap);
+
+                // Fetch quiz attempts for this module
+                const { data: attempts } = await supabase
+                    .from('quiz_attempts')
+                    .select('passed, is_exam')
+                    .eq('user_id', user.id)
+                    .eq('module_id', id);
+
+                if (attempts) {
+                    setQuizPassed(attempts.some(a => a.passed && !a.is_exam));
+                    setExamPassed(attempts.some(a => a.passed && a.is_exam));
+                }
             } catch (err) {
                 console.error("Module fetchData error:", err);
             } finally {
@@ -60,6 +74,8 @@ export default function ModulePage() {
 
         if (user && id) fetchData();
     }, [user?.id, id]);
+
+    const allLessonsCompleted = lessons.length > 0 && lessons.every(l => progress[l.id]);
 
     return (
         <div className="min-h-screen bg-background text-text">
@@ -97,41 +113,79 @@ export default function ModulePage() {
                                 </Link>
                             ))}
 
-                            {}
+                            { }
                             <div className="pt-8 border-t border-white/5 mt-8 space-y-4">
                                 <h3 className="text-sm font-bold text-text-muted uppercase tracking-wider mb-4">Évaluations</h3>
 
-                                <Link
-                                    to={`/quiz/${module.id}`}
-                                    className="flex items-center justify-between p-5 bg-accent/5 rounded-xl border border-accent/10 hover:bg-accent/10 transition-all group"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2 rounded-lg bg-accent/20 text-accent">
-                                            <HelpCircle className="w-5 h-5" />
+                                {allLessonsCompleted ? (
+                                    <Link
+                                        to={`/quiz/${module.id}`}
+                                        className="flex items-center justify-between p-5 bg-accent/5 rounded-xl border border-accent/10 hover:bg-accent/10 transition-all group"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 rounded-lg bg-accent/20 text-accent">
+                                                <HelpCircle className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold block">Quiz de validation</span>
+                                                <span className="text-xs text-text-muted">10 questions • {quizPassed ? 'Réussi' : 'Requis pour l\'examen'}</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span className="font-semibold block">Quiz de validation</span>
-                                            <span className="text-xs text-text-muted">10 questions • Requis pour l'examen</span>
+                                        {quizPassed ? (
+                                            <div className="px-3 py-1 bg-green-500/20 rounded text-[10px] font-bold text-green-400 uppercase">Validé</div>
+                                        ) : (
+                                            <div className="px-3 py-1 bg-accent/20 rounded text-[10px] font-bold text-accent uppercase">Prêt</div>
+                                        )}
+                                    </Link>
+                                ) : (
+                                    <div className="flex items-center justify-between p-5 bg-surface rounded-xl border border-white/5 transition-all group opacity-60 grayscale cursor-not-allowed">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 rounded-lg bg-background text-text-muted">
+                                                <HelpCircle className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold block">Quiz de validation</span>
+                                                <span className="text-xs text-text-muted">Lisez toutes les leçons pour débloquer</span>
+                                            </div>
                                         </div>
+                                        <LockIcon className="w-4 h-4 text-text-muted" />
                                     </div>
-                                    <div className="px-3 py-1 bg-accent/20 rounded text-[10px] font-bold text-accent uppercase">Prêt</div>
-                                </Link>
+                                )}
 
-                                <Link
-                                    to={`/exam/${module.id}`}
-                                    className="flex items-center justify-between p-5 bg-surface rounded-xl border border-white/5 hover:border-white/10 transition-all group opacity-60 grayscale hover:grayscale-0 hover:opacity-100"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2 rounded-lg bg-background text-text-muted group-hover:text-yellow-500 transition-colors">
-                                            <Shield className="w-5 h-5" />
+                                {quizPassed ? (
+                                    <Link
+                                        to={`/exam/${module.id}`}
+                                        className="flex items-center justify-between p-5 bg-accent/5 rounded-xl border border-accent/10 hover:bg-accent/10 transition-all group"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 rounded-lg bg-yellow-500/20 text-yellow-500">
+                                                <Shield className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold block text-yellow-500">Examen Final</span>
+                                                <span className="text-xs text-text-muted">20 questions • {examPassed ? 'Réussi' : 'Débloque le module suivant'}</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span className="font-semibold block">Examen Final</span>
-                                            <span className="text-xs text-text-muted">20 questions • Débloque le module suivant</span>
+                                        {examPassed ? (
+                                            <div className="px-3 py-1 bg-green-500/20 rounded text-[10px] font-bold text-green-400 uppercase">Validé</div>
+                                        ) : (
+                                            <div className="px-3 py-1 bg-yellow-500/20 rounded text-[10px] font-bold text-yellow-500 uppercase">Prêt</div>
+                                        )}
+                                    </Link>
+                                ) : (
+                                    <div className="flex items-center justify-between p-5 bg-surface rounded-xl border border-white/5 transition-all group opacity-60 grayscale cursor-not-allowed">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 rounded-lg bg-background text-text-muted">
+                                                <Shield className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold block">Examen Final</span>
+                                                <span className="text-xs text-text-muted">Réussissez le quiz pour débloquer</span>
+                                            </div>
                                         </div>
+                                        <LockIcon className="w-4 h-4 text-text-muted" />
                                     </div>
-                                    <LockIcon className="w-4 h-4 text-text-muted" />
-                                </Link>
+                                )}
                             </div>
                         </div>
                     </div>
