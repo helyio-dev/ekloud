@@ -8,22 +8,33 @@ export default function AuthCallbackPage() {
 
     useEffect(() => {
         const handleAuthCallback = async () => {
+            const hash = window.location.hash;
             const params = new URLSearchParams(window.location.search);
             const code = params.get('code');
 
-            if (!code) {
-                navigate('/login?error=No code provided');
+            if (hash && hash.includes('access_token')) {
+                const { data, error } = await supabase.auth.getSession();
+                if (error || !data.session) {
+                    console.error('Erreur lors de la récupération de la session:', error?.message);
+                    navigate('/login?error=Verification failed');
+                } else {
+                    navigate('/dashboard');
+                }
                 return;
             }
 
-            const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-            if (error) {
-                console.error('Error exchanging code for session:', error.message);
-                navigate('/login?error=Verification failed');
-            } else {
-                navigate('/dashboard');
+            if (code) {
+                const { error } = await supabase.auth.exchangeCodeForSession(code);
+                if (error) {
+                    console.error('Error exchanging code for session:', error.message);
+                    navigate('/login?error=Verification failed');
+                } else {
+                    navigate('/dashboard');
+                }
+                return;
             }
+
+            navigate('/login?error=No token provided');
         };
 
         handleAuthCallback();
