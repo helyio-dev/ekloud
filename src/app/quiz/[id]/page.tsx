@@ -44,7 +44,7 @@ export default function QuizPage() {
           id,
           question_text,
           difficulty,
-          answers (id, answer_text, is_correct)
+          quiz_options (id, option_text, is_correct)
         `)
                     .eq('module_id', id)
                     .limit(10);
@@ -52,7 +52,11 @@ export default function QuizPage() {
 
                 const shuffled = (qData || []).map(q => ({
                     ...q,
-                    answers: [...q.answers].sort(() => Math.random() - 0.5)
+                    answers: (q.quiz_options || []).map((o: any) => ({
+                        id: o.id,
+                        answer_text: o.option_text,
+                        is_correct: o.is_correct
+                    })).sort(() => Math.random() - 0.5)
                 }));
                 setQuestions(shuffled);
             } catch (err) {

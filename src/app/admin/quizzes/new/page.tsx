@@ -42,15 +42,15 @@ export default function CreateQuizPage() {
 
             if (questionError) throw questionError;
 
-            const answersToInsert = data.answers.map((a: any) => ({
+            const optionsToInsert = data.answers.map((a: any) => ({
                 question_id: questionData.id,
-                answer_text: a.text,
+                option_text: a.text,
                 is_correct: a.isCorrect
             }));
 
             const { error: answersError } = await supabase
-                .from('answers')
-                .insert(answersToInsert);
+                .from('quiz_options')
+                .insert(optionsToInsert);
 
             if (answersError) throw answersError;
 

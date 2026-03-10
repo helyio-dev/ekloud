@@ -15,9 +15,10 @@ interface ModuleFormProps {
     onSubmit: (data: ModuleFormData) => Promise<void>;
     isSubmitting: boolean;
     buttonText: string;
+    currentModuleId?: string;
 }
 
-export default function ModuleForm({ initialData, onSubmit, isSubmitting, buttonText }: ModuleFormProps) {
+export default function ModuleForm({ initialData, onSubmit, isSubmitting, buttonText, currentModuleId }: ModuleFormProps) {
     const [title, setTitle] = useState(initialData?.title || '');
     const [description, setDescription] = useState(initialData?.description || '');
     const [category, setCategory] = useState(initialData?.category || 'programming');
@@ -113,9 +114,11 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                         className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none"
                     >
                         <option value="">Aucun (Accessible immédiatement)</option>
-                        {existingModules.map(mod => (
-                            <option key={mod.id} value={mod.id}>{mod.title}</option>
-                        ))}
+                        {existingModules
+                            .filter(mod => mod.id !== currentModuleId)
+                            .map(mod => (
+                                <option key={mod.id} value={mod.id}>{mod.title}</option>
+                            ))}
                     </select>
                     <p className="text-xs text-text-muted mt-2">L'étudiant devra terminer ce module avant d'accéder au nouveau.</p>
                 </div>

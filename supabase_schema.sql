@@ -109,9 +109,14 @@ END $$;
 
 ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Tout le monde peut lire les questions" ON public.questions;
-CREATE POLICY "Tout le monde peut lire les questions" ON public.questions FOR SELECT USING (true);
+CREATE POLICY "Tout le monde peut lire les questions" ON public.questions FOR SELECT TO authenticated USING (true);
 DROP POLICY IF EXISTS "Les admins peuvent gérer les questions" ON public.questions;
-CREATE POLICY "Les admins peuvent gérer les questions" ON public.questions FOR ALL USING (public.is_admin());
+DROP POLICY IF EXISTS "Les admins peuvent insérer les questions" ON public.questions;
+DROP POLICY IF EXISTS "Les admins peuvent modifier les questions" ON public.questions;
+DROP POLICY IF EXISTS "Les admins peuvent supprimer les questions" ON public.questions;
+CREATE POLICY "Les admins peuvent insérer les questions" ON public.questions FOR INSERT WITH CHECK (public.is_admin());
+CREATE POLICY "Les admins peuvent modifier les questions" ON public.questions FOR UPDATE USING (public.is_admin());
+CREATE POLICY "Les admins peuvent supprimer les questions" ON public.questions FOR DELETE USING (public.is_admin());
 
 CREATE TABLE IF NOT EXISTS public.answers (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -123,9 +128,14 @@ CREATE TABLE IF NOT EXISTS public.answers (
 
 ALTER TABLE public.answers ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Tout le monde peut lire les réponses" ON public.answers;
-CREATE POLICY "Tout le monde peut lire les réponses" ON public.answers FOR SELECT USING (true);
+CREATE POLICY "Tout le monde peut lire les réponses" ON public.answers FOR SELECT TO authenticated USING (true);
 DROP POLICY IF EXISTS "Les admins peuvent gérer les réponses" ON public.answers;
-CREATE POLICY "Les admins peuvent gérer les réponses" ON public.answers FOR ALL USING (public.is_admin());
+DROP POLICY IF EXISTS "Les admins peuvent insérer les réponses" ON public.answers;
+DROP POLICY IF EXISTS "Les admins peuvent modifier les réponses" ON public.answers;
+DROP POLICY IF EXISTS "Les admins peuvent supprimer les réponses" ON public.answers;
+CREATE POLICY "Les admins peuvent insérer les réponses" ON public.answers FOR INSERT WITH CHECK (public.is_admin());
+CREATE POLICY "Les admins peuvent modifier les réponses" ON public.answers FOR UPDATE USING (public.is_admin());
+CREATE POLICY "Les admins peuvent supprimer les réponses" ON public.answers FOR DELETE USING (public.is_admin());
 
 CREATE TABLE IF NOT EXISTS public.user_modules (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -410,3 +420,33 @@ CREATE POLICY "User skills can be inserted by the user" ON public.user_skills FO
 DROP POLICY IF EXISTS "User skills are viewable by admins" ON public.user_skills;
 CREATE POLICY "User skills are viewable by admins" ON public.user_skills FOR SELECT
 USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+
+-- ============================================================
+-- Module prerequisite auto-unlock trigger
+-- When a user passes the exam of module X, automatically unlock
+-- any module that has X as its prerequisite_id.
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.unlock_dependent_modules()
+RETURNS TRIGGER AS $$
+DECLARE
+  dep_module RECORD;
+BEGIN
+  IF NEW.passed = true AND NEW.is_exam = true THEN
+    FOR dep_module IN
+      SELECT id FROM public.modules WHERE prerequisite_id = NEW.module_id
+    LOOP
+      INSERT INTO public.user_modules (user_id, module_id, unlocked, completed)
+      VALUES (NEW.user_id, dep_module.id, true, false)
+      ON CONFLICT (user_id, module_id)
+      DO UPDATE SET unlocked = true;
+    END LOOP;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS trg_unlock_dependent_modules ON public.quiz_attempts;
+CREATE TRIGGER trg_unlock_dependent_modules
+AFTER INSERT ON public.quiz_attempts
+FOR EACH ROW
+EXECUTE FUNCTION public.unlock_dependent_modules();

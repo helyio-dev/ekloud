@@ -73,7 +73,7 @@ export default function CoursesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {modules.map((mod, index) => {
                             const userMod = userModules[mod.id];
-                            const isUnlocked = userMod?.unlocked || index === 0; // Simplified for this view
+                            const isUnlocked = userMod?.unlocked || !mod.prerequisite_id;
                             const isCompleted = userMod?.completed;
 
                             return (

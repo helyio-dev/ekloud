@@ -42,11 +42,22 @@ export default function SkillExamQuestionsPage() {
                 { data: questionData }
             ] = await Promise.all([
                 supabase.from('skills').select('name').eq('id', skillId).single(),
-                supabase.from('questions').select('id, question_text, difficulty, answers(id, answer_text, is_correct)').eq('skill_id', skillId)
+                supabase.from('questions').select('id, question_text, difficulty, quiz_options (id, option_text, is_correct)').eq('skill_id', skillId)
             ]);
 
             if (skillData) setSkillName(skillData.name);
-            setQuestions((questionData as any) || []);
+            
+            const formattedQuestions = (questionData || []).map((q: any) => ({
+                id: q.id,
+                question_text: q.question_text,
+                difficulty: q.difficulty,
+                answers: (q.quiz_options || []).map((o: any) => ({
+                    id: o.id,
+                    answer_text: o.option_text,
+                    is_correct: o.is_correct
+                }))
+            }));
+            setQuestions(formattedQuestions);
         } catch (err) {
             console.error('Error fetching skill exam content:', err);
         } finally {

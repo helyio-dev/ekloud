@@ -54,12 +54,23 @@ export default function ModuleContentPage() {
             ] = await Promise.all([
                 supabase.from('modules').select('title').eq('id', moduleId).single(),
                 supabase.from('lessons').select('id, title, order_index').eq('module_id', moduleId).order('order_index'),
-                supabase.from('questions').select('id, question_text, difficulty, answers(id, answer_text, is_correct)').eq('module_id', moduleId)
+                supabase.from('questions').select('id, question_text, difficulty, quiz_options (id, option_text, is_correct)').eq('module_id', moduleId)
             ]);
 
             if (modData) setModuleTitle(modData.title);
             setLessons(lessonData || []);
-            setQuestions((questionData as any) || []);
+            
+            const formattedQuestions = (questionData || []).map((q: any) => ({
+                id: q.id,
+                question_text: q.question_text,
+                difficulty: q.difficulty,
+                answers: (q.quiz_options || []).map((o: any) => ({
+                    id: o.id,
+                    answer_text: o.option_text,
+                    is_correct: o.is_correct
+                }))
+            }));
+            setQuestions(formattedQuestions);
         } catch (err) {
             console.error('Error fetching module content:', err);
         } finally {

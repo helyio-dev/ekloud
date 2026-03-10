@@ -92,6 +92,7 @@ export default function EditModulePage() {
                         onSubmit={handleSubmit}
                         isSubmitting={isSubmitting}
                         buttonText="Mettre à jour le module"
+                        currentModuleId={id}
                     />
                 )}
             </div>
