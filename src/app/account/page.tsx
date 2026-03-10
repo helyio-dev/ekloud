@@ -95,7 +95,7 @@ export default function AccountPage() {
         <div className="min-h-screen bg-background p-6 md:p-12">
             <div className="max-w-4xl mx-auto space-y-8">
                 <div>
-                    <h1 className="text-4xl font-black mb-2">Mon Compte</h1>
+                    <h1 className="text-4xl font-black mb-2">MON COMPTE</h1>
                     <p className="text-text-muted text-lg">Gérez vos informations personnelles et sécurisez votre compte.</p>
                 </div>
 
@@ -119,8 +119,8 @@ export default function AccountPage() {
                 <div className="bg-surface border border-white/5 p-8 rounded-3xl">
                     <div className="flex justify-between items-end mb-4">
                         <div>
-                            <span className="text-sm font-bold text-text-muted uppercase">Progression du Niveau</span>
-                            <h3 className="text-xl font-bold">Vers le niveau {level + 1}</h3>
+                            <span className="text-sm font-bold text-text-muted uppercase">PROGRESSION AU NIVEAU SUIVANT</span>
+                            <h3 className="text-xl font-bold">LVL {level + 1}</h3>
                         </div>
                         <span className="text-sm font-bold text-text-muted">
                             {formatXP(currentLevelXp)} / {formatXP(requiredXpForNext)} XP
@@ -143,12 +143,12 @@ export default function AccountPage() {
                             <div className="bg-blue-500/10 p-2 rounded-xl border border-blue-500/20">
                                 <User className="w-5 h-5 text-blue-400" />
                             </div>
-                            <h2 className="text-xl font-bold">Changer mon Pseudo</h2>
+                            <h2 className="text-xl font-bold">CHANGER MON PSEUDO</h2>
                         </div>
 
                         <form onSubmit={handleUpdateUsername} className="space-y-4 flex-grow">
                             <div>
-                                <label className="block text-sm font-medium mb-2 text-text-muted">Nouveau Pseudo</label>
+                                <label className="block text-sm font-medium mb-2 text-text-muted">NOUVEAU PSEUDO</label>
                                 <input
                                     type="text"
                                     value={newUsername}
@@ -194,7 +194,7 @@ export default function AccountPage() {
 
                         <form onSubmit={handleUpdatePassword} className="space-y-4 flex-grow">
                             <div>
-                                <label className="block text-sm font-medium mb-2 text-text-muted">Nouveau Mot de Passe</label>
+                                <label className="block text-sm font-medium mb-2 text-text-muted">NOUVEAU MOT DE PASSE</label>
                                 <input
                                     type="password"
                                     value={newPassword}
@@ -204,7 +204,7 @@ export default function AccountPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-2 text-text-muted">Confirmer le Mot de Passe</label>
+                                <label className="block text-sm font-medium mb-2 text-text-muted">CONFIRMER LE MOT DE PASSE</label>
                                 <input
                                     type="password"
                                     value={confirmPassword}

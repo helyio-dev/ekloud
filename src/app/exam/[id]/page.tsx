@@ -154,14 +154,14 @@ export default function ExamPage() {
                                 to={`/dashboard`}
                                 className="w-full py-4 bg-accent text-white rounded-xl font-bold transition-all hover:bg-accent/90"
                             >
-                                Retour au Dashboard
+                                Retour au dashboard
                             </Link>
                             {((score / questions.length) * 100) < 80 && (
                                 <button
                                     onClick={() => window.location.reload()}
                                     className="w-full py-4 bg-surface text-text rounded-xl font-bold border border-white/5 hover:bg-white/5"
                                 >
-                                    Repasser l'Examen
+                                    Repasser l'examen
                                 </button>
                             )}
                         </div>

@@ -61,7 +61,7 @@ export default function CoursesPage() {
         <div className="min-h-screen bg-background text-text p-6 md:p-12">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-12">
-                    <h1 className="text-4xl font-black mb-2">Tous les Cours</h1>
+                    <h1 className="text-4xl font-black mb-2">TOUS LES COURS</h1>
                     <p className="text-text-muted text-lg text-balance">Explorez notre catalogue complet de modules et progressez à votre rythme.</p>
                 </div>
 
