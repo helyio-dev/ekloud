@@ -18,7 +18,7 @@ type Question = {
 
 export default function ExamPage() {
     const { id } = useParams();
-    const { user, isLoading: authLoading, xp } = useAuth();
+    const { user, isLoading: authLoading, xp, refreshProfile } = useAuth();
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
@@ -98,6 +98,15 @@ export default function ExamPage() {
         // Exam pass threshold is 80%
         const passed = finalScore >= 80;
 
+        if (passed) {
+            await supabase.from('user_modules').upsert({
+                user_id: user?.id,
+                module_id: id,
+                completed: true,
+                unlocked: true
+            }, { onConflict: 'user_id,module_id' });
+        }
+
         await supabase.from('quiz_attempts').insert({
             user_id: user?.id,
             module_id: id,
@@ -108,6 +117,10 @@ export default function ExamPage() {
 
         if (passed && earnedXp > 0 && user) {
             await addXp(supabase, user.id, xp || 0, earnedXp);
+            // Re-fetch profile to ensure local state has updated XP and potentially new skills
+            await refreshProfile();
+        } else if (passed) {
+            await refreshProfile();
         }
 
         setShowResult(true);

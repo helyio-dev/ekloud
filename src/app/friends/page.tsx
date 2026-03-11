@@ -506,8 +506,8 @@ export default function FriendsPage() {
                                                                     {friend.clan}
                                                                 </span>
                                                             ) : (
-                                                                <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-md bg-white/5 text-text-muted/60">
-                                                                    Sans Squad
+                                                                <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-md bg-red-500/10 text-red-400 border border-red-500/20">
+                                                                    Squad Inactive
                                                                 </span>
                                                             )}
                                                         </div>

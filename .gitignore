@@ -5,3 +5,5 @@
 .env
 
 bdd.sql
+
+test_supabase.mjs

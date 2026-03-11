@@ -95,6 +95,15 @@ export default function QuizPage() {
         const finalScore = (score / questions.length) * 100;
         const passed = finalScore >= 70;
 
+        if (passed) {
+            await supabase.from('user_modules').upsert({
+                user_id: user?.id,
+                module_id: id,
+                completed: true,
+                unlocked: true
+            }, { onConflict: 'user_id,module_id' });
+        }
+
         await supabase.from('quiz_attempts').insert({
             user_id: user?.id,
             module_id: id,

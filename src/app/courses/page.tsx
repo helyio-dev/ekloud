@@ -55,6 +55,21 @@ export default function CoursesPage() {
         }
 
         if (!authLoading && user) fetchData();
+
+        // Realtime subscription for instant updates
+        const channel = supabase
+            .channel('courses-updates')
+            .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'user_modules', 
+                filter: `user_id=eq.${user?.id}` 
+            }, () => fetchData())
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [user?.id, authLoading]);
 
     return (

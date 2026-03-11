@@ -163,10 +163,34 @@ export default function Dashboard() {
 
         if (!authLoading && user) fetchData();
 
+        // Realtime subscription for instant updates
+        const channel = supabase
+            .channel('dashboard-updates')
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'user_modules',
+                filter: `user_id=eq.${user?.id}`
+            }, () => fetchData())
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'user_skills',
+                filter: `user_id=eq.${user?.id}`
+            }, () => fetchData())
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'quiz_attempts',
+                filter: `user_id=eq.${user?.id}`
+            }, () => fetchData())
+            .subscribe();
+
         // 4. Hide scrollbars on dashboard specifically
         document.body.style.overflow = 'hidden';
         return () => {
             document.body.style.overflow = 'unset';
+            supabase.removeChannel(channel);
         };
     }, [user?.id, authLoading]);
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Cloud, Layout, LogOut, Settings, Flame, Trophy, Menu, Users, User, BookOpen } from 'lucide-react';
+import { Cloud, Layout, LogOut, Settings, Flame, Trophy, Menu, Users, User, BookOpen, Heart, MessageSquare } from 'lucide-react';
 import { calculateLevelProgress, formatXP } from '@/lib/gamification';
 
 export default function Navbar() {
@@ -59,6 +59,24 @@ export default function Navbar() {
                     <div className="flex items-center gap-3">
                         {!user ? (
                             <>
+                                <a
+                                    href="https://discord.gg/WnwyMHm4Gc"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 rounded-xl transition-all"
+                                >
+                                    <MessageSquare className="w-4 h-4 fill-blue-400/20" />
+                                    <span className="hidden sm:inline">Discord</span>
+                                </a>
+                                <a
+                                    href="https://liberapay.com/Helyio/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl transition-all"
+                                >
+                                    <Heart className="w-4 h-4 fill-rose-400/20" />
+                                    <span>Soutenir</span>
+                                </a>
                                 <Link to="/login" className="text-sm font-medium text-text-muted hover:text-text transition-colors">
                                     Connexion
                                 </Link>
@@ -103,9 +121,13 @@ export default function Navbar() {
                                             <span className={`w-4 h-4 rounded-full border border-white/20 flex-shrink-0 ${clan === 'ROOT' ? 'bg-orange-400' :
                                                     clan === 'VOID' ? 'bg-violet-400' :
                                                         clan === 'CORE' ? 'bg-blue-400' :
-                                                            clan === 'CYPHER' ? 'bg-green-400' : 'bg-accent'
+                                                            clan === 'CYPHER' ? 'bg-green-400' : 'bg-red-500'
                                                 }`} />
-                                            TechSquad {clan || 'Non rejoint'}
+                                            {clan ? (
+                                                <span>TechSquad {clan}</span>
+                                            ) : (
+                                                <span className="text-red-500">TechSquad inactive</span>
+                                            )}
                                         </Link>
 
                                         <div className="h-[1px] w-full bg-white/5 my-1"></div>
@@ -119,6 +141,28 @@ export default function Navbar() {
                                                 <div className="h-[1px] w-full bg-white/5 my-1"></div>
                                             </>
                                         )}
+
+                                        <a
+                                            href="https://discord.gg/WnwyMHm4Gc"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 rounded-lg transition-colors flex items-center gap-3"
+                                        >
+                                            <MessageSquare className="w-4 h-4 fill-blue-400/20" />
+                                            Rejoindre le Discord
+                                        </a>
+
+                                        <a
+                                            href="https://liberapay.com/Helyio/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-3 py-2 text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-lg transition-colors flex items-center gap-3"
+                                        >
+                                            <Heart className="w-4 h-4 fill-rose-400/20" />
+                                            Soutenir le projet
+                                        </a>
+
+                                        <div className="h-[1px] w-full bg-white/5 my-1"></div>
 
                                         <button
                                             onClick={() => signOut()}
