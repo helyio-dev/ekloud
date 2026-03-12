@@ -27,6 +27,7 @@ import EditLessonPage from '@/app/admin/lessons/[id]/edit/page';
 import EditQuestionPage from '@/app/admin/quizzes/[id]/edit/page';
 import SkillExamQuestionsPage from '@/app/admin/skills/[id]/exam/page';
 import ClanQuizPage from '@/app/clan-quiz/page';
+import SupportPage from '@/app/support/page';
 
 const AppContent = () => {
     const { isLoading, user } = useAuth();
@@ -74,7 +75,9 @@ const AppContent = () => {
                     <Route path="/admin/quizzes/:id/edit" element={<EditQuestionPage />} />
                     <Route path="/admin/skills/:id/exam" element={<SkillExamQuestionsPage />} />
                     <Route path="/clan-quiz" element={<ClanQuizPage />} />
+                    <Route path="/support" element={<SupportPage />} />
                     <Route path="/account" element={<AccountPage />} />
+
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>

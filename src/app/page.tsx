@@ -2,6 +2,8 @@ import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import { Rocket, GraduationCap, Target } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 
 export default function LandingPage() {
     return (
@@ -53,9 +55,10 @@ export default function LandingPage() {
                         © {new Date().getFullYear()} • Plateforme d'apprentissage technologique
                     </p>
                     <div className="flex gap-8 text-white/40 text-sm font-bold tracking-widest uppercase">
-                        <span className="hover:text-accent cursor-pointer transition-colors">Discord</span>
-                        <span className="hover:text-accent cursor-pointer transition-colors">Soutenir</span>
+                        <a href="https://discord.gg/WnwyMHm4Gc" target="_blank" rel="noopener noreferrer" className="hover:text-accent cursor-pointer transition-colors">Discord</a>
+                        <Link to="/support" className="hover:text-accent cursor-pointer transition-colors">Soutenir</Link>
                     </div>
+
                 </div>
             </footer>
         </main>

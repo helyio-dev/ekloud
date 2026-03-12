@@ -9,8 +9,8 @@ export default function Hero() {
             <div className="absolute top-0 right-[-15%] w-[600px] h-[600px] bg-accent-secondary/15 rounded-full blur-[160px] -z-10" />
             
             {/* Floating 3D Elements for the "Visual Slap" */}
-            <div className="absolute top-10 left-10 md:left-40 w-16 h-16 border border-white/10 rounded-2xl rotate-45 animate-float-subtle -z-10 bg-white/5 backdrop-blur-sm" />
             <div className="absolute top-1/3 left-[-5%] w-32 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent -rotate-12" />
+
 
             <div className="relative z-10 space-y-4 animate-in fade-in slide-up duration-1000 ease-out">
                 <div className="space-y-1">

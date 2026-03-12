@@ -68,15 +68,13 @@ export default function Navbar() {
                                     <MessageSquare className="w-4 h-4 fill-blue-400/20" />
                                     <span className="hidden sm:inline">Discord</span>
                                 </a>
-                                <a
-                                    href="https://liberapay.com/Helyio/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <Link
+                                    to="/support"
                                     className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl transition-all"
                                 >
                                     <Heart className="w-4 h-4 fill-rose-400/20" />
                                     <span>Soutenir</span>
-                                </a>
+                                </Link>
                                 <Link to="/login" className="text-sm font-medium text-text-muted hover:text-text transition-colors">
                                     Connexion
                                 </Link>
@@ -152,15 +150,13 @@ export default function Navbar() {
                                             Rejoindre le Discord
                                         </a>
 
-                                        <a
-                                            href="https://liberapay.com/Helyio/"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <Link
+                                            to="/support"
                                             className="px-3 py-2 text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-lg transition-colors flex items-center gap-3"
                                         >
                                             <Heart className="w-4 h-4 fill-rose-400/20" />
                                             Soutenir le projet
-                                        </a>
+                                        </Link>
 
                                         <div className="h-[1px] w-full bg-white/5 my-1"></div>
 
