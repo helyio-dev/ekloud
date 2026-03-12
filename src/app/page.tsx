@@ -48,7 +48,7 @@ export default function LandingPage() {
             
             <footer className="py-12 px-6 border-t border-white/[0.05] w-full text-center mesh-gradient">
                 <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">
-                    <div className="text-3xl font-black tracking-tighter text-gradient mb-2">EKLOUD</div>
+                    <div className="text-3xl font-black tracking-tighter text-gradient mb-2 font-equinox">EKLOUD</div>
                     <p className="text-text-muted text-lg font-medium tracking-widest uppercase opacity-60">
                         © {new Date().getFullYear()} • Plateforme d'apprentissage technologique
                     </p>
