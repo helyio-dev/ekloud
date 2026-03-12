@@ -4,8 +4,8 @@ import { BookOpen, ShieldCheck, Cpu } from 'lucide-react';
 
 export default function Features() {
     return (
-        <section id="features" className="relative z-10 py-32 px-6 max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <section id="features" className="relative z-10 py-16 px-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FeatureCard
                     icon={<BookOpen className="w-8 h-8 text-accent" />}
                     title="PARCOURS ACCESSIBLES"
@@ -31,17 +31,30 @@ export default function Features() {
 
 function FeatureCard({ icon, title, description, delay }: { icon: React.ReactNode, title: string, description: string, delay: string }) {
     return (
-        <div className={`p-10 rounded-[2.5rem] bg-surface/20 border border-white/5 backdrop-blur-md transition-all duration-700 group animate-in slide-up hover-glow hover:bg-surface/40 flex flex-col items-center text-center ${delay}`}>
-            <div className="mb-8 p-5 rounded-2xl bg-background border border-white/5 w-fit group-hover:bg-accent/20 group-hover:border-accent/30 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] transition-all duration-700">
-                {icon}
+        <div className={`group relative p-[1px] rounded-[3.5rem] bg-gradient-to-br from-white/20 via-transparent to-white/5 transition-all duration-1000 hover:scale-[1.05] hover:rotate-1 animate-in slide-up ${delay}`}>
+            <div className="relative p-8 rounded-[3.4rem] bg-surface h-full flex flex-col items-center text-center overflow-hidden neon-border">
+                {/* Inner Glow Effect */}
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-accent/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                
+                <div className="mb-8 relative">
+                    <div className="absolute inset-0 bg-accent blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                    <div className="relative p-8 rounded-[2rem] bg-gradient-to-br from-accent to-accent-secondary text-white transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-700 shadow-[0_0_40px_rgba(99,102,241,0.4)]">
+                        {icon}
+                    </div>
+                </div>
+
+                <h3 className="text-2xl font-black mb-4 tracking-[0.3em] text-white uppercase w-full group-hover:text-accent transition-colors duration-500">
+                    {title}
+                </h3>
+                
+                <p className="text-text-muted leading-relaxed text-lg font-medium group-hover:text-white/80 transition-colors duration-500">
+                    {description}
+                </p>
+
+                <div className="mt-8 w-16 h-1 w-full bg-white/[0.03] rounded-full overflow-hidden relative">
+                    <div className="absolute inset-0 w-0 group-hover:w-full bg-gradient-to-r from-accent to-accent-secondary transition-all duration-1000 ease-out" />
+                </div>
             </div>
-            <h3 className="text-xl font-bold mb-4 tracking-tight text-accent/90 group-hover:text-accent transition-colors duration-500 whitespace-nowrap overflow-hidden text-ellipsis uppercase w-full">
-                {title}
-            </h3>
-            <p className="text-text-muted leading-relaxed text-lg group-hover:text-text transition-colors duration-500">
-                {description}
-            </p>
-            <div className="mt-8 w-12 h-1 bg-accent/20 rounded-full group-hover:w-full group-hover:bg-accent/40 transition-all duration-700" />
         </div>
     );
 }
