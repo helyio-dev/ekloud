@@ -145,8 +145,8 @@ export default function ExamPage() {
                     </div>
                 </div>
             ) : showResult ? (
-                <div className="flex-grow flex items-center justify-center p-6">
-                    <div className="max-w-md w-full bg-surface/50 border border-white/5 rounded-3xl p-8 text-center shadow-2xl backdrop-blur-md">
+                <div className="flex-grow flex items-center justify-center p-4 md:p-6">
+                    <div className="max-w-md w-full bg-surface/50 border border-white/5 rounded-3xl p-6 md:p-8 text-center shadow-2xl backdrop-blur-md">
                         <div className={`w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center ${((score / questions.length) * 100) >= 80 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                             {((score / questions.length) * 100) >= 80 ? <Shield className="w-10 h-10" /> : <XCircle className="w-10 h-10" />}
                         </div>
@@ -202,7 +202,7 @@ export default function ExamPage() {
                     </header>
 
                     <main className="flex-grow max-w-2xl mx-auto w-full px-6 py-12 flex flex-col justify-center">
-                        <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center leading-tight">
+                        <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12 text-center leading-tight">
                             {currentQ?.question_text}
                         </h2>
 

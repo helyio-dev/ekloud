@@ -110,16 +110,16 @@ export default function LessonPage() {
                             <Link to={`/modules/${lesson.module_id}`} className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-muted hover:text-white">
                                 <ChevronLeft className="w-5 h-5" />
                             </Link>
-                            <h1 className="text-sm font-bold truncate max-w-[200px] md:max-w-md text-text-muted">{lesson.title}</h1>
+                            <h1 className="text-sm md:text-base font-bold truncate max-w-[200px] md:max-w-md text-text-muted">{lesson.title}</h1>
                         </div>
                         <div className="bg-accent/10 px-3 py-1 rounded-full border border-accent/20 text-[10px] font-bold text-accent uppercase">
                             En cours
                         </div>
                     </header>
 
-                    <main className="flex-grow max-w-4xl mx-auto w-full px-6 py-12">
+                    <main className="flex-grow max-w-4xl mx-auto w-full px-4 md:px-6 py-8 md:py-12">
                         <article className="prose prose-invert prose-indigo max-w-none">
-                            <h2 className="text-4xl font-extrabold mb-10 tracking-tight text-white">{lesson.title}</h2>
+                            <h2 className="text-3xl md:text-4xl font-extrabold mb-6 md:mb-10 tracking-tight text-white leading-tight">{lesson.title}</h2>
                             <div className="text-text-muted text-lg leading-relaxed">
                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                                     {lesson.content}
