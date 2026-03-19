@@ -35,14 +35,14 @@ export default function Hero() {
                 <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-2 animate-in fade-in delay-700 fill-mode-both">
                     <Link
                         to="/signup"
-                        className="group relative px-16 py-8 bg-white text-background rounded-full font-black text-2xl transition-all hover:scale-110 active:scale-95 shadow-[0_0_60px_rgba(255,255,255,0.2)] overflow-hidden"
+                        className="group relative px-10 py-4 bg-white text-background rounded-full font-bold text-lg transition-all hover:scale-110 active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.2)] overflow-hidden"
                     >
                         <span className="relative z-10">Commencer maintenant</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-secondary opacity-0 group-hover:opacity-10 transition-opacity" />
                     </Link>
                     <a
                         href="#features"
-                        className="px-16 py-8 glass-morphism border border-white/10 hover:border-accent/40 text-text rounded-full font-black text-2xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center backdrop-blur-3xl shadow-2xl"
+                        className="px-10 py-4 glass-morphism border border-white/10 hover:border-accent/40 text-text rounded-full font-bold text-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center backdrop-blur-3xl shadow-xl"
                     >
                         Explorer
                     </a>

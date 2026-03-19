@@ -2,8 +2,8 @@
 
 /dist
 
+/.gemini
+
 .env
 
 bdd.sql
-
-doc.md
