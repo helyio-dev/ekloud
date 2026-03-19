@@ -259,7 +259,7 @@ export default function FriendsPage() {
 
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
 
-            <main className="max-w-6xl mx-auto px-6 py-16 w-full relative z-10 flex-1 flex flex-col">
+            <main className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-16 w-full relative z-10 flex-1 flex flex-col">
                 {}
                 <div className="mb-16 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 animate-in slide-in-from-bottom-8 fade-in duration-1000">
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
@@ -271,7 +271,7 @@ export default function FriendsPage() {
                             </div>
                         </div>
                         <div className="pt-2">
-                            <h1 className="text-5xl md:text-6xl font-black mb-3 pb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/60 drop-shadow-sm">
+                            <h1 className="text-4xl md:text-6xl font-black mb-3 pb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/60 drop-shadow-sm">
                                 Mon_.réseau
                             </h1>
                             <p className="text-text-muted text-lg max-w-lg leading-relaxed font-medium">

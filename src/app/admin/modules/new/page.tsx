@@ -6,17 +6,17 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import ModuleForm from '@/app/admin/components/ModuleForm';
 
 export default function CreateModulePage() {
-    const { isAdmin, isLoading } = useAuth();
+    const { isAdmin, isContributor, isLoading } = useAuth();
     const navigate = useNavigate();
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!isLoading && !isAdmin) {
+        if (!isLoading && !isAdmin && !isContributor) {
             navigate('/dashboard');
         }
-    }, [isAdmin, isLoading, navigate]);
+    }, [isAdmin, isContributor, isLoading, navigate]);
 
     const handleSubmit = async (data: any) => {
         setIsSubmitting(true);
@@ -34,7 +34,7 @@ export default function CreateModulePage() {
         }
     };
 
-    if (isLoading || !isAdmin) {
+    if (isLoading || (!isAdmin && !isContributor)) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-accent" />

@@ -6,7 +6,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import ModuleForm from '../../../components/ModuleForm';
 
 export default function EditModulePage() {
-    const { isAdmin, isLoading: authLoading } = useAuth();
+    const { isAdmin, isContributor, isLoading: authLoading } = useAuth();
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
 
@@ -16,10 +16,10 @@ export default function EditModulePage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!authLoading && !isAdmin) {
+        if (!authLoading && !isAdmin && !isContributor) {
             navigate('/dashboard');
         }
-    }, [isAdmin, authLoading, navigate]);
+    }, [isAdmin, isContributor, authLoading, navigate]);
 
     useEffect(() => {
         const fetchModule = async () => {
@@ -40,10 +40,10 @@ export default function EditModulePage() {
             setIsLoading(false);
         };
 
-        if (isAdmin) {
+        if (isAdmin || isContributor) {
             fetchModule();
         }
-    }, [id, isAdmin]);
+    }, [id, isAdmin, isContributor]);
 
     const handleSubmit = async (data: any) => {
         setIsSubmitting(true);
@@ -62,7 +62,7 @@ export default function EditModulePage() {
         }
     };
 
-    if (authLoading || (isLoading && !error) || !isAdmin) {
+    if (authLoading || (isLoading && !error) || (!isAdmin && !isContributor)) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-accent" />

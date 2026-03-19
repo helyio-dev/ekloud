@@ -2,17 +2,31 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Cloud, Layout, LogOut, Settings, Flame, Trophy, Menu, Users, User, BookOpen, Heart, MessageSquare } from 'lucide-react';
 import { calculateLevelProgress, formatXP } from '@/lib/gamification';
+import { useState, useRef, useEffect } from 'react';
 
 export default function Navbar() {
-    const { user, isAdmin, signOut, xp, streak, clan } = useAuth();
+    const { user, isAdmin, isContributor, signOut, xp, streak, clan } = useAuth();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const { progress, currentLevelXp, requiredXpForNext, level: currentLevel } = calculateLevelProgress(xp || 0);
 
     return (
-        <nav className="border-b border-white/5 bg-surface/50 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <nav className="border-b border-white/5 bg-surface/50 backdrop-blur-md sticky top-0 z-50 px-4 md:px-6 py-4">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 {/* Logo Section */}
-                <Link to="/" className="flex items-center gap-3 group">
+                <Link to="/" className="flex items-center gap-2 md:gap-3 group">
                     <div className="bg-accent/10 p-2 rounded-xl border border-accent/20 group-hover:scale-110 transition-all duration-500 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.3)]">
                         <Cloud className="w-6 h-6 text-accent" />
                     </div>
@@ -56,41 +70,47 @@ export default function Navbar() {
                     )}
 
                     {/* Right Section: Menu or Login */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 md:gap-3">
                         {!user ? (
                             <>
                                 <a
                                     href="https://discord.gg/WnwyMHm4Gc"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 rounded-xl transition-all"
+                                    className="hidden md:flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 rounded-xl transition-all"
                                 >
                                     <MessageSquare className="w-4 h-4 fill-blue-400/20" />
-                                    <span className="hidden sm:inline">Discord</span>
+                                    <span>Discord</span>
                                 </a>
                                 <Link
                                     to="/support"
-                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl transition-all"
+                                    className="hidden md:flex items-center gap-2 px-3 py-2 text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl transition-all"
                                 >
                                     <Heart className="w-4 h-4 fill-rose-400/20" />
                                     <span>Soutenir</span>
                                 </Link>
-                                <Link to="/login" className="text-sm font-medium text-text-muted hover:text-text transition-colors">
+                                <Link to="/login" className="text-xs md:text-sm font-medium text-text-muted hover:text-text transition-colors">
                                     Connexion
                                 </Link>
-                                <Link to="/signup" className="px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-sm font-black transition-all shadow-lg shadow-accent/20 active:scale-95 hover:-translate-y-0.5">
+                                <Link to="/signup" className="px-4 py-2 md:px-5 md:py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs md:text-sm font-black transition-all shadow-lg shadow-accent/20 active:scale-95 hover:-translate-y-0.5">
                                     S'inscrire
                                 </Link>
                             </>
                         ) : (
-                            <div className="relative group/menu">
-                                <button className="flex items-center gap-2 bg-surface hover:bg-surface/80 border border-white/10 px-4 py-2 rounded-xl text-sm font-bold transition-all text-white shadow-lg">
+                            <div className="relative group/menu" ref={menuRef}>
+                                <button 
+                                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                    className="flex items-center gap-2 bg-surface hover:bg-surface/80 border border-white/10 px-4 py-2 rounded-xl text-sm font-bold transition-all text-white shadow-lg"
+                                >
                                     Menu
                                     <Menu className="w-4 h-4" />
                                 </button>
 
                                 {/* Dropdown Menu */}
-                                <div className="absolute right-0 top-full mt-2 w-56 bg-[#09090b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden opacity-0 invisible pointer-events-none group-hover/menu:opacity-100 group-hover/menu:visible group-hover/menu:pointer-events-auto transition-all duration-200 transform translate-y-2 group-hover/menu:translate-y-0 z-50">
+                                <div 
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className={`fixed inset-x-4 top-[80px] md:absolute md:inset-auto md:right-0 md:top-full md:mt-2 md:w-64 bg-[#09090b]/95 backdrop-blur-3xl md:bg-[#09090b] border border-white/10 rounded-[28px] md:rounded-2xl shadow-2xl overflow-y-auto max-h-[calc(100vh-100px)] md:max-h-none transition-all duration-300 transform z-50 ${isMenuOpen ? 'opacity-100 visible pointer-events-auto translate-y-0' : 'opacity-0 invisible pointer-events-none translate-y-4 md:translate-y-2'}`}
+                                >
                                     <div className="p-2 flex flex-col gap-1">
                                         <Link to="/account" className="px-3 py-2 text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3">
                                             <User className="w-4 h-4 text-accent" />
@@ -130,11 +150,11 @@ export default function Navbar() {
 
                                         <div className="h-[1px] w-full bg-white/5 my-1"></div>
 
-                                        {isAdmin && (
+                                        {(isAdmin || isContributor) && (
                                             <>
                                                 <Link to="/admin" className="px-3 py-2 text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3">
                                                     <Settings className="w-4 h-4 text-purple-400" />
-                                                    Administration
+                                                    {isAdmin ? 'Administration' : 'Contribution'}
                                                 </Link>
                                                 <div className="h-[1px] w-full bg-white/5 my-1"></div>
                                             </>

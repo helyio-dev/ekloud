@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Search, ChevronDown, ChevronUp, Shield, User, Loader2 } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Shield, User, Loader2, BookOpen } from 'lucide-react';
 import UserDetailModal from './UserDetailModal';
 
 export type AdminUser = {
@@ -119,7 +119,7 @@ export default function UserManagementTab() {
                 <div className="overflow-x-auto rounded-2xl border border-white/5">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-white/5 bg-white/5 text-text-muted uppercase text-xs tracking-wider">
+                            <tr className="border-b border-white/5 bg-white/5 text-text-muted uppercase text-xs tracking-wider whitespace-nowrap">
                                 <th className="p-4 text-left">Utilisateur</th>
                                 <th className="p-4 text-left">Rôle</th>
                                 <th className="p-4 text-right cursor-pointer hover:text-white transition-colors" onClick={() => toggleSort('xp')}>
@@ -137,7 +137,7 @@ export default function UserManagementTab() {
                                 <th className="p-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-white/5 whitespace-nowrap">
                             {filtered.map(u => (
                                 <tr key={u.id} className="hover:bg-white/[0.02] transition-colors group">
                                     <td className="p-4">
@@ -155,6 +155,10 @@ export default function UserManagementTab() {
                                         {u.role === 'admin' ? (
                                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-400/10 text-yellow-400 rounded-lg text-xs font-bold">
                                                 <Shield className="w-3 h-3" /> Admin
+                                            </span>
+                                        ) : u.role === 'contributor' ? (
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-400/10 text-green-400 rounded-lg text-xs font-bold">
+                                                <BookOpen className="w-3 h-3" /> Contributeur
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-white/5 text-text-muted rounded-lg text-xs font-bold">

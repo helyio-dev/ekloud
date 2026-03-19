@@ -117,15 +117,15 @@ export default function LeaderboardPage() {
                 <div className="bg-surface/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl min-h-[400px] relative">
                     <div key={view} className="animate-in fade-in duration-500 fill-mode-both">
                         <div className="overflow-x-auto">
-                            <table className={`w-full text-left border-collapse transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
+                            <table className={`w-full text-left border-collapse whitespace-nowrap transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                                 <thead>
                                     <tr className="border-b border-white/5 bg-white/5">
-                                        <th className="p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider w-16 text-center">Rang</th>
-                                        <th className="p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider">Hacker</th>
-                                        <th className="p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-center">TechSquad</th>
-                                        <th className="p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-center">Niveau</th>
-                                        <th className="p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-right">Série</th>
-                                        <th className="p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-right">XP</th>
+                                        <th className="p-3 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider w-12 sm:w-16 text-center">Rang</th>
+                                        <th className="p-3 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider">Hacker</th>
+                                        <th className="hidden md:table-cell p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-center">TechSquad</th>
+                                        <th className="hidden md:table-cell p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-center">Niveau</th>
+                                        <th className="hidden md:table-cell p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-right">Série</th>
+                                        <th className="p-3 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-right">XP</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -136,29 +136,35 @@ export default function LeaderboardPage() {
                                                 key={leader.id}
                                                 className={`border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors ${isCurrentUser ? 'bg-accent/5 relative' : ''}`}
                                             >
-                                                <td className="p-4 sm:p-6 text-center relative">
+                                                <td className="p-3 sm:p-6 text-center relative">
                                                     {isCurrentUser && (
                                                         <div className="absolute inset-y-0 left-0 w-1 bg-accent rounded-r-full" />
                                                     )}
                                                     {index === 0 ? (
-                                                        <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 mx-auto drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
+                                                        <Crown className="w-5 h-5 sm:w-8 sm:h-8 text-yellow-400 mx-auto drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
                                                     ) : index === 1 ? (
-                                                        <Medal className="w-6 h-6 sm:w-7 sm:h-7 text-gray-300 mx-auto" />
+                                                        <Medal className="w-5 h-5 sm:w-7 sm:h-7 text-gray-300 mx-auto" />
                                                     ) : index === 2 ? (
-                                                        <Medal className="w-6 h-6 sm:w-7 sm:h-7 text-amber-700 mx-auto" />
+                                                        <Medal className="w-5 h-5 sm:w-7 sm:h-7 text-amber-700 mx-auto" />
                                                     ) : (
-                                                        <span className="text-text-muted font-bold">{index + 1}</span>
+                                                        <span className="text-text-muted font-bold text-xs sm:text-base">{index + 1}</span>
                                                     )}
                                                 </td>
-                                                <td className="p-4 sm:p-6">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-accent to-purple-500 opacity-80" />
-                                                        <span className={`font-bold ${isCurrentUser ? 'text-accent' : 'text-white'}`}>
-                                                            {leader.username ?? (isCurrentUser ? 'Vous' : `Hacker #${leader.id.substring(0, 4)}`)}
-                                                        </span>
+                                                <td className="p-3 sm:p-6">
+                                                    <div className="flex items-center gap-2 sm:gap-3">
+                                                        <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-accent to-purple-500 opacity-80 shrink-0" />
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className={`font-bold text-sm sm:text-base truncate max-w-[120px] sm:max-w-none ${isCurrentUser ? 'text-accent' : 'text-white'}`}>
+                                                                {leader.username ?? (isCurrentUser ? 'Vous' : `Hacker #${leader.id.substring(0, 4)}`)}
+                                                            </span>
+                                                            <div className="md:hidden flex items-center gap-1.5 mt-0.5">
+                                                                <span className="text-[10px] bg-white/5 border border-white/10 px-1.5 py-[1px] rounded text-white/70">Lvl {calculateLevelFromXp(leader.xp || 0)}</span>
+                                                                {leader.clan && <span className="text-[10px] text-text-muted border border-white/5 px-1.5 py-[1px] rounded">{leader.clan}</span>}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 sm:p-6 text-center">
+                                                <td className="hidden md:table-cell p-4 sm:p-6 text-center">
                                                     {leader.clan ? (
                                                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-white/5 text-xs font-bold whitespace-nowrap">
                                                             <span className={`w-2.5 h-2.5 rounded-full ${leader.clan === 'ROOT' ? 'bg-orange-400' :
@@ -174,21 +180,24 @@ export default function LeaderboardPage() {
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="p-4 sm:p-6 text-center">
+                                                <td className="hidden md:table-cell p-4 sm:p-6 text-center">
                                                     <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface border border-white/10 text-sm font-bold">
                                                         {calculateLevelFromXp(leader.xp || 0)}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 sm:p-6 text-right">
+                                                <td className="hidden md:table-cell p-4 sm:p-6 text-right">
                                                     <div className="flex items-center justify-end gap-1.5 text-orange-400 font-bold">
                                                         <Flame className={`w-4 h-4 ${(leader.streak || 0) > 2 ? 'fill-orange-400/20' : ''}`} />
                                                         <span>{leader.streak || 0}</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 sm:p-6 text-right">
-                                                    <span className="font-black text-white bg-white/5 py-1.5 px-3 rounded-lg border border-white/5 text-sm sm:text-base">
-                                                        {formatXP(leader.xp || 0)} XP
-                                                    </span>
+                                                <td className="p-3 sm:p-6 text-right">
+                                                    <div className="flex flex-col items-end gap-1">
+                                                        <span className="font-black text-white bg-white/5 py-1 px-2 sm:py-1.5 sm:px-3 rounded-lg border border-white/5 text-[11px] sm:text-base whitespace-nowrap">
+                                                            {formatXP(leader.xp || 0)} XP
+                                                        </span>
+                                                        <span className="md:hidden flex items-center gap-1 text-[10px] text-orange-400 font-bold px-1"><Flame className="w-3 h-3"/> {leader.streak || 0}</span>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );

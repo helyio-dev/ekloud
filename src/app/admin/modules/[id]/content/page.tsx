@@ -29,7 +29,7 @@ interface Question {
 }
 
 export default function ModuleContentPage() {
-    const { isAdmin, isLoading: authLoading } = useAuth();
+    const { isAdmin, isContributor, isLoading: authLoading } = useAuth();
     const navigate = useNavigate();
     const { id: moduleId } = useParams<{ id: string }>();
 
@@ -40,8 +40,8 @@ export default function ModuleContentPage() {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!authLoading && !isAdmin) navigate('/dashboard');
-    }, [isAdmin, authLoading, navigate]);
+        if (!authLoading && !isAdmin && !isContributor) navigate('/dashboard');
+    }, [isAdmin, isContributor, authLoading, navigate]);
 
     const fetchData = async () => {
         if (!moduleId) return;
@@ -79,8 +79,8 @@ export default function ModuleContentPage() {
     };
 
     useEffect(() => {
-        if (isAdmin) fetchData();
-    }, [moduleId, isAdmin]);
+        if (isAdmin || isContributor) fetchData();
+    }, [moduleId, isAdmin, isContributor]);
 
     const handleDeleteLesson = async (id: string, title: string) => {
         if (!window.confirm(`Supprimer la leçon "${title}" ?`)) return;

@@ -32,16 +32,16 @@ export default function SupportPage() {
     };
 
     return (
-        <main className="min-h-screen pt-32 pb-20 px-6 relative overflow-hidden bg-grid-pattern">
+        <main className="min-h-screen pt-8 md:pt-32 pb-20 px-4 md:px-6 relative overflow-hidden bg-grid-pattern">
             <BackgroundParticles />
             
             <div className="max-w-4xl mx-auto relative z-10">
                 <div className="text-center mb-16 space-y-4 animate-in fade-in slide-up duration-1000">
                     <div className="text-accent font-black tracking-[0.5em] uppercase text-sm">Soutenir le projet</div>
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase">
+                    <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase">
                         Propulsez <span className="text-gradient drop-shadow-[0_0_30px_rgba(168,85,247,0.3)] font-equinox normal-case">EklouD</span> vers le futur
                     </h1>
-                    <p className="text-text-muted text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+                    <p className="text-text-muted text-base md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
 
                         Chaque contribution nous permet de créer plus de contenu de qualité et d'améliorer la plateforme pour tout le monde.
                     </p>
@@ -49,7 +49,7 @@ export default function SupportPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-up duration-1000 delay-300 fill-mode-both">
                     {/* Liberapay Card */}
-                    <div className="group relative p-8 rounded-3xl bg-white/[0.01] border border-white/5 hover:border-rose-500/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
+                    <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-white/[0.01] border border-white/5 hover:border-rose-500/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
                         <div className="w-14 h-14 rounded-2xl bg-rose-500/5 border border-rose-500/10 flex items-center justify-center text-rose-500/50 group-hover:text-rose-500 group-hover:bg-rose-500/10 transition-all duration-500">
                             <Heart className="w-7 h-7 fill-current" />
                         </div>
@@ -68,7 +68,7 @@ export default function SupportPage() {
                     </div>
 
                     {/* Crypto Support Info */}
-                    <div className="group relative p-8 rounded-3xl bg-white/[0.01] border border-white/5 hover:border-accent/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
+                    <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-white/[0.01] border border-white/5 hover:border-accent/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
                         <div className="w-14 h-14 rounded-2xl bg-accent/5 border border-accent/10 flex items-center justify-center text-accent/50 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500">
                             <Coins className="w-7 h-7" />
                         </div>

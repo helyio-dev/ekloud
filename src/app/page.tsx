@@ -67,10 +67,10 @@ export default function LandingPage() {
 
 function ConceptItem({ icon, num, title, desc }: { icon: React.ReactNode; num: string; title: string; desc: string }) {
     return (
-        <div className="group relative flex flex-col md:flex-row gap-10 items-center md:items-start p-12 rounded-[3.5rem] transition-all duration-700 hover:bg-white/[0.03] border border-white/[0.03] hover:border-accent/20 glass-morphism backdrop-blur-3xl overflow-hidden">
+        <div className="group relative flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start p-8 md:p-12 rounded-[2rem] md:rounded-[3.5rem] transition-all duration-700 hover:bg-white/[0.03] border border-white/[0.03] hover:border-accent/20 glass-morphism backdrop-blur-3xl overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-[100px] -z-10 group-hover:bg-accent/10 transition-colors" />
 
-            <div className="flex-shrink-0 w-24 h-24 rounded-[2rem] bg-surface border border-white/5 flex items-center justify-center font-black text-white text-4xl shadow-2xl group-hover:bg-accent group-hover:border-accent/50 group-hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] transition-all duration-700 relative overflow-hidden">
+            <div className="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-surface border border-white/5 flex items-center justify-center font-black text-white text-2xl md:text-4xl shadow-2xl group-hover:bg-accent group-hover:border-accent/50 group-hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] transition-all duration-700 relative overflow-hidden">
                 <div className="absolute inset-x-0 bottom-0 h-1/3 bg-white/5" />
                 <span className="relative z-10 group-hover:hidden">{num}</span>
                 <span className="hidden group-hover:flex items-center justify-center relative z-10 animate-in zoom-in duration-500">{icon}</span>

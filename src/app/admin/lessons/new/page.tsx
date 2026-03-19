@@ -6,7 +6,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import LessonForm from '../../components/LessonForm';
 
 export default function CreateLessonPage() {
-    const { isAdmin, isLoading } = useAuth();
+    const { isAdmin, isContributor, isLoading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -17,10 +17,10 @@ export default function CreateLessonPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!isLoading && !isAdmin) {
+        if (!isLoading && !isAdmin && !isContributor) {
             navigate('/dashboard');
         }
-    }, [isAdmin, isLoading, navigate]);
+    }, [isAdmin, isContributor, isLoading, navigate]);
 
     const handleSubmit = async (data: any) => {
         setIsSubmitting(true);
@@ -38,7 +38,7 @@ export default function CreateLessonPage() {
         }
     };
 
-    if (isLoading || !isAdmin) {
+    if (isLoading || (!isAdmin && !isContributor)) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-accent" />

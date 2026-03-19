@@ -6,7 +6,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import LessonForm from '../../../components/LessonForm';
 
 export default function EditLessonPage() {
-    const { isAdmin, isLoading: authLoading } = useAuth();
+    const { isAdmin, isContributor, isLoading: authLoading } = useAuth();
     const navigate = useNavigate();
     const { id: lessonId } = useParams<{ id: string }>();
 
@@ -16,8 +16,8 @@ export default function EditLessonPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!authLoading && !isAdmin) navigate('/dashboard');
-    }, [isAdmin, authLoading, navigate]);
+        if (!authLoading && !isAdmin && !isContributor) navigate('/dashboard');
+    }, [isAdmin, isContributor, authLoading, navigate]);
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -38,8 +38,8 @@ export default function EditLessonPage() {
             setIsLoading(false);
         };
 
-        if (isAdmin) fetchLesson();
-    }, [lessonId, isAdmin]);
+        if (isAdmin || isContributor) fetchLesson();
+    }, [lessonId, isAdmin, isContributor]);
 
     const handleSubmit = async (data: any) => {
         setIsSubmitting(true);
@@ -58,7 +58,7 @@ export default function EditLessonPage() {
         }
     };
 
-    if (authLoading || (isLoading && !error) || !isAdmin) {
+    if (authLoading || (isLoading && !error) || (!isAdmin && !isContributor)) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-accent" />

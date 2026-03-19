@@ -100,18 +100,18 @@ export default function AccountPage() {
                 </div>
 
                 {/* Stats Summary */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-surface border border-white/5 p-6 rounded-3xl flex flex-col items-center justify-center text-center">
-                        <span className="text-sm font-bold text-text-muted uppercase mb-1">Niveau</span>
-                        <span className="text-4xl font-black text-accent">{level}</span>
+                <div className="grid grid-cols-3 gap-3 md:gap-6">
+                    <div className="bg-surface border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
+                        <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">Niveau</span>
+                        <span className="text-2xl md:text-4xl font-black text-accent">{level}</span>
                     </div>
-                    <div className="bg-surface border border-white/5 p-6 rounded-3xl flex flex-col items-center justify-center text-center">
-                        <span className="text-sm font-bold text-text-muted uppercase mb-1">Streak</span>
-                        <span className="text-4xl font-black text-orange-400">{streak} 🔥</span>
+                    <div className="bg-surface border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
+                        <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">Streak</span>
+                        <span className="text-2xl md:text-4xl font-black text-orange-400">{streak} 🔥</span>
                     </div>
-                    <div className="bg-surface border border-white/5 p-6 rounded-3xl flex flex-col items-center justify-center text-center">
-                        <span className="text-sm font-bold text-text-muted uppercase mb-1">XP Total</span>
-                        <span className="text-4xl font-black text-white">{formatXP(xp)}</span>
+                    <div className="bg-surface border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center overflow-hidden">
+                        <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">XP Total</span>
+                        <span className="text-2xl md:text-4xl font-black text-white px-1 max-w-full overflow-hidden text-ellipsis">{formatXP(xp)}</span>
                     </div>
                 </div>
 
@@ -138,12 +138,12 @@ export default function AccountPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Username Update */}
-                    <div className="bg-surface border border-white/5 p-8 rounded-3xl flex flex-col">
+                    <div className="bg-surface border border-white/5 p-6 md:p-8 rounded-3xl flex flex-col">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="bg-blue-500/10 p-2 rounded-xl border border-blue-500/20">
                                 <User className="w-5 h-5 text-blue-400" />
                             </div>
-                            <h2 className="text-xl font-bold">CHANGER MON PSEUDO</h2>
+                            <h2 className="text-lg md:text-xl font-bold">CHANGER MON PSEUDO</h2>
                         </div>
 
                         <form onSubmit={handleUpdateUsername} className="space-y-4 flex-grow">
@@ -184,12 +184,12 @@ export default function AccountPage() {
                     </div>
 
                     {/* Password Update */}
-                    <div className="bg-surface border border-white/5 p-8 rounded-3xl flex flex-col">
+                    <div className="bg-surface border border-white/5 p-6 md:p-8 rounded-3xl flex flex-col">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="bg-purple-500/10 p-2 rounded-xl border border-purple-500/20">
                                 <Lock className="w-5 h-5 text-purple-400" />
                             </div>
-                            <h2 className="text-xl font-bold">Sécurité</h2>
+                            <h2 className="text-lg md:text-xl font-bold">SÉCURITÉ</h2>
                         </div>
 
                         <form onSubmit={handleUpdatePassword} className="space-y-4 flex-grow">

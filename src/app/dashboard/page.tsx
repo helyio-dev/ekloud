@@ -464,13 +464,13 @@ export default function Dashboard() {
                 const skillModulesData = skillModules.filter(sm => sm.skill_id === selectedSkill.id);
 
                 return (
-                    <div className="fixed top-1/2 -translate-y-1/2 right-8 w-full md:w-[540px] max-h-[90vh] bg-black/20 backdrop-blur-[60px] border border-white/10 z-50 rounded-[48px] shadow-[0_40px_120px_rgba(0,0,0,0.8)] animate-in zoom-in-95 slide-in-from-right-20 duration-1000 overflow-hidden flex flex-col">
+                    <div className="fixed inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:-translate-y-1/2 md:right-8 w-full md:w-[540px] max-h-[85vh] md:max-h-[90vh] bg-[#09090b]/40 md:bg-black/20 backdrop-blur-[60px] border border-white/10 md:border-white/10 z-50 rounded-t-[48px] md:rounded-[48px] shadow-[0_-20px_60px_rgba(0,0,0,0.8)] md:shadow-[0_40px_120px_rgba(0,0,0,0.8)] animate-in slide-in-from-bottom-20 md:slide-in-from-right-20 duration-500 overflow-hidden flex flex-col">
                         {/* Immersive Background Icon */}
                         <div className="absolute top-0 right-0 p-8 opacity-[0.05] pointer-events-none scale-150 transform translate-x-12 -translate-y-12">
                             <SkillIcon name={selectedSkill.icon} isFinal={selectedSkill.is_final} status={status} size={300} />
                         </div>
 
-                        <div className="relative z-10 p-10 space-y-10 flex flex-col h-full overflow-y-auto no-scrollbar">
+                        <div className="relative z-10 p-6 md:p-10 space-y-6 md:space-y-10 flex flex-col h-full overflow-y-auto no-scrollbar">
                             {/* Top Info Bar */}
                             <div className="flex justify-between items-start">
                                 <div className="space-y-4">
@@ -498,7 +498,7 @@ export default function Dashboard() {
                                             </div>
                                         )}
                                     </div>
-                                    <h2 className="text-5xl font-black tracking-tighter leading-[0.8] text-white pr-12">
+                                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-[0.8] text-white pr-12">
                                         {selectedSkill.name}
                                     </h2>
                                 </div>
@@ -515,9 +515,9 @@ export default function Dashboard() {
                             </p>
 
                             {/* Rewards Box */}
-                            <div className="flex items-center gap-6 p-6 bg-white/[0.03] border border-white/[0.05] rounded-[32px]">
-                                <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center">
-                                    <Sparkles className="w-6 h-6 text-accent" />
+                            <div className="flex items-center gap-4 md:gap-6 p-4 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-[24px] md:rounded-[32px]">
+                                <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 bg-accent/20 rounded-xl flex items-center justify-center">
+                                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-accent" />
                                 </div>
                                 <div className="space-y-0.5">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">Récompense</p>
@@ -578,9 +578,9 @@ export default function Dashboard() {
                                         className="group w-full relative overflow-hidden rounded-[40px] bg-accent p-[1px] shadow-[0_20px_50px_rgba(99,102,241,0.4)] active:scale-[0.97] transition-all"
                                     >
                                         <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%)] bg-[length:250%_250%] group-hover:animate-[shimmer_2s_infinite]"></div>
-                                        <div className="bg-accent py-8 rounded-[39px] flex items-center justify-center gap-4">
-                                            <Sparkles className="w-6 h-6 text-white group-hover:rotate-12 transition-transform" />
-                                            <span className="text-xl font-black text-white uppercase tracking-[0.3em]">Collecter Succès</span>
+                                        <div className="bg-accent py-5 md:py-8 rounded-[39px] flex items-center justify-center gap-3 md:gap-4">
+                                            <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:rotate-12 transition-transform" />
+                                            <span className="text-lg md:text-xl font-black text-white uppercase tracking-[0.2em] md:tracking-[0.3em]">Collecter Succès</span>
                                         </div>
                                     </button>
                                 ) : (selectedSkill.name === 'Bienvenue sur Ekloud !' && status === 'completed') ? null : selectedSkill.is_locked ? (
@@ -602,11 +602,11 @@ export default function Dashboard() {
                                         disabled={status === 'locked'}
                                         className={`group w-full relative rounded-[40px] p-[1px] overflow-hidden transition-all ${status === 'locked' ? 'opacity-30 grayscale cursor-not-allowed' : 'bg-white/10 hover:bg-white/20'}`}
                                     >
-                                        <div className="bg-[#101014]/80 py-8 rounded-[39px] flex items-center justify-center gap-4 border border-white/5 backdrop-blur-xl">
-                                            <span className="text-xl font-black text-white uppercase tracking-[0.2em]">
+                                        <div className="bg-[#101014]/80 py-5 md:py-8 rounded-[39px] flex items-center justify-center gap-3 md:gap-4 border border-white/5 backdrop-blur-xl">
+                                            <span className="text-sm md:text-xl font-black text-white uppercase tracking-[0.1em] md:tracking-[0.2em] text-center px-4">
                                                 {status === 'completed' ? 'Revoir Activités' : status === 'unlocked_needs_exam' ? 'Passer l\'Examen' : 'Lancer l\'Objectif'}
                                             </span>
-                                            <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-2 transition-transform" />
+                                            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-2 transition-transform shrink-0" />
                                         </div>
                                     </button>
                                 ) : null}
@@ -617,7 +617,7 @@ export default function Dashboard() {
             })()}
 
             {/* Premium Status Legend Bar (Optimized) */}
-            <div className="fixed bottom-10 left-10 z-40">
+            <div className="fixed bottom-4 left-4 md:bottom-10 md:left-10 z-40 hidden md:block">
                 <div className="flex flex-col gap-4 p-5 bg-[#09090b]/80 backdrop-blur-3xl border border-white/10 rounded-[32px] shadow-[0_30px_60px_rgba(0,0,0,0.5)] group hover:bg-[#09090b]/95 transition-all">
                     <div className="flex items-center gap-5">
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full">
@@ -641,7 +641,7 @@ export default function Dashboard() {
             </div>
 
             {/* Bottom Right Controls (Zoom + Instruction) */}
-            <div className="fixed bottom-10 right-10 z-40 flex flex-col items-end gap-6">
+            <div className="fixed top-24 right-4 md:top-auto md:bottom-10 md:right-10 z-40 flex flex-col items-end gap-2 md:gap-6">
                 {/* Zoom Controls (PS5 Style) */}
                 <div className="flex items-center gap-2 p-2 bg-[#09090b]/80 backdrop-blur-3xl border border-white/10 rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
                     <button

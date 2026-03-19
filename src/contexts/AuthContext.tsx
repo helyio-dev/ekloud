@@ -6,6 +6,7 @@ type AuthContextType = {
     user: User | null;
     session: Session | null;
     isAdmin: boolean;
+    isContributor: boolean;
     isLoading: boolean;
     xp: number;
     level: number;
@@ -21,6 +22,7 @@ export const AuthContext = createContext<AuthContextType>({
     user: null,
     session: null,
     isAdmin: false,
+    isContributor: false,
     isLoading: true,
     xp: 0,
     level: 1,
@@ -36,6 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isContributor, setIsContributor] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [xp, setXp] = useState(0);
     const [level, setLevel] = useState(1);
@@ -73,6 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (data) {
                 setIsAdmin(data.role === 'admin');
+                setIsContributor(data.role === 'contributor');
                 setXp(data.xp || 0);
                 setLevel(data.level || 1);
                 setStreak(data.streak || 0);
@@ -102,6 +106,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
                 lastFetchedIdRef.current = null;
                 setIsAdmin(false);
+                setIsContributor(false);
                 setXp(0);
                 setLevel(1);
                 setStreak(0);
@@ -149,7 +154,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <AuthContext.Provider value={{
-            user, session, isAdmin, isLoading, xp, level, streak, username, clan,
+            user, session, isAdmin, isContributor, isLoading, xp, level, streak, username, clan,
             signOut, refreshSession, refreshProfile
         }}>
             {children}

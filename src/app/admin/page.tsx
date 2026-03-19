@@ -9,7 +9,7 @@ import SkillManagementTab from './components/SkillManagementTab';
 type TabId = 'modules' | 'skills' | 'users';
 
 export default function AdminDashboard() {
-    const { user, isAdmin, isLoading } = useAuth();
+    const { user, isAdmin, isContributor, isLoading } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabId>('modules');
     const [modules, setModules] = useState<any[]>([]);
@@ -17,13 +17,13 @@ export default function AdminDashboard() {
     const [isFetching, setIsFetching] = useState(true);
 
     useEffect(() => {
-        if (!isLoading && !isAdmin) {
+        if (!isLoading && !isAdmin && !isContributor) {
             navigate('/dashboard');
         }
-    }, [isAdmin, isLoading, navigate]);
+    }, [isAdmin, isContributor, isLoading, navigate]);
 
     useEffect(() => {
-        if (!isAdmin) return;
+        if (!isAdmin && !isContributor) return;
         const fetchData = async () => {
             setIsFetching(true);
             try {
@@ -40,7 +40,7 @@ export default function AdminDashboard() {
             }
         };
         fetchData();
-    }, [isAdmin]);
+    }, [isAdmin, isContributor]);
 
     const handleDeleteModule = async (id: string, title: string) => {
         if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le module "${title}" ? Cette action est irréversible.`)) {
@@ -57,13 +57,16 @@ export default function AdminDashboard() {
         }
     };
 
-    if (!isLoading && !isAdmin) return null;
+    if (!isLoading && !isAdmin && !isContributor) return null;
 
     const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
         { id: 'modules', label: 'Modules', icon: <BookOpen className="w-4 h-4" /> },
-        { id: 'skills', label: 'Arbre de Compétences', icon: <LayoutDashboard className="w-4 h-4" /> },
-        { id: 'users', label: 'Utilisateurs', icon: <Users className="w-4 h-4" /> },
     ];
+
+    if (isAdmin) {
+        tabs.push({ id: 'skills', label: 'Arbre de Compétences', icon: <LayoutDashboard className="w-4 h-4" /> });
+        tabs.push({ id: 'users', label: 'Utilisateurs', icon: <Users className="w-4 h-4" /> });
+    }
 
     return (
         <div className="min-h-screen bg-background p-6 md:p-8">
@@ -73,10 +76,8 @@ export default function AdminDashboard() {
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <LayoutDashboard className="w-5 h-5 text-accent" />
-                            <span className="text-xs font-bold text-accent uppercase tracking-widest">Administration</span>
+                            <span className="text-xs font-bold text-accent uppercase tracking-widest">{isAdmin ? 'Administrateur' : 'Contributeur'}</span>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight">Panel Admin</h1>
-                        <p className="text-text-muted mt-1">Gérez les contenus et les utilisateurs de la plateforme.</p>
                     </div>
                     <div className="flex flex-wrap gap-3">
                         <Link to="/admin/modules/new" className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-accent/20 text-sm">

@@ -47,9 +47,9 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
         setTimeout(() => setFeedback(null), 4000);
     };
 
-    const handleRoleToggle = async () => {
-        const newRole = user.role === 'admin' ? 'student' : 'admin';
-        setIsActionLoading('role');
+    const handleRoleChange = async (newRole: string) => {
+        if (newRole === user.role) return;
+        setIsActionLoading(`role-${newRole}`);
         try {
             const { error } = await supabase
                 .from('profiles')
@@ -188,6 +188,8 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
                             <Row label="Rôle actuel" value={
                                 user.role === 'admin'
                                     ? <span className="text-yellow-400 font-bold flex items-center gap-1"><Shield className="w-3 h-3" /> Admin</span>
+                                    : user.role === 'contributor'
+                                    ? <span className="text-green-400 font-bold flex items-center gap-1"><BookOpen className="w-3 h-3" /> Contributeur</span>
                                     : <span className="text-text-muted flex items-center gap-1"><User className="w-3 h-3" /> Étudiant</span>
                             } />
                             <Row label="Inscrit le" value={new Date(user.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })} />
@@ -199,14 +201,29 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
                         <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Actions</h3>
 
                         {}
-                        <ActionButton
-                            icon={user.role === 'admin' ? <User className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
-                            label={user.role === 'admin' ? 'Rétrograder en Étudiant' : 'Promouvoir en Admin'}
-                            description={user.role === 'admin' ? 'Retire les droits administrateur' : 'Donne les droits administrateur'}
-                            loading={isActionLoading === 'role'}
-                            onClick={handleRoleToggle}
-                            variant="default"
-                        />
+                        <div className="grid grid-cols-3 gap-2">
+                            <button
+                                onClick={() => handleRoleChange('student')}
+                                disabled={user.role === 'student' || (isActionLoading !== null && isActionLoading.startsWith('role'))}
+                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'student' ? 'bg-white/10 text-white border-transparent shadow-inner' : 'border-white/10 text-text-muted hover:border-white/30 hover:bg-white/5'}`}
+                            >
+                                <User className="w-4 h-4" /> Étudiant
+                            </button>
+                            <button
+                                onClick={() => handleRoleChange('contributor')}
+                                disabled={user.role === 'contributor' || (isActionLoading !== null && isActionLoading.startsWith('role'))}
+                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'contributor' ? 'bg-green-400/10 text-green-400 border-green-400/20 shadow-inner' : 'border-white/10 text-text-muted hover:border-green-400/30 hover:bg-green-400/5 hover:text-green-400'}`}
+                            >
+                                <BookOpen className="w-4 h-4" /> Contributeur
+                            </button>
+                            <button
+                                onClick={() => handleRoleChange('admin')}
+                                disabled={user.role === 'admin' || (isActionLoading !== null && isActionLoading.startsWith('role'))}
+                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'admin' ? 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20 shadow-inner' : 'border-white/10 text-text-muted hover:border-yellow-400/30 hover:bg-yellow-400/5 hover:text-yellow-400'}`}
+                            >
+                                <Shield className="w-4 h-4" /> Admin
+                            </button>
+                        </div>
 
                         {}
                         <ActionButton

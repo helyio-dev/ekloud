@@ -6,7 +6,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import QuestionForm from '../../components/QuestionForm';
 
 export default function CreateQuizPage() {
-    const { isAdmin, isLoading } = useAuth();
+    const { isAdmin, isContributor, isLoading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -20,8 +20,8 @@ export default function CreateQuizPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!isLoading && !isAdmin) navigate('/dashboard');
-    }, [isAdmin, isLoading, navigate]);
+        if (!isLoading && !isAdmin && !isContributor) navigate('/dashboard');
+    }, [isAdmin, isContributor, isLoading, navigate]);
 
     const handleSubmit = async (data: any) => {
         setIsSubmitting(true);
@@ -67,7 +67,7 @@ export default function CreateQuizPage() {
         }
     };
 
-    if (isLoading || !isAdmin) {
+    if (isLoading || (!isAdmin && !isContributor)) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-accent" />

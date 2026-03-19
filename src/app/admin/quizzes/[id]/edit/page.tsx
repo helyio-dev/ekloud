@@ -6,7 +6,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import QuestionForm from '../../../components/QuestionForm';
 
 export default function EditQuestionPage() {
-    const { isAdmin, isLoading: authLoading } = useAuth();
+    const { isAdmin, isContributor, isLoading: authLoading } = useAuth();
     const navigate = useNavigate();
     const { id: questionId } = useParams<{ id: string }>();
 
@@ -16,8 +16,8 @@ export default function EditQuestionPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!authLoading && !isAdmin) navigate('/dashboard');
-    }, [isAdmin, authLoading, navigate]);
+        if (!authLoading && !isAdmin && !isContributor) navigate('/dashboard');
+    }, [isAdmin, isContributor, authLoading, navigate]);
 
     useEffect(() => {
         const fetchQuestion = async () => {
@@ -55,8 +55,8 @@ export default function EditQuestionPage() {
         }
     };
 
-    if (isAdmin) fetchQuestion();
-}, [questionId, isAdmin]);
+    if (isAdmin || isContributor) fetchQuestion();
+}, [questionId, isAdmin, isContributor]);
 
 const handleSubmit = async (data: any) => {
     if (!data.answers || data.answers.length < 2) {
@@ -116,7 +116,7 @@ const handleSubmit = async (data: any) => {
     }
 };
 
-if (authLoading || (isLoading && !error) || !isAdmin) {
+if (authLoading || (isLoading && !error) || (!isAdmin && !isContributor)) {
     return (
         <div className="min-h-screen flex items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-accent" />

@@ -311,35 +311,37 @@ export default function TechSquadPage() {
                                                 : 'bg-background/40 border-white/5'
                                                 }`}
                                         >
-                                            <div className="flex items-center gap-4 mb-3">
+                                            <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
                                                 {}
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shrink-0 ${index === 0 ? 'bg-yellow-400/10 text-yellow-400' : 'bg-white/5 text-text-muted'}`}>
-                                                    {index === 0 ? <Crown className="w-5 h-5" /> : index + 1}
-                                                </div>
-
-                                                {}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-0.5">
-                                                        <span className={`font-black text-lg ${sq.color}`}>{s.squad}</span>
-                                                        <sq.icon className="w-4 h-4 text-text-muted" />
-                                                        {isMySquad && (
-                                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/10">
-                                                                Ta squad
-                                                            </span>
-                                                        )}
+                                                <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-lg rounded-xl flex items-center justify-center font-black shrink-0 ${index === 0 ? 'bg-yellow-400/10 text-yellow-400' : 'bg-white/5 text-text-muted'}`}>
+                                                        {index === 0 ? <Crown className="w-4 h-4 sm:w-5 sm:h-5" /> : index + 1}
                                                     </div>
-                                                    <p className="text-xs text-text-muted">{sq.tagline}</p>
+
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-0.5">
+                                                            <span className={`font-black text-sm sm:text-lg whitespace-nowrap ${sq.color}`}>{s.squad}</span>
+                                                            <sq.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-muted" />
+                                                            {isMySquad && (
+                                                                <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/10 whitespace-nowrap">
+                                                                    Ta squad
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-[10px] sm:text-xs text-text-muted hidden sm:block truncate pr-2 w-full">{sq.tagline}</p>
+                                                    </div>
                                                 </div>
 
                                                 {}
                                                 <div className="text-right shrink-0">
-                                                    <p className="font-black text-white text-base">{s.totalXp.toLocaleString()} XP</p>
-                                                    <div className="flex items-center justify-end gap-1 text-text-muted text-xs mt-0.5">
+                                                    <p className="font-black text-white text-sm sm:text-base whitespace-nowrap">{s.totalXp.toLocaleString()} XP</p>
+                                                    <div className="flex items-center justify-end gap-1 text-text-muted text-[10px] sm:text-xs mt-0.5">
                                                         <Users className="w-3 h-3" />
-                                                        <span>{s.members} membre{s.members !== 1 ? 's' : ''}</span>
+                                                        <span className="whitespace-nowrap">{s.members} mb.</span>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <p className="text-[10px] sm:hidden text-text-muted mb-3 opacity-80 leading-snug break-words">{sq.tagline}</p>
 
                                             {}
                                             <div className="h-1.5 w-full bg-background/60 rounded-full overflow-hidden">
@@ -393,7 +395,7 @@ export default function TechSquadPage() {
                             <div className="flex justify-center mb-6">
                                 <sq.icon className="w-16 h-16 drop-shadow-2xl" />
                             </div>
-                            <h2 className={`text-6xl font-black mb-2 ${sq.color}`}
+                            <h2 className={`text-4xl md:text-6xl font-black mb-2 ${sq.color}`}
                                 style={{ textShadow: `0 0 40px ${sq.hex}66` }}>
                                 {resultSquad}
                             </h2>
@@ -452,7 +454,7 @@ export default function TechSquadPage() {
             <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center px-6 py-12">
                 <div className="max-w-5xl w-full text-center animate-in fade-in slide-in-from-bottom-6 duration-700">
                     <div className="max-w-2xl mx-auto">
-                        <h1 className="text-5xl font-black mb-4 tracking-tight">
+                        <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">
                             Quelle est ta{' '}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-violet-400 to-green-400">
                                 TechSquad

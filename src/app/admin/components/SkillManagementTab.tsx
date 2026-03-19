@@ -497,8 +497,8 @@ export default function SkillManagementTab() {
             )}
 
             {isFormOpen && editingSkill && (
-                <div className="fixed inset-0 bg-[#09090b]/90 backdrop-blur-xl z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
-                    <div className="bg-surface border border-white/10 p-10 rounded-[40px] w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-8 shadow-2xl">
+                <div className="fixed inset-0 bg-[#09090b]/90 backdrop-blur-xl z-[100] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
+                    <div className="bg-surface border border-white/10 p-6 md:p-10 rounded-3xl md:rounded-[40px] w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-6 md:space-y-8 shadow-2xl">
                         <div className="flex justify-between items-center">
                             <div className="space-y-1">
                                 <h2 className="text-3xl font-black text-white">{editingSkill.id.length < 30 ? 'Nouvelle Compétence' : 'Paramètres'}</h2>
