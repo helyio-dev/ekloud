@@ -7,6 +7,8 @@ import { addXp, XP_REWARDS } from '@/lib/gamification';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
+import { parseShortcodes } from '@/lib/shortcodes';
 
 type Lesson = {
     id: string;
@@ -121,8 +123,11 @@ export default function LessonPage() {
                         <article className="prose prose-invert prose-indigo max-w-none">
                             <h2 className="text-3xl md:text-4xl font-extrabold mb-6 md:mb-10 tracking-tight text-white leading-tight">{lesson.title}</h2>
                             <div className="text-text-muted text-lg leading-relaxed">
-                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
-                                    {lesson.content}
+                                <ReactMarkdown 
+                                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                                    rehypePlugins={[rehypeRaw]}
+                                >
+                                    {parseShortcodes(lesson.content)}
                                 </ReactMarkdown>
                             </div>
                         </article>

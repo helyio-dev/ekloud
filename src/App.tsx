@@ -12,8 +12,9 @@ import ModulePage from '@/app/modules/[id]/page';
 import LessonPage from '@/app/lessons/[id]/page';
 import QuizPage from '@/app/quiz/[id]/page';
 import ExamPage from '@/app/exam/[id]/page';
-import AccountPage from '@/app/account/page';
 import CoursesPage from '@/app/courses/page';
+import AccountPage from '@/app/account/page';
+import PublicProfilePage from '@/app/u/[username]/page';
 
 
 import AuthCallbackPage from '@/app/auth/callback/page';
@@ -77,6 +78,7 @@ const AppContent = () => {
                     <Route path="/clan-quiz" element={<ClanQuizPage />} />
                     <Route path="/support" element={<SupportPage />} />
                     <Route path="/account" element={<AccountPage />} />
+                    <Route path="/u/:username" element={<PublicProfilePage />} />
 
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

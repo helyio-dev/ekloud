@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Loader2, Save, Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import { Loader2, Save, Plus, Trash2, CheckCircle2, Bold, Italic, List, ListTodo, Heading1, Heading2, Heading3, Code, Link, Quote, Eye, Edit3, Type, Sparkles, Paintbrush, Highlighter } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
+import { parseShortcodes } from '@/lib/shortcodes';
 
 interface Answer {
     id?: string;
@@ -39,6 +44,8 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
         { text: '', isCorrect: false }
     ]);
 
+    const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
+
     useEffect(() => {
         const fetchData = async () => {
             const [
@@ -67,6 +74,38 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
             if (!newAnswers.some(a => a.isCorrect)) newAnswers[0].isCorrect = true;
             setAnswers(newAnswers);
         }
+    };
+
+    const insertFormatting = (prefix: string, suffix: string = '') => {
+        const textarea = document.getElementById('question-text') as HTMLTextAreaElement;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = questionText.substring(start, end);
+        const before = questionText.substring(0, start);
+        const after = questionText.substring(end);
+
+        const newText = before + prefix + selectedText + suffix + after;
+        setQuestionText(newText);
+
+        // Reset focus and selection
+        setTimeout(() => {
+            textarea.focus();
+            const newCursorPos = start + prefix.length + selectedText.length + suffix.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
+
+    const insertBlock = (prefix: string, suffix: string = '') => {
+        const textarea = document.getElementById('question-text') as HTMLTextAreaElement;
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const before = questionText.substring(0, start);
+        const isNewLine = start === 0 || before.endsWith('\n');
+        
+        insertFormatting(isNewLine ? prefix : '\n' + prefix, suffix);
     };
 
     const handleAnswerChange = (index: number, field: keyof Answer, value: any) => {
@@ -152,15 +191,84 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-text-muted ml-1">Énoncé de la question</label>
-                <textarea
-                    required
-                    value={questionText}
-                    onChange={(e) => setQuestionText(e.target.value)}
-                    className="w-full px-6 py-5 bg-background border border-white/5 rounded-3xl outline-none focus:border-accent transition-all text-white font-medium min-h-[120px] leading-relaxed"
-                    placeholder="Posez votre question ici..."
-                />
+            <div className="space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-text-muted ml-1">Énoncé de la question</label>
+                    <div className="flex bg-background border border-white/5 p-1 rounded-xl shrink-0">
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('edit')}
+                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'edit' ? 'bg-accent text-white' : 'text-text-muted hover:text-white'}`}
+                        >
+                            <Edit3 size={12} /> ÉDITION
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('preview')}
+                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'preview' ? 'bg-accent text-white' : 'text-text-muted hover:text-white'}`}
+                        >
+                            <Eye size={12} /> APERÇU
+                        </button>
+                    </div>
+                </div>
+
+                {activeTab === 'edit' ? (
+                    <div className="space-y-2">
+                        {/* Toolbar */}
+                        <div className="flex flex-wrap items-center gap-1 p-2 bg-background border border-white/5 rounded-2xl overflow-x-auto no-scrollbar">
+                            <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Gras"><Bold size={16} /></button>
+                            <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Italique"><Italic size={16} /></button>
+                            <div className="w-px h-6 bg-white/10 mx-1"></div>
+                            <button type="button" onClick={() => insertBlock('# ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 1"><Heading1 size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('## ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 2"><Heading2 size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('### ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 3"><Heading3 size={16} /></button>
+                            <div className="w-px h-6 bg-white/10 mx-1"></div>
+                            <button type="button" onClick={() => insertBlock('- ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Liste"><List size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Liste de tâches"><ListTodo size={16} /></button>
+                            <div className="w-px h-6 bg-white/10 mx-1"></div>
+                            <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Code en ligne"><Type size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Bloc de code"><Code size={16} /></button>
+                            <div className="w-px h-6 bg-white/10 mx-1"></div>
+                            <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Lien"><Link size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('> ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Citation"><Quote size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('---\n')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Ligne horizontale"><div className="w-4 h-px bg-current opacity-50"></div></button>
+                            <div className="w-px h-6 bg-white/10 mx-1"></div>
+                            <div className="flex items-center gap-1 px-2 border-x border-white/10">
+                                <span className="text-[10px] text-text-muted mr-1">TEXTE</span>
+                                <button type="button" onClick={() => insertFormatting('[[indigo:', ']]')} className="w-5 h-5 rounded-full bg-[#818cf8] border border-white/20 hover:scale-110 transition-transform" title="Texte Indigo"></button>
+                                <button type="button" onClick={() => insertFormatting('[[vert:', ']]')} className="w-5 h-5 rounded-full bg-[#22c55e] border border-white/20 hover:scale-110 transition-transform" title="Texte Vert"></button>
+                                <button type="button" onClick={() => insertFormatting('[[rouge:', ']]')} className="w-5 h-5 rounded-full bg-[#ef4444] border border-white/20 hover:scale-110 transition-transform" title="Texte Rouge"></button>
+                                <button type="button" onClick={() => insertFormatting('[[jaune:', ']]')} className="w-5 h-5 rounded-full bg-[#eab308] border border-white/20 hover:scale-110 transition-transform" title="Texte Jaune"></button>
+                            </div>
+                            <div className="flex items-center gap-1 px-2">
+                                <span className="text-[10px] text-text-muted mr-1">FOND</span>
+                                <button type="button" onClick={() => insertFormatting('[[bg-indigo:', ']]')} className="w-5 h-5 rounded bg-[#818cf8]/20 border border-[#818cf8]/40 hover:scale-110 transition-transform" title="Fond Indigo"></button>
+                                <button type="button" onClick={() => insertFormatting('[[bg-vert:', ']]')} className="w-5 h-5 rounded bg-[#22c55e]/20 border border-[#22c55e]/40 hover:scale-110 transition-transform" title="Fond Vert"></button>
+                                <button type="button" onClick={() => insertFormatting('[[bg-jaune:', ']]')} className="w-5 h-5 rounded bg-[#eab308]/20 border border-[#eab308]/40 hover:scale-110 transition-transform" title="Fond Jaune"></button>
+                                <button type="button" onClick={() => insertFormatting('[[bg-rouge:', ']]')} className="w-5 h-5 rounded bg-[#ef4444]/20 border border-[#ef4444]/40 hover:scale-110 transition-transform" title="Fond Rouge"></button>
+                            </div>
+                        </div>
+                        <textarea
+                            id="question-text"
+                            required
+                            value={questionText}
+                            onChange={(e) => setQuestionText(e.target.value)}
+                            className="w-full px-6 py-5 bg-background border border-white/5 rounded-[2rem] outline-none focus:border-accent transition-all text-white font-medium min-h-[150px] leading-relaxed shadow-inner"
+                            placeholder="Posez votre question ici... Utilisez le formatage Markdown si besoin."
+                        />
+                    </div>
+                ) : (
+                    <div className="min-h-[150px] p-8 bg-background border border-white/5 rounded-[2rem] overflow-y-auto">
+                        <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-img:rounded-3xl">
+                            <ReactMarkdown 
+                                remarkPlugins={[remarkGfm, remarkBreaks]}
+                                rehypePlugins={[rehypeRaw]}
+                            >
+                                {parseShortcodes(questionText) || "*Aucun énoncé à afficher pour le moment.*"}
+                            </ReactMarkdown>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="space-y-6 pt-4 border-t border-white/5">

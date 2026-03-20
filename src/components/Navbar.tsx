@@ -32,8 +32,8 @@ export default function Navbar() {
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center md:gap-2">
                         <span className="text-xl font-bold tracking-tight group-hover:text-accent transition-colors duration-300 font-equinox">EKLOUD</span>
-                        <span className="hidden md:block text-xs text-text-muted font-medium border-l border-white/10 pl-2 opacity-70 group-hover:opacity-100 transition-opacity font-equinox">
-                            Level UP YOUr TECH KNOwleDGe
+                        <span className="hidden md:block text-xs text-text-muted font-black border-l border-white/10 pl-2 opacity-70 group-hover:opacity-100 transition-opacity font-equinox uppercase tracking-widest">
+                            Level UP YOUR TECH KNOWLEDGE
                         </span>
                     </div>
                 </Link>
