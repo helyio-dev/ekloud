@@ -1,8 +1,8 @@
-export const XP_REWARDS = {
-    easy: 10,
-    medium: 25,
-    hard: 50,
-    very_hard: 100
+export const XP_REWARDS: Record<string, number> = {
+    'Découverte': 10,
+    'Fondamentaux': 25,
+    'Avancé': 50,
+    'Expert': 100
 };
 
 

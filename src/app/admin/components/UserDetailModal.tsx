@@ -134,19 +134,19 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
             {}
-            <div className="relative w-full max-w-md h-full bg-surface border-l border-white/10 overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
+            <div className="relative w-full max-w-md h-full bg-surface border-l border-border overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
                 {}
-                <div className="sticky top-0 z-10 bg-surface/90 backdrop-blur-md border-b border-white/5 p-6 flex items-start justify-between">
+                <div className="sticky top-0 z-10 bg-surface/90 backdrop-blur-md border-b border-border p-6 flex items-start justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center text-white font-bold text-lg shrink-0">
                             {(user.username ?? user.email ?? '?').charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-white">{user.username ?? 'Sans pseudo'}</h2>
+                            <h2 className="text-lg font-bold text-text">{user.username ?? 'Sans pseudo'}</h2>
                             <p className="text-xs text-text-muted">{user.email}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors text-text-muted hover:text-white">
+                    <button onClick={onClose} className="p-2 hover:bg-surface-hover rounded-lg transition-colors text-text-muted hover:text-text">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -184,7 +184,7 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
                     {}
                     <section>
                         <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Compte</h3>
-                        <div className="bg-background/50 border border-white/5 rounded-xl p-4 space-y-2 text-sm">
+                        <div className="bg-background/50 border border-border rounded-xl p-4 space-y-2 text-sm">
                             <Row label="Rôle actuel" value={
                                 user.role === 'admin'
                                     ? <span className="text-yellow-400 font-bold flex items-center gap-1"><Shield className="w-3 h-3" /> Admin</span>
@@ -205,21 +205,21 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
                             <button
                                 onClick={() => handleRoleChange('student')}
                                 disabled={user.role === 'student' || (isActionLoading !== null && isActionLoading.startsWith('role'))}
-                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'student' ? 'bg-white/10 text-white border-transparent shadow-inner' : 'border-white/10 text-text-muted hover:border-white/30 hover:bg-white/5'}`}
+                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'student' ? 'bg-surface text-text border-transparent shadow-inner' : 'border-border text-text-muted hover:border-accent/30 hover:bg-surface-hover'}`}
                             >
                                 <User className="w-4 h-4" /> Étudiant
                             </button>
                             <button
                                 onClick={() => handleRoleChange('contributor')}
                                 disabled={user.role === 'contributor' || (isActionLoading !== null && isActionLoading.startsWith('role'))}
-                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'contributor' ? 'bg-green-400/10 text-green-400 border-green-400/20 shadow-inner' : 'border-white/10 text-text-muted hover:border-green-400/30 hover:bg-green-400/5 hover:text-green-400'}`}
+                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'contributor' ? 'bg-green-400/10 text-green-400 border-green-400/20 shadow-inner' : 'border-border text-text-muted hover:border-green-400/30 hover:bg-green-400/5 hover:text-green-400'}`}
                             >
                                 <BookOpen className="w-4 h-4" /> Contributeur
                             </button>
                             <button
                                 onClick={() => handleRoleChange('admin')}
                                 disabled={user.role === 'admin' || (isActionLoading !== null && isActionLoading.startsWith('role'))}
-                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'admin' ? 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20 shadow-inner' : 'border-white/10 text-text-muted hover:border-yellow-400/30 hover:bg-yellow-400/5 hover:text-yellow-400'}`}
+                                className={`px-2 py-3 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed ${user.role === 'admin' ? 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20 shadow-inner' : 'border-border text-text-muted hover:border-yellow-400/30 hover:bg-yellow-400/5 hover:text-yellow-400'}`}
                             >
                                 <Shield className="w-4 h-4" /> Admin
                             </button>
@@ -285,7 +285,7 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
 
 function StatMini({ label, value, color }: { label: string; value: string; color: string }) {
     return (
-        <div className="bg-background/50 border border-white/5 rounded-xl p-3 text-center">
+        <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
             <p className={`text-xl font-black ${color}`}>{value}</p>
             <p className="text-xs text-text-muted mt-0.5">{label}</p>
         </div>
@@ -294,9 +294,9 @@ function StatMini({ label, value, color }: { label: string; value: string; color
 
 function StatMiniIcon({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
     return (
-        <div className="bg-background/50 border border-white/5 rounded-xl p-3 text-center">
+        <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
             <div className="flex justify-center mb-1">{icon}</div>
-            <p className="text-lg font-black text-white">{value}</p>
+            <p className="text-lg font-black text-text">{value}</p>
             <p className="text-xs text-text-muted">{label}</p>
         </div>
     );
@@ -306,7 +306,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
     return (
         <div className="flex items-center justify-between">
             <span className="text-text-muted">{label}</span>
-            <span className="text-white font-medium">{value}</span>
+            <span className="text-text font-medium">{value}</span>
         </div>
     );
 }
@@ -320,7 +320,7 @@ function ActionButton({ icon, label, description, loading, onClick, variant }: {
     variant: 'default' | 'warning' | 'danger';
 }) {
     const colors = {
-        default: 'border-white/10 hover:border-accent/40 hover:bg-accent/5 text-white',
+        default: 'border-border hover:border-accent/40 hover:bg-accent/5 text-text',
         warning: 'border-orange-400/20 hover:border-orange-400/60 hover:bg-orange-400/5 text-orange-400',
         danger: 'border-red-400/20 hover:border-red-400/60 hover:bg-red-400/5 text-red-400',
     };
@@ -354,10 +354,10 @@ function ConfirmBox({ message, onConfirm, onCancel, loading, variant }: {
         <div className={`p-4 rounded-xl border ${colors[variant].border}`}>
             <div className="flex items-start gap-2 mb-3">
                 <AlertTriangle className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
-                <p className="text-sm text-white">{message}</p>
+                <p className="text-sm text-text">{message}</p>
             </div>
             <div className="flex gap-2">
-                <button onClick={onCancel} disabled={loading} className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-bold transition-colors">
+                <button onClick={onCancel} disabled={loading} className="flex-1 py-2 bg-surface-hover text-text rounded-lg text-sm font-bold transition-colors">
                     Annuler
                 </button>
                 <button onClick={onConfirm} disabled={loading} className={`flex-1 py-2 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 ${colors[variant].btn}`}>

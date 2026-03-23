@@ -50,7 +50,7 @@ export default function Dashboard() {
                 const { data: skillsData } = await supabase.from('skills').select('*');
                 const { data: prereqsData } = await supabase.from('skill_prerequisites').select('*');
                 const { data: smData } = await supabase.from('skill_modules').select('*');
-                const { data: moduleData } = await supabase.from('modules').select('id, title');
+                const { data: moduleData } = await supabase.from('modules').select('id, title, order_index').order('order_index', { ascending: true });
                 const { data: umData } = await supabase.from('user_modules').select('module_id, completed').eq('user_id', user.id);
                 const { data: usData } = await supabase.from('user_skills').select('skill_id').eq('user_id', user.id);
                 const { data: examsData } = await supabase.from('quiz_attempts').select('module_id, is_exam, created_at').eq('user_id', user.id).eq('passed', true);
@@ -219,6 +219,7 @@ export default function Dashboard() {
         } else {
             setNotification({ message: "Cette compétence est encore verrouillée.", type: 'info' });
             setTimeout(() => setNotification(null), 2000);
+            setSelectedSkill(skill);
         }
     };
 
@@ -226,11 +227,13 @@ export default function Dashboard() {
 
 
     return (
-        <div className="h-[calc(100vh-73px)] bg-background relative overflow-hidden flex flex-col select-none">
+        <div className="h-[calc(100vh-73px)] bg-background relative overflow-hidden flex flex-col select-none mesh-gradient">
+            <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
             <SkillTree
                 skills={skills}
                 prereqs={prereqs}
                 skillModules={skillModules}
+                modules={modules}
                 userModules={userModules}
                 completedSkills={completedSkills}
                 passedExams={passedExams}
@@ -243,10 +246,10 @@ export default function Dashboard() {
                 const skillModulesData = skillModules.filter(sm => sm.skill_id === selectedSkill.id);
 
                 return (
-                    <div className="fixed inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:-translate-y-1/2 md:right-8 w-full md:w-[540px] max-h-[85vh] md:max-h-[90vh] bg-[#09090b]/40 md:bg-black/20 backdrop-blur-[60px] border border-white/10 md:border-white/10 z-50 rounded-t-[48px] md:rounded-[48px] shadow-[0_-20px_60px_rgba(0,0,0,0.8)] md:shadow-[0_40px_120px_rgba(0,0,0,0.8)] animate-in slide-in-from-bottom-20 md:slide-in-from-right-20 duration-500 overflow-hidden flex flex-col">
+                    <div className="fixed inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:-translate-y-1/2 md:right-8 w-full md:w-[540px] max-h-[85vh] md:max-h-[90vh] bg-surface/40 md:bg-surface/20 backdrop-blur-[60px] border border-border md:border-border z-50 rounded-t-[48px] md:rounded-[48px] shadow-[0_-20px_60px_rgba(0,0,0,0.2)] md:shadow-[0_40px_120px_rgba(0,0,0,0.1)] animate-in slide-in-from-bottom-20 md:slide-in-from-right-20 duration-500 overflow-hidden flex flex-col">
                         <div className="absolute top-0 right-0 p-8 opacity-[0.05] pointer-events-none scale-150 transform translate-x-12 -translate-y-12">
                             {/* Inlined SkillIcon logic for simplicity in detail panel */}
-                            <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                            <svg width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-text">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                             </svg>
                         </div>
@@ -268,25 +271,25 @@ export default function Dashboard() {
                                                 <Lock className="w-3 h-3" /> Construction
                                             </div>
                                         ) : (
-                                            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
+                                            <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover/50 border border-border rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-text-muted">
                                                 <Lock className="w-3 h-3" /> {status === 'unlocked' ? 'En Cours' : 'Verrouillé'}
                                             </div>
                                         )}
                                         {selectedSkill.is_final && (
-                                            <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-white/40">
+                                            <div className="px-3 py-1 bg-surface-hover/50 border border-border rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-text-muted">
                                                 🏆 Légendaire
                                             </div>
                                         )}
                                     </div>
-                                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-[0.8] text-white pr-12">
+                                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-[0.8] text-text pr-12">
                                         {selectedSkill.name}
                                     </h2>
                                 </div>
                                 <button
                                     onClick={() => setSelectedSkill(null)}
-                                    className="p-3 hover:bg-white/10 rounded-full transition-all group shrink-0"
+                                    className="p-3 hover:bg-surface-hover rounded-full transition-all group shrink-0"
                                 >
-                                    <X className="w-6 h-6 text-white/30 group-hover:text-white group-hover:rotate-90 transition-all" />
+                                    <X className="w-6 h-6 text-text-muted group-hover:text-text group-hover:rotate-90 transition-all" />
                                 </button>
                             </div>
 
@@ -294,21 +297,21 @@ export default function Dashboard() {
                                 {selectedSkill.description || "Maîtrisez cette compétence pour progresser dans votre arbre de connaissances technologiques."}
                             </p>
 
-                            <div className="flex items-center gap-4 md:gap-6 p-4 md:p-6 bg-white/[0.03] border border-white/[0.05] rounded-[24px] md:rounded-[32px]">
+                            <div className="flex items-center gap-4 md:gap-6 p-4 md:p-6 bg-surface-hover/30 border border-border rounded-[24px] md:rounded-[32px]">
                                 <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 bg-accent/20 rounded-xl flex items-center justify-center">
                                     <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-accent" />
                                 </div>
                                 <div className="space-y-0.5">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">Récompense</p>
-                                    <p className="text-xl font-black text-white">+{selectedSkill.is_final ? '100' : '25'} XP Collectables</p>
+                                    <p className="text-xl font-black text-text">+{selectedSkill.is_final ? '100' : '25'} XP Collectables</p>
                                 </div>
                             </div>
 
                             {selectedSkill.name !== 'Bienvenue sur Ekloud !' && skillModulesData.length > 0 && (
                                 <div className="space-y-6">
                                     <div className="flex justify-between items-end px-2">
-                                        <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">Activités du succès</h3>
-                                        <span className="text-[10px] font-black text-white/40">
+                                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em]">Activités du succès</h3>
+                                        <span className="text-[10px] font-black text-text-muted/60">
                                             {skillModulesData.filter(sm => userModules[sm.module_id]).length} / {skillModulesData.length} terminée(s)
                                         </span>
                                     </div>
@@ -324,16 +327,16 @@ export default function Dashboard() {
                                                     className="group relative flex-shrink-0 w-44 snap-start cursor-pointer"
                                                     style={{ animationDelay: `${idx * 100}ms` }}
                                                 >
-                                                    <div className={`relative aspect-[4/5] rounded-[32px] border ${completed ? 'border-green-500/30 bg-green-500/5' : 'border-white/10 bg-white/[0.03]'} overflow-hidden transition-all duration-500 group-hover:scale-[1.05] group-hover:border-white/20 group-hover:bg-white/[0.06] group-hover:shadow-2xl`}>
+                                                    <div className={`relative aspect-[4/5] rounded-[32px] border ${completed ? 'border-green-500/30 bg-green-500/5' : 'border-border bg-surface-hover/30'} overflow-hidden transition-all duration-500 group-hover:scale-[1.05] group-hover:border-accent/40 group-hover:bg-surface-hover/50 group-hover:shadow-2xl`}>
                                                         <div className="absolute inset-0 flex flex-col p-5 justify-between">
-                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${completed ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-white/20'}`}>
+                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${completed ? 'bg-green-500/20 text-green-400' : 'bg-surface-hover text-text-muted/40'}`}>
                                                                 {completed ? <CheckCircle className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
                                                             </div>
                                                             <div className="space-y-1.5">
-                                                                <span className={`text-sm font-black leading-tight block ${completed ? 'text-green-500/80' : 'text-white/80'}`}>
+                                                                <span className={`text-sm font-black leading-tight block ${completed ? 'text-green-500/80' : 'text-text'}`}>
                                                                     {mod?.title || 'Activité'}
                                                                 </span>
-                                                                <span className="text-[8px] font-black uppercase tracking-widest text-white/30">
+                                                                <span className="text-[8px] font-black uppercase tracking-widest text-text-muted/40">
                                                                     {completed ? 'Terminé' : 'En cours'}
                                                                 </span>
                                                             </div>
@@ -353,7 +356,7 @@ export default function Dashboard() {
                                         onClick={() => handleSkillClick(selectedSkill)}
                                         className="group w-full relative overflow-hidden rounded-[40px] bg-accent p-[1px] shadow-[0_20px_50px_rgba(99,102,241,0.4)] active:scale-[0.97] transition-all"
                                     >
-                                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%)] bg-[length:250%_250%] group-hover:animate-[shimmer_2s_infinite]"></div>
+                                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%] group-hover:animate-[shimmer_2s_infinite]"></div>
                                         <div className="bg-accent py-5 md:py-8 rounded-[39px] flex items-center justify-center gap-3 md:gap-4">
                                             <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:rotate-12 transition-transform" />
                                             <span className="text-lg md:text-xl font-black text-white uppercase tracking-[0.2em] md:tracking-[0.3em]">Collecter Succès</span>
@@ -376,13 +379,13 @@ export default function Dashboard() {
                                             }
                                         }}
                                         disabled={status === 'locked'}
-                                        className={`group w-full relative rounded-[40px] p-[1px] overflow-hidden transition-all ${status === 'locked' ? 'opacity-30 grayscale cursor-not-allowed' : 'bg-white/10 hover:bg-white/20'}`}
+                                        className={`group w-full relative rounded-[40px] p-[1px] overflow-hidden transition-all ${status === 'locked' ? 'opacity-30 grayscale cursor-not-allowed' : 'bg-surface-hover hover:scale-105 active:scale-95'}`}
                                     >
-                                        <div className="bg-[#101014]/80 py-5 md:py-8 rounded-[39px] flex items-center justify-center gap-3 md:gap-4 border border-white/5 backdrop-blur-xl">
-                                            <span className="text-sm md:text-xl font-black text-white uppercase tracking-[0.1em] md:tracking-[0.2em] text-center px-4">
+                                        <div className="bg-surface py-5 md:py-8 rounded-[39px] flex items-center justify-center gap-3 md:gap-4 border border-border backdrop-blur-xl">
+                                            <span className="text-sm md:text-xl font-black text-text uppercase tracking-[0.1em] md:tracking-[0.2em] text-center px-4">
                                                 {status === 'completed' ? 'Revoir Activités' : status === 'unlocked_needs_exam' ? 'Passer l\'Examen' : 'Lancer l\'Objectif'}
                                             </span>
-                                            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:translate-x-2 transition-transform shrink-0" />
+                                            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-text group-hover:translate-x-2 transition-transform shrink-0" />
                                         </div>
                                     </button>
                                 ) : null}

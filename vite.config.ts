@@ -7,6 +7,11 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    allowedHosts: ['.trycloudflare.com']
+    allowedHosts: ['.trycloudflare.com'],
+    hmr: {
+        host: 'localhost',
+        protocol: 'ws',
+        timeout: 30000
+    }
   },
 });

@@ -12,7 +12,6 @@ interface LessonFormData {
     title: string;
     content: string;
     order_index: number;
-    difficulty: string;
 }
 
 interface LessonFormProps {
@@ -28,7 +27,6 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
     const [title, setTitle] = useState(initialData?.title || '');
     const [content, setContent] = useState(initialData?.content || '');
     const [orderIndex, setOrderIndex] = useState(initialData?.order_index || 1);
-    const [difficulty, setDifficulty] = useState(initialData?.difficulty || 'easy');
 
     const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
 
@@ -81,13 +79,12 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
             module_id: moduleId,
             title,
             content,
-            order_index: orderIndex,
-            difficulty
+            order_index: orderIndex
         });
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 bg-surface border border-white/5 p-8 rounded-3xl">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-surface border border-border p-8 rounded-3xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-sm font-medium mb-2 text-text-muted">Module Parent</label>
@@ -95,27 +92,12 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
                         required
                         value={moduleId}
                         onChange={(e) => setModuleId(e.target.value)}
-                        className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none text-white"
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none text-text"
                     >
                         <option value="" disabled>Sélectionnez un module</option>
                         {modules.map(mod => (
                             <option key={mod.id} value={mod.id}>{mod.title}</option>
                         ))}
-                    </select>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-2 text-text-muted">Difficulté</label>
-                    <select
-                        required
-                        value={difficulty}
-                        onChange={(e) => setDifficulty(e.target.value)}
-                        className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none text-white"
-                    >
-                        <option value="easy">Facile (10 XP)</option>
-                        <option value="medium">Moyen (25 XP)</option>
-                        <option value="hard">Difficile (50 XP)</option>
-                        <option value="very_hard">Très Difficile (100 XP)</option>
                     </select>
                 </div>
 
@@ -126,7 +108,7 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
                         required
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-white"
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-text"
                         placeholder="Ex: Les fondamentaux des variables"
                     />
                 </div>
@@ -139,26 +121,26 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
                         required
                         value={orderIndex}
                         onChange={(e) => setOrderIndex(parseInt(e.target.value))}
-                        className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-white"
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text"
                     />
                 </div>
             </div>
 
             <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-2">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-2">
                     <label className="text-sm font-medium text-text-muted">Contenu de la leçon</label>
-                    <div className="flex bg-background border border-white/5 p-1 rounded-xl shrink-0">
+                    <div className="flex bg-background border border-border p-1 rounded-xl shrink-0">
                         <button
                             type="button"
                             onClick={() => setActiveTab('edit')}
-                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black transition-all ${activeTab === 'edit' ? 'bg-accent text-white' : 'text-text-muted hover:text-white'}`}
+                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black transition-all ${activeTab === 'edit' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
                         >
                             <Edit3 size={14} /> ÉDITION
                         </button>
                         <button
                             type="button"
                             onClick={() => setActiveTab('preview')}
-                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black transition-all ${activeTab === 'preview' ? 'bg-accent text-white' : 'text-text-muted hover:text-white'}`}
+                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black transition-all ${activeTab === 'preview' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
                         >
                             <Eye size={14} /> APERÇU
                         </button>
@@ -168,25 +150,25 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
                 {activeTab === 'edit' ? (
                     <div className="space-y-2">
                         {/* Toolbar */}
-                        <div className="flex flex-wrap items-center gap-1 p-2 bg-background border border-white/5 rounded-xl overflow-x-auto no-scrollbar">
-                            <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Gras"><Bold size={18} /></button>
-                            <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Italique"><Italic size={18} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertBlock('# ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 1"><Heading1 size={18} /></button>
-                            <button type="button" onClick={() => insertBlock('## ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 2"><Heading2 size={18} /></button>
-                            <button type="button" onClick={() => insertBlock('### ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 3"><Heading3 size={18} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertBlock('- ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Liste"><List size={18} /></button>
-                            <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Liste de tâches"><ListTodo size={18} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Code en ligne"><Type size={18} /></button>
-                            <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Bloc de code"><Code size={18} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Lien"><Link size={18} /></button>
-                            <button type="button" onClick={() => insertBlock('> ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Citation"><Quote size={18} /></button>
-                            <button type="button" onClick={() => insertBlock('---\n')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Ligne horizontale"><div className="w-5 h-px bg-current opacity-50"></div></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <div className="flex items-center gap-1 px-2 border-x border-white/10">
+                        <div className="flex flex-wrap items-center gap-1 p-2 bg-background border border-border rounded-xl overflow-x-auto no-scrollbar">
+                            <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Gras"><Bold size={18} /></button>
+                            <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Italique"><Italic size={18} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertBlock('# ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 1"><Heading1 size={18} /></button>
+                            <button type="button" onClick={() => insertBlock('## ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 2"><Heading2 size={18} /></button>
+                            <button type="button" onClick={() => insertBlock('### ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 3"><Heading3 size={18} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertBlock('- ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Liste"><List size={18} /></button>
+                            <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Liste de tâches"><ListTodo size={18} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Code en ligne"><Type size={18} /></button>
+                            <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Bloc de code"><Code size={18} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Lien"><Link size={18} /></button>
+                            <button type="button" onClick={() => insertBlock('> ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Citation"><Quote size={18} /></button>
+                            <button type="button" onClick={() => insertBlock('---\n')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Ligne horizontale"><div className="w-5 h-px bg-current opacity-50"></div></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <div className="flex items-center gap-1 px-2 border-x border-border">
                                 <span className="text-[10px] text-text-muted mr-1">TEXTE</span>
                                 <button type="button" onClick={() => insertFormatting('[[indigo:', ']]')} className="w-5 h-5 rounded-full bg-[#818cf8] border border-white/20 hover:scale-110 transition-transform" title="Texte Indigo"></button>
                                 <button type="button" onClick={() => insertFormatting('[[vert:', ']]')} className="w-5 h-5 rounded-full bg-[#22c55e] border border-white/20 hover:scale-110 transition-transform" title="Texte Vert"></button>
@@ -206,13 +188,13 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
                             required
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
-                            className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all min-h-[500px] font-mono text-sm leading-relaxed text-white shadow-inner"
+                            className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all min-h-[500px] font-mono text-sm leading-relaxed text-text shadow-inner"
                             placeholder="Rédigez le contenu de votre cours ici... Utlisez les icônes pour mettre en forme."
                         />
                     </div>
                 ) : (
-                    <div className="min-h-[500px] p-8 bg-background border border-white/5 rounded-xl overflow-y-auto">
-                        <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-img:rounded-3xl">
+                    <div className="min-h-[500px] p-8 bg-background border border-border rounded-xl overflow-y-auto">
+                        <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-img:rounded-3xl">
                             <ReactMarkdown 
                                 remarkPlugins={[remarkGfm, remarkBreaks]}
                                 rehypePlugins={[rehypeRaw]}
@@ -224,7 +206,7 @@ export default function LessonForm({ initialData, onSubmit, isSubmitting, button
                 )}
             </div>
 
-            <div className="pt-6 border-t border-white/5 flex justify-end">
+            <div className="pt-6 border-t border-border flex justify-end">
                 <button
                     type="submit"
                     disabled={isSubmitting}

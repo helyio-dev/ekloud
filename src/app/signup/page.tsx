@@ -47,7 +47,7 @@ export default function SignupPage() {
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-                <div className="w-full max-w-md bg-surface border border-white/5 rounded-2xl p-8 shadow-2xl text-center">
+            <div className="w-full max-w-md bg-surface border border-border rounded-2xl p-8 shadow-2xl text-center">
                     <div className="bg-green-500/10 p-3 rounded-xl border border-green-500/20 mb-6 inline-block">
                         <Mail className="w-8 h-8 text-green-400" />
                     </div>
@@ -64,7 +64,7 @@ export default function SignupPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-            <div className="w-full max-w-md bg-surface border border-white/5 rounded-2xl p-8 shadow-2xl">
+            <div className="w-full max-w-md bg-surface border border-border rounded-2xl p-8 shadow-2xl">
                 <div className="flex flex-col items-center mb-8">
                     <div className="bg-accent/10 p-3 rounded-xl border border-accent/20 mb-4">
                         <Cloud className="w-8 h-8 text-accent" />
@@ -89,7 +89,7 @@ export default function SignupPage() {
                                 required
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
+                                className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text"
                                 placeholder="Votre pseudo"
                             />
                         </div>
@@ -105,7 +105,7 @@ export default function SignupPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
+                                className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text"
                                 placeholder="votre@email.com"
                             />
                         </div>
@@ -120,7 +120,7 @@ export default function SignupPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
+                                className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text"
                                 placeholder="Choisir un mot de passe fort"
                             />
                         </div>

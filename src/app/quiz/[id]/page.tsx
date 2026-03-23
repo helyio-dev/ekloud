@@ -8,7 +8,6 @@ import { addXp } from '@/lib/gamification';
 type Question = {
     id: string;
     question_text: string;
-    difficulty: string;
     answers: {
         id: string;
         answer_text: string;
@@ -43,7 +42,6 @@ export default function QuizPage() {
                     .select(`
           id,
           question_text,
-          difficulty,
           quiz_options (id, option_text, is_correct)
         `)
                     .eq('module_id', id)
@@ -140,7 +138,7 @@ export default function QuizPage() {
                 </div>
             ) : showResult ? (
                 <div className="flex-grow flex items-center justify-center p-6">
-                    <div className="max-w-md w-full bg-surface/50 border border-white/5 rounded-3xl p-8 text-center shadow-2xl backdrop-blur-md">
+                    <div className="max-w-md w-full bg-surface/50 border border-border rounded-3xl p-8 text-center shadow-2xl backdrop-blur-md">
                         <div className={`w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center ${((score / questions.length) * 100) >= 70 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                             {((score / questions.length) * 100) >= 70 ? <Award className="w-10 h-10" /> : <XCircle className="w-10 h-10" />}
                         </div>
@@ -148,7 +146,7 @@ export default function QuizPage() {
                         <p className="text-text-muted mb-6">Vous avez obtenu un score de {((score / questions.length) * 100).toFixed(0)}%</p>
 
                         <div className="space-y-4">
-                            <div className="p-4 bg-background/50 rounded-xl border border-white/5 flex justify-between items-center">
+                            <div className="p-4 bg-background/50 rounded-xl border border-border flex justify-between items-center">
                                 <span className="text-sm font-medium">Réponses correctes</span>
                                 <span className="font-bold text-accent">{score} / {questions.length}</span>
                             </div>
@@ -170,7 +168,7 @@ export default function QuizPage() {
                             {((score / questions.length) * 100) < 70 && (
                                 <button
                                     onClick={() => window.location.reload()}
-                                    className="w-full py-4 bg-surface text-text rounded-xl font-bold border border-white/5 hover:bg-white/5"
+                                    className="w-full py-4 bg-surface text-text rounded-xl font-bold border border-border hover:bg-surface-hover"
                                 >
                                     Réessayer
                                 </button>
@@ -180,14 +178,14 @@ export default function QuizPage() {
                 </div>
             ) : (
                 <>
-                    <header className="border-b border-white/5 bg-surface/30 px-6 py-3 flex items-center justify-between">
+                    <header className="border-b border-border bg-surface/30 px-6 py-3 flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <Link to={`/modules/${id}`} className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-muted hover:text-white">
+                            <Link to={`/modules/${id}`} className="p-2 hover:bg-surface-hover rounded-lg transition-colors text-text-muted hover:text-text">
                                 <ChevronLeft className="w-5 h-5" />
                             </Link>
                             <h1 className="text-xs font-bold text-text-muted uppercase tracking-widest">Question {currentIndex + 1} / {questions.length}</h1>
                         </div>
-                        <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div className="w-32 h-2 bg-surface rounded-full overflow-hidden border border-border">
                             <div
                                 className="h-full bg-accent transition-all duration-500"
                                 style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
@@ -214,7 +212,7 @@ export default function QuizPage() {
                                             ? isCorrect
                                                 ? 'bg-green-500/10 border-green-500/50 text-green-400'
                                                 : 'bg-red-500/10 border-red-500/50 text-red-400'
-                                            : 'bg-surface border-white/5 hover:border-accent/50 text-text'
+                                            : 'bg-surface border-border hover:border-accent/50 text-text'
                                             }`}
                                     >
                                         <span className="font-medium">{answer.answer_text}</span>

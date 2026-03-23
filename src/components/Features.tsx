@@ -31,7 +31,7 @@ export default function Features() {
 
 function FeatureCard({ icon, title, description, delay }: { icon: React.ReactNode, title: string, description: string, delay: string }) {
     return (
-        <div className={`group relative p-[1px] rounded-[3.5rem] bg-gradient-to-br from-white/20 via-transparent to-white/5 transition-all duration-1000 hover:scale-[1.05] hover:rotate-1 animate-in slide-up ${delay}`}>
+        <div className={`group relative p-[1px] rounded-[3.5rem] bg-border/20 transition-all duration-1000 hover:scale-[1.05] hover:rotate-1 animate-in slide-up ${delay}`}>
             <div className="relative p-8 rounded-[3.4rem] bg-surface h-full flex flex-col items-center text-center overflow-hidden neon-border">
                 {/* Inner Glow Effect */}
                 <div className="absolute -top-12 -right-12 w-32 h-32 bg-accent/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -43,15 +43,15 @@ function FeatureCard({ icon, title, description, delay }: { icon: React.ReactNod
                     </div>
                 </div>
 
-                <h3 className="text-2xl font-black mb-4 tracking-[0.3em] text-white uppercase w-full group-hover:text-accent transition-colors duration-500">
+                <h3 className="text-2xl font-black mb-4 tracking-[0.3em] text-text uppercase w-full group-hover:text-accent transition-colors duration-500">
                     {title}
                 </h3>
                 
-                <p className="text-text-muted leading-relaxed text-lg font-medium group-hover:text-white/80 transition-colors duration-500">
+                <p className="text-text-muted leading-relaxed text-lg font-medium group-hover:text-text transition-colors duration-500">
                     {description}
                 </p>
 
-                <div className="mt-8 w-16 h-1 w-full bg-white/[0.03] rounded-full overflow-hidden relative">
+                <div className="mt-8 w-16 h-1 w-full bg-border/20 rounded-full overflow-hidden relative">
                     <div className="absolute inset-0 w-0 group-hover:w-full bg-gradient-to-r from-accent to-accent-secondary transition-all duration-1000 ease-out" />
                 </div>
             </div>

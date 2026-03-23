@@ -17,7 +17,6 @@ interface QuestionFormData {
     module_id: string | null;
     skill_id: string | null;
     question_text: string;
-    difficulty: string;
     type: string;
     answers: Answer[];
 }
@@ -37,7 +36,6 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
     const [moduleId, setModuleId] = useState(initialData?.module_id || '');
     const [skillId, setSkillId] = useState(initialData?.skill_id || '');
     const [questionText, setQuestionText] = useState(initialData?.question_text || '');
-    const [difficulty, setDifficulty] = useState(initialData?.difficulty || 'easy');
     const [type, setType] = useState(initialData?.type || 'multiple_choice');
     const [answers, setAnswers] = useState<Answer[]>(initialData?.answers || [
         { text: '', isCorrect: true },
@@ -123,14 +121,13 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
             module_id: context === 'module' ? (moduleId || null) : null,
             skill_id: context === 'skill' ? (skillId || null) : null,
             question_text: questionText,
-            difficulty,
             type,
             answers
         });
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8 bg-surface border border-white/5 p-8 rounded-[32px]">
+        <form onSubmit={handleSubmit} className="space-y-8 bg-surface border border-border p-8 rounded-[32px]">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {context === 'module' ? (
                     <div>
@@ -139,7 +136,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                             required
                             value={moduleId}
                             onChange={(e) => setModuleId(e.target.value)}
-                            className="w-full px-5 py-4 bg-background border border-white/5 rounded-2xl outline-none focus:border-accent transition-all appearance-none text-white font-bold"
+                            className="w-full px-5 py-4 bg-background border border-border rounded-2xl outline-none focus:border-accent transition-all appearance-none text-text font-bold"
                         >
                             <option value="" disabled>Sélectionnez un module</option>
                             {modules.map(mod => (
@@ -154,7 +151,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                             required
                             value={skillId}
                             onChange={(e) => setSkillId(e.target.value)}
-                            className="w-full px-5 py-4 bg-background border border-white/5 rounded-2xl outline-none focus:border-accent transition-all appearance-none text-white font-bold"
+                            className="w-full px-5 py-4 bg-background border border-border rounded-2xl outline-none focus:border-accent transition-all appearance-none text-text font-bold"
                         >
                             <option value="" disabled>Sélectionnez une compétence</option>
                             {skills.map(s => (
@@ -165,25 +162,11 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                 )}
 
                 <div>
-                    <label className="block text-xs font-black uppercase tracking-widest mb-3 text-text-muted ml-1">Difficulté</label>
-                    <select
-                        value={difficulty}
-                        onChange={(e) => setDifficulty(e.target.value)}
-                        className="w-full px-5 py-4 bg-background border border-white/5 rounded-2xl outline-none focus:border-accent transition-all appearance-none text-white font-bold"
-                    >
-                        <option value="easy">Facile</option>
-                        <option value="medium">Moyen</option>
-                        <option value="hard">Difficile</option>
-                        <option value="very_hard">Très Difficile</option>
-                    </select>
-                </div>
-
-                <div>
                     <label className="block text-xs font-black uppercase tracking-widest mb-3 text-text-muted ml-1">Type de question</label>
                     <select
                         value={type}
                         onChange={(e) => setType(e.target.value)}
-                        className="w-full px-5 py-4 bg-background border border-white/5 rounded-2xl outline-none focus:border-accent transition-all appearance-none text-white font-bold"
+                        className="w-full px-5 py-4 bg-background border border-border rounded-2xl outline-none focus:border-accent transition-all appearance-none text-text font-bold"
                     >
                         <option value="multiple_choice">Choix Multiple</option>
                         <option value="true_false">Vrai / Faux</option>
@@ -192,20 +175,20 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
             </div>
 
             <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-2">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-2">
                     <label className="text-xs font-black uppercase tracking-widest text-text-muted ml-1">Énoncé de la question</label>
-                    <div className="flex bg-background border border-white/5 p-1 rounded-xl shrink-0">
+                    <div className="flex bg-background border border-border p-1 rounded-xl shrink-0">
                         <button
                             type="button"
                             onClick={() => setActiveTab('edit')}
-                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'edit' ? 'bg-accent text-white' : 'text-text-muted hover:text-white'}`}
+                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'edit' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
                         >
                             <Edit3 size={12} /> ÉDITION
                         </button>
                         <button
                             type="button"
                             onClick={() => setActiveTab('preview')}
-                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'preview' ? 'bg-accent text-white' : 'text-text-muted hover:text-white'}`}
+                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'preview' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
                         >
                             <Eye size={12} /> APERÇU
                         </button>
@@ -215,25 +198,25 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                 {activeTab === 'edit' ? (
                     <div className="space-y-2">
                         {/* Toolbar */}
-                        <div className="flex flex-wrap items-center gap-1 p-2 bg-background border border-white/5 rounded-2xl overflow-x-auto no-scrollbar">
-                            <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Gras"><Bold size={16} /></button>
-                            <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Italique"><Italic size={16} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertBlock('# ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 1"><Heading1 size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('## ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 2"><Heading2 size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('### ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Titre 3"><Heading3 size={16} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertBlock('- ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Liste"><List size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Liste de tâches"><ListTodo size={16} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Code en ligne"><Type size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Bloc de code"><Code size={16} /></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Lien"><Link size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('> ')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Citation"><Quote size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('---\n')} className="p-2 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors" title="Ligne horizontale"><div className="w-4 h-px bg-current opacity-50"></div></button>
-                            <div className="w-px h-6 bg-white/10 mx-1"></div>
-                            <div className="flex items-center gap-1 px-2 border-x border-white/10">
+                        <div className="flex flex-wrap items-center gap-1 p-2 bg-background border border-border rounded-2xl overflow-x-auto no-scrollbar">
+                            <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Gras"><Bold size={16} /></button>
+                            <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Italique"><Italic size={16} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertBlock('# ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 1"><Heading1 size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('## ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 2"><Heading2 size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('### ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 3"><Heading3 size={16} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertBlock('- ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Liste"><List size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Liste de tâches"><ListTodo size={16} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Code en ligne"><Type size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Bloc de code"><Code size={16} /></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Lien"><Link size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('> ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Citation"><Quote size={16} /></button>
+                            <button type="button" onClick={() => insertBlock('---\n')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Ligne horizontale"><div className="w-4 h-px bg-current opacity-50"></div></button>
+                            <div className="w-px h-6 bg-border mx-1"></div>
+                            <div className="flex items-center gap-1 px-2 border-x border-border">
                                 <span className="text-[10px] text-text-muted mr-1">TEXTE</span>
                                 <button type="button" onClick={() => insertFormatting('[[indigo:', ']]')} className="w-5 h-5 rounded-full bg-[#818cf8] border border-white/20 hover:scale-110 transition-transform" title="Texte Indigo"></button>
                                 <button type="button" onClick={() => insertFormatting('[[vert:', ']]')} className="w-5 h-5 rounded-full bg-[#22c55e] border border-white/20 hover:scale-110 transition-transform" title="Texte Vert"></button>
@@ -253,13 +236,13 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                             required
                             value={questionText}
                             onChange={(e) => setQuestionText(e.target.value)}
-                            className="w-full px-6 py-5 bg-background border border-white/5 rounded-[2rem] outline-none focus:border-accent transition-all text-white font-medium min-h-[150px] leading-relaxed shadow-inner"
+                            className="w-full px-6 py-5 bg-background border border-border rounded-[2rem] outline-none focus:border-accent transition-all text-text font-medium min-h-[150px] leading-relaxed shadow-inner"
                             placeholder="Posez votre question ici... Utilisez le formatage Markdown si besoin."
                         />
                     </div>
                 ) : (
-                    <div className="min-h-[150px] p-8 bg-background border border-white/5 rounded-[2rem] overflow-y-auto">
-                        <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-img:rounded-3xl">
+                    <div className="min-h-[150px] p-8 bg-background border border-border rounded-[2rem] overflow-y-auto">
+                        <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-img:rounded-3xl">
                             <ReactMarkdown 
                                 remarkPlugins={[remarkGfm, remarkBreaks]}
                                 rehypePlugins={[rehypeRaw]}
@@ -271,14 +254,14 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                 )}
             </div>
 
-            <div className="space-y-6 pt-4 border-t border-white/5">
+            <div className="space-y-6 pt-4 border-t border-border">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-black text-white uppercase tracking-wider">Réponses</h2>
+                    <h2 className="text-xl font-black text-text uppercase tracking-wider">Réponses</h2>
                     {answers.length < 5 && type !== 'true_false' && (
                         <button
                             type="button"
                             onClick={handleAddAnswer}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-black transition-all"
+                            className="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface-hover border border-border rounded-xl text-xs font-black transition-all text-text"
                         >
                             <Plus className="w-4 h-4" /> AJOUTER
                         </button>
@@ -289,7 +272,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                     {answers.map((answer, index) => (
                         <div
                             key={index}
-                            className={`flex items-center gap-4 p-5 rounded-2xl border transition-all ${answer.isCorrect ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.1)]' : 'border-white/5 bg-background hover:border-white/10'}`}
+                            className={`flex items-center gap-4 p-5 rounded-2xl border transition-all ${answer.isCorrect ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.1)]' : 'border-border bg-background hover:border-accent/30'}`}
                         >
                             <div className="shrink-0">
                                 <label className="relative flex items-center justify-center cursor-pointer">
@@ -300,7 +283,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                                         onChange={() => handleAnswerChange(index, 'isCorrect', true)}
                                         className="hidden"
                                     />
-                                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${answer.isCorrect ? 'bg-green-500 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'border-white/10'}`}>
+                                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${answer.isCorrect ? 'bg-green-500 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'border-border'}`}>
                                         {answer.isCorrect && <CheckCircle2 className="w-5 h-5 text-black" />}
                                     </div>
                                 </label>
@@ -330,7 +313,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                 <p className="text-[10px] text-text-muted font-black uppercase tracking-widest text-center">Sélectionnez la réponse correcte via l'icône de gauche.</p>
             </div>
 
-            <div className="pt-8 border-t border-white/5 flex justify-end">
+            <div className="pt-8 border-t border-border flex justify-end">
                 <button
                     type="submit"
                     disabled={isSubmitting}

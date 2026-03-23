@@ -279,8 +279,8 @@ export default function TechSquadPage() {
                     </div>
 
                     {}
-                    <div className="bg-surface/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl">
-                        <div className="p-5 border-b border-white/5 flex items-center justify-between">
+                    <div className="bg-surface/50 border border-border rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl">
+                        <div className="p-5 border-b border-border flex items-center justify-between">
                             <div>
                                 <h2 className="text-lg font-black">Classement des TechSquads</h2>
                                 <p className="text-xs text-text-muted mt-0.5">Classé par XP total accumulé</p>
@@ -308,13 +308,13 @@ export default function TechSquadPage() {
                                             key={s.squad}
                                             className={`p-5 rounded-2xl border transition-all ${isMySquad
                                                 ? `bg-gradient-to-br ${sq.bg} ${sq.border} ${sq.glow}`
-                                                : 'bg-background/40 border-white/5'
+                                                : 'bg-background/40 border-border'
                                                 }`}
                                         >
                                             <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
                                                 {}
                                                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-lg rounded-xl flex items-center justify-center font-black shrink-0 ${index === 0 ? 'bg-yellow-400/10 text-yellow-400' : 'bg-white/5 text-text-muted'}`}>
+                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-lg rounded-xl flex items-center justify-center font-black shrink-0 ${index === 0 ? 'bg-yellow-400/10 text-yellow-400' : 'bg-surface-hover/50 border border-border text-text-muted'}`}>
                                                         {index === 0 ? <Crown className="w-4 h-4 sm:w-5 sm:h-5" /> : index + 1}
                                                     </div>
 
@@ -323,7 +323,7 @@ export default function TechSquadPage() {
                                                             <span className={`font-black text-sm sm:text-lg whitespace-nowrap ${sq.color}`}>{s.squad}</span>
                                                             <sq.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-muted" />
                                                             {isMySquad && (
-                                                                <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/10 whitespace-nowrap">
+                                                                <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 whitespace-nowrap">
                                                                     Ta squad
                                                                 </span>
                                                             )}
@@ -334,7 +334,7 @@ export default function TechSquadPage() {
 
                                                 {}
                                                 <div className="text-right shrink-0">
-                                                    <p className="font-black text-white text-sm sm:text-base whitespace-nowrap">{s.totalXp.toLocaleString()} XP</p>
+                                                    <p className="font-black text-text text-sm sm:text-base whitespace-nowrap">{s.totalXp.toLocaleString()} XP</p>
                                                     <div className="flex items-center justify-end gap-1 text-text-muted text-[10px] sm:text-xs mt-0.5">
                                                         <Users className="w-3 h-3" />
                                                         <span className="whitespace-nowrap">{s.members} mb.</span>
@@ -405,7 +405,7 @@ export default function TechSquadPage() {
                     </div>
 
                     {}
-                    <div className="bg-surface/50 border border-white/5 rounded-2xl p-5 mb-6">
+                    <div className="bg-surface/50 border border-border rounded-2xl p-5 mb-6">
                         <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Répartition des affinités</p>
                         <div className="space-y-3">
                             {sortedScores.map(([id, pts]) => {
@@ -482,7 +482,7 @@ export default function TechSquadPage() {
                     </div>
 
                     {}
-                    <div className="text-left border-t border-white/10 pt-16 mb-16 animate-in fade-in slide-in-from-bottom-8 fill-mode-both" style={{ animationDelay: '200ms' }}>
+                    <div className="text-left border-t border-border pt-16 mb-16 animate-in fade-in slide-in-from-bottom-8 fill-mode-both" style={{ animationDelay: '200ms' }}>
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-black mb-4">Qu'est-ce que le programme TechSquad ?</h2>
                             <p className="text-text-muted max-w-lg mx-auto">
@@ -492,7 +492,7 @@ export default function TechSquadPage() {
                         </div>
 
                         <div className="grid md:grid-cols-3 gap-6 w-full">
-                            <div className="bg-surface/30 border border-white/5 p-6 rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
+                            <div className="bg-surface/30 border border-border p-6 rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
                                 <div className="w-12 h-12 bg-accent/20 text-accent rounded-xl flex items-center justify-center mb-4 border border-accent/20">
                                     <Users className="w-6 h-6" />
                                 </div>
@@ -503,7 +503,7 @@ export default function TechSquadPage() {
                                 </p>
                             </div>
 
-                            <div className="bg-surface/30 border border-white/5 p-6 rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
+                            <div className="bg-surface/30 border border-border p-6 rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
                                 <div className="w-12 h-12 bg-yellow-400/20 text-yellow-400 rounded-xl flex items-center justify-center mb-4 border border-yellow-400/20">
                                     <Crown className="w-6 h-6" />
                                 </div>
@@ -514,7 +514,7 @@ export default function TechSquadPage() {
                                 </p>
                             </div>
 
-                            <div className="bg-surface/30 border border-white/5 p-6 rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
+                            <div className="bg-surface/30 border border-border p-6 rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
                                 <div className="w-12 h-12 bg-rose-400/20 text-rose-400 rounded-xl flex items-center justify-center mb-4 border border-rose-400/20">
                                     <Swords className="w-6 h-6" />
                                 </div>
@@ -535,14 +535,14 @@ export default function TechSquadPage() {
                                 return (
                                     <div
                                         key={id}
-                                        className={`relative group p-6 sm:p-8 rounded-3xl bg-surface/30 border border-white/5 transition-all duration-500 hover:border-white/20 hover:-translate-y-1 hover:shadow-2xl animate-in fade-in slide-in-from-bottom-8 fill-mode-both overflow-hidden`}
+                                        className={`relative group p-6 sm:p-8 rounded-3xl bg-surface/30 border border-border transition-all duration-500 hover:border-accent/40 hover:-translate-y-1 hover:shadow-2xl animate-in fade-in slide-in-from-bottom-8 fill-mode-both overflow-hidden`}
                                         style={{ animationDelay: `${400 + index * 150}ms` }}
                                     >
                                         <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${sq.bg}`} />
 
                                         <div className="relative z-10 flex flex-col gap-5 items-start">
                                             <div className="flex items-center gap-4">
-                                                <div className={`shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center ${sq.color} bg-background/80 border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                                                <div className={`shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center ${sq.color} bg-background/80 border border-border shadow-lg group-hover:scale-110 transition-transform duration-500`}>
                                                     <sq.icon className="w-8 h-8" />
                                                 </div>
                                                 <div>
@@ -599,10 +599,10 @@ export default function TechSquadPage() {
                                     onClick={() => handleAnswer(i)}
                                     disabled={selected !== null}
                                     className={`text-left px-6 py-4 rounded-2xl border font-medium text-sm sm:text-base transition-all duration-300 ${isSelected
-                                        ? 'bg-accent/20 border-accent text-white scale-[1.01] shadow-lg shadow-accent/20'
+                                        ? 'bg-accent/20 border-accent text-accent scale-[1.01] shadow-lg shadow-accent/20'
                                         : isOther
-                                            ? 'bg-surface/20 border-white/5 text-text-muted opacity-40'
-                                            : 'bg-surface/50 border-white/5 hover:border-accent/40 hover:bg-accent/5 hover:text-white active:scale-[0.99]'
+                                            ? 'bg-surface/20 border-border text-text-muted opacity-40'
+                                            : 'bg-surface/50 border-border hover:border-accent/40 hover:bg-accent/5 hover:text-accent active:scale-[0.99]'
                                         }`}
                                 >
                                     <span className="opacity-50 mr-3 text-xs font-bold">{String.fromCharCode(65 + i)}</span>

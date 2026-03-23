@@ -90,12 +90,12 @@ export default function LeaderboardPage() {
                         Les meilleurs hackers de la plateforme. Gagnez de l'XP en complétant des modules et des quiz pour grimper dans le classement !
                     </p>
 
-                    <div className="flex items-center justify-center gap-2 p-1 bg-surface/50 border border-white/5 rounded-2xl w-fit mx-auto backdrop-blur-sm">
+                    <div className="flex items-center justify-center gap-2 p-1 bg-surface/50 border border-border rounded-2xl w-fit mx-auto backdrop-blur-sm">
                         <button
                             onClick={() => setView('global')}
                             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${view === 'global'
                                 ? 'bg-accent text-white shadow-lg shadow-accent/20'
-                                : 'text-text-muted hover:text-white hover:bg-white/5'
+                                : 'text-text-muted hover:text-text hover:bg-surface-hover'
                                 }`}
                         >
                             <Globe className="w-4 h-4" />
@@ -105,7 +105,7 @@ export default function LeaderboardPage() {
                             onClick={() => setView('friends')}
                             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${view === 'friends'
                                 ? 'bg-accent text-white shadow-lg shadow-accent/20'
-                                : 'text-text-muted hover:text-white hover:bg-white/5'
+                                : 'text-text-muted hover:text-text hover:bg-surface-hover'
                                 }`}
                         >
                             <Users className="w-4 h-4" />
@@ -114,12 +114,12 @@ export default function LeaderboardPage() {
                     </div>
                 </div>
 
-                <div className="bg-surface/50 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl min-h-[400px] relative">
+                <div className="bg-surface/50 border border-border rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl min-h-[400px] relative">
                     <div key={view} className="animate-in fade-in duration-500 fill-mode-both">
                         <div className="overflow-x-auto">
                             <table className={`w-full text-left border-collapse whitespace-nowrap transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                                 <thead>
-                                    <tr className="border-b border-white/5 bg-white/5">
+                                    <tr className="border-b border-border bg-surface-hover/10">
                                         <th className="p-3 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider w-12 sm:w-16 text-center">Rang</th>
                                         <th className="p-3 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider">Hacker</th>
                                         <th className="hidden md:table-cell p-4 sm:p-6 text-xs sm:text-sm font-bold text-text-muted uppercase tracking-wider text-center">TechSquad</th>
@@ -134,7 +134,7 @@ export default function LeaderboardPage() {
                                         return (
                                             <tr
                                                 key={leader.id}
-                                                className={`border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors ${isCurrentUser ? 'bg-accent/5 relative' : ''}`}
+                                                className={`border-b border-border last:border-0 hover:bg-surface-hover/20 transition-colors ${isCurrentUser ? 'bg-accent/5 relative' : ''}`}
                                             >
                                                 <td className="p-3 sm:p-6 text-center relative">
                                                     {isCurrentUser && (
@@ -154,19 +154,19 @@ export default function LeaderboardPage() {
                                                     <div className="flex items-center gap-2 sm:gap-3">
                                                         <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-accent to-purple-500 opacity-80 shrink-0" />
                                                         <div className="flex flex-col min-w-0">
-                                                            <span className={`font-bold text-sm sm:text-base truncate max-w-[120px] sm:max-w-none ${isCurrentUser ? 'text-accent' : 'text-white'}`}>
+                                                            <span className={`font-bold text-sm sm:text-base truncate max-w-[120px] sm:max-w-none ${isCurrentUser ? 'text-accent' : 'text-text'}`}>
                                                                 {leader.username ?? (isCurrentUser ? 'Vous' : `Hacker #${leader.id.substring(0, 4)}`)}
                                                             </span>
                                                             <div className="md:hidden flex items-center gap-1.5 mt-0.5">
-                                                                <span className="text-[10px] bg-white/5 border border-white/10 px-1.5 py-[1px] rounded text-white/70">Lvl {calculateLevelFromXp(leader.xp || 0)}</span>
-                                                                {leader.clan && <span className="text-[10px] text-text-muted border border-white/5 px-1.5 py-[1px] rounded">{leader.clan}</span>}
+                                                                <span className="text-[10px] bg-surface-hover/50 border border-border px-1.5 py-[1px] rounded text-text-muted">Lvl {calculateLevelFromXp(leader.xp || 0)}</span>
+                                                                {leader.clan && <span className="text-[10px] text-text-muted border border-border px-1.5 py-[1px] rounded">{leader.clan}</span>}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="hidden md:table-cell p-4 sm:p-6 text-center">
                                                     {leader.clan ? (
-                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-white/5 text-xs font-bold whitespace-nowrap">
+                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-border text-xs font-bold whitespace-nowrap">
                                                             <span className={`w-2.5 h-2.5 rounded-full ${leader.clan === 'ROOT' ? 'bg-orange-400' :
                                                                 leader.clan === 'VOID' ? 'bg-violet-400' :
                                                                     leader.clan === 'CORE' ? 'bg-blue-400' :
@@ -181,7 +181,7 @@ export default function LeaderboardPage() {
                                                     )}
                                                 </td>
                                                 <td className="hidden md:table-cell p-4 sm:p-6 text-center">
-                                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface border border-white/10 text-sm font-bold">
+                                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface border border-border text-sm font-bold">
                                                         {calculateLevelFromXp(leader.xp || 0)}
                                                     </span>
                                                 </td>
@@ -193,7 +193,7 @@ export default function LeaderboardPage() {
                                                 </td>
                                                 <td className="p-3 sm:p-6 text-right">
                                                     <div className="flex flex-col items-end gap-1">
-                                                        <span className="font-black text-white bg-white/5 py-1 px-2 sm:py-1.5 sm:px-3 rounded-lg border border-white/5 text-[11px] sm:text-base whitespace-nowrap">
+                                                        <span className="font-black text-text bg-surface-hover/50 py-1 px-2 sm:py-1.5 sm:px-3 rounded-lg border border-border text-[11px] sm:text-base whitespace-nowrap">
                                                             {formatXP(leader.xp || 0)} XP
                                                         </span>
                                                         <span className="md:hidden flex items-center gap-1 text-[10px] text-orange-400 font-bold px-1"><Flame className="w-3 h-3"/> {leader.streak || 0}</span>

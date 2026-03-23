@@ -15,7 +15,6 @@ import {
 interface Question {
     id: string;
     question_text: string;
-    difficulty: string;
     answers: { id: string; answer_text: string; is_correct: boolean }[];
 }
 
@@ -42,7 +41,7 @@ export default function SkillExamQuestionsPage() {
                 { data: questionData }
             ] = await Promise.all([
                 supabase.from('skills').select('name').eq('id', skillId).single(),
-                supabase.from('questions').select('id, question_text, difficulty, quiz_options (id, option_text, is_correct)').eq('skill_id', skillId)
+                supabase.from('questions').select('id, question_text, quiz_options (id, option_text, is_correct)').eq('skill_id', skillId)
             ]);
 
             if (skillData) setSkillName(skillData.name);
@@ -50,7 +49,6 @@ export default function SkillExamQuestionsPage() {
             const formattedQuestions = (questionData || []).map((q: any) => ({
                 id: q.id,
                 question_text: q.question_text,
-                difficulty: q.difficulty,
                 answers: (q.quiz_options || []).map((o: any) => ({
                     id: o.id,
                     answer_text: o.option_text,
@@ -116,16 +114,10 @@ export default function SkillExamQuestionsPage() {
 
                     <div className="grid grid-cols-1 gap-6">
                         {questions.map((q) => (
-                            <div key={q.id} className="group bg-surface/50 border border-white/5 p-6 rounded-[32px] hover:border-yellow-500/30 transition-all">
+                            <div key={q.id} className="group bg-surface/50 border border-border p-6 rounded-[32px] hover:border-accent/30 transition-all">
                                 <div className="flex items-start justify-between mb-6">
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${q.difficulty === 'hard' ? 'bg-red-400/10 text-red-400 border-red-400/20' :
-                                                    q.difficulty === 'medium' ? 'bg-orange-400/10 text-orange-400 border-orange-400/20' :
-                                                        'bg-green-400/10 text-green-400 border-green-400/20'
-                                                }`}>
-                                                {q.difficulty}
-                                            </span>
                                             <span className="text-[10px] font-black uppercase text-yellow-500/60 tracking-widest">Question d'Examen</span>
                                         </div>
                                         <h3 className="text-lg font-bold text-white leading-relaxed">{q.question_text}</h3>
@@ -133,7 +125,7 @@ export default function SkillExamQuestionsPage() {
                                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all shrink-0">
                                         <Link
                                             to={`/admin/quizzes/${q.id}/edit`}
-                                            className="p-2.5 hover:bg-white/5 rounded-xl text-text-muted hover:text-white transition-all shadow-lg"
+                                            className="p-2.5 hover:bg-surface-hover rounded-xl text-text-muted hover:text-text transition-all shadow-lg"
                                         >
                                             <Edit2 className="w-5 h-5" />
                                         </Link>
@@ -149,7 +141,7 @@ export default function SkillExamQuestionsPage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {q.answers.map((a) => (
-                                        <div key={a.id} className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold border transition-all ${a.is_correct ? 'bg-green-400/10 border-green-400/20 text-green-400' : 'bg-background/40 border-white/5 text-text-muted'}`}>
+                                        <div key={a.id} className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold border transition-all ${a.is_correct ? 'bg-green-400/10 border-green-400/20 text-green-400' : 'bg-background/40 border-border text-text-muted'}`}>
                                             {a.is_correct && <CheckCircle2 className="w-4 h-4" />}
                                             <span className="truncate">{a.answer_text}</span>
                                         </div>

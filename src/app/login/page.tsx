@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-            <div className="w-full max-w-md bg-surface border border-white/5 rounded-2xl p-8 shadow-2xl">
+            <div className="w-full max-w-md bg-surface border border-border rounded-2xl p-8 shadow-2xl">
                 <div className="flex flex-col items-center mb-8">
                     <div className="bg-accent/10 p-3 rounded-xl border border-accent/20 mb-4">
                         <Cloud className="w-8 h-8 text-accent" />
@@ -59,7 +59,7 @@ export default function LoginPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
+                                className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text"
                                 placeholder="nom@exemple.com"
                             />
                         </div>
@@ -74,7 +74,7 @@ export default function LoginPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
+                                className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text"
                                 placeholder="••••••••"
                             />
                         </div>

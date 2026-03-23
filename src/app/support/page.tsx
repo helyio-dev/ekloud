@@ -49,12 +49,12 @@ export default function SupportPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-up duration-1000 delay-300 fill-mode-both">
                     {/* Liberapay Card */}
-                    <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-white/[0.01] border border-white/5 hover:border-rose-500/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
+                    <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-surface border border-border hover:border-rose-500/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
                         <div className="w-14 h-14 rounded-2xl bg-rose-500/5 border border-rose-500/10 flex items-center justify-center text-rose-500/50 group-hover:text-rose-500 group-hover:bg-rose-500/10 transition-all duration-500">
                             <Heart className="w-7 h-7 fill-current" />
                         </div>
                         <div className="space-y-1 text-center">
-                            <h2 className="text-xl font-bold text-white/90 tracking-tight font-equinox">LIBERAPAY</h2>
+                            <h2 className="text-xl font-bold text-text tracking-tight font-equinox">LIBERAPAY</h2>
                             <p className="text-text-muted text-sm font-medium">Soutien récurrent pour le projet.</p>
                         </div>
                         <a 
@@ -68,28 +68,28 @@ export default function SupportPage() {
                     </div>
 
                     {/* Crypto Support Info */}
-                    <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-white/[0.01] border border-white/5 hover:border-accent/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
+                    <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-surface border border-border hover:border-accent/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
                         <div className="w-14 h-14 rounded-2xl bg-accent/5 border border-accent/10 flex items-center justify-center text-accent/50 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500">
                             <Coins className="w-7 h-7" />
                         </div>
                         <div className="space-y-1 text-center">
-                            <h2 className="text-xl font-bold text-white/90 tracking-tight font-equinox">CRYPTO</h2>
+                            <h2 className="text-xl font-bold text-text tracking-tight font-equinox">CRYPTO</h2>
                             <p className="text-text-muted text-sm font-medium">MATIC ou XLM.</p>
                         </div>
                         
                         <div className="grid grid-cols-1 gap-3 w-full">
                             {cryptoAddresses.map((crypto) => (
-                                <div key={crypto.symbol} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group/item">
+                                <div key={crypto.symbol} className="flex items-center justify-between p-3 rounded-xl bg-surface-hover/30 border border-border hover:border-accent/30 transition-all group/item">
                                     <div className="flex flex-col">
                                         <span className={`text-[10px] font-black uppercase tracking-widest ${crypto.color}`}>{crypto.symbol}</span>
-                                        <span className="text-[10px] font-mono text-white/40 truncate w-32 md:w-40">{crypto.address}</span>
+                                        <span className="text-[10px] font-mono text-text-muted/40 truncate w-32 md:w-40">{crypto.address}</span>
                                     </div>
                                     <button 
                                         onClick={() => copyToClipboard(crypto.address, crypto.symbol)}
                                         className={`p-2 rounded-lg transition-all ${
                                             copied === crypto.symbol 
                                             ? 'bg-green-500/20 text-green-400' 
-                                            : 'hover:bg-white/5 text-white/30 hover:text-white'
+                                            : 'hover:bg-surface-hover text-text-muted/30 hover:text-text'
                                         }`}
                                     >
                                         {copied === crypto.symbol ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

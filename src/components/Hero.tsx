@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import Typewriter from './Typewriter';
+import { Mail, Check } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Hero() {
+    const [copied, setCopied] = useState(false);
     return (
         <section className="relative pt-16 pb-16 md:pt-32 md:pb-28 px-6 max-w-7xl mx-auto text-center overflow-visible">
             {/* Ultra-Immersive Background Elements */}
@@ -14,7 +17,7 @@ export default function Hero() {
 
             <div className="relative z-10 space-y-4 animate-in fade-in slide-up duration-1000 ease-out">
                 <div className="space-y-1">
-                    <div className="text-xl md:text-3xl font-black tracking-tight leading-tight max-w-4xl mx-auto text-white">
+                    <div className="text-xl md:text-3xl font-black tracking-tight leading-tight max-w-4xl mx-auto text-text">
                         <span className="text-gradient">
                             <Typewriter
                                 words={["Apprendre", "Progresser", "Maîtriser"]}
@@ -24,7 +27,7 @@ export default function Hero() {
 
                     <div className="text-xl md:text-3xl text-text-muted/80 max-w-3xl mx-auto leading-relaxed font-bold tracking-tight">
                         Des parcours clairs pour progresser {' '}
-                        <span className="text-white underline decoration-accent/40 underline-offset-[8px] font-black italic">
+                        <span className="text-accent underline decoration-accent/40 underline-offset-[8px] font-black italic">
                             <Typewriter
                                 words={["à votre rythme.", "sans pression.", "efficacement.", "pas à pas."]}
                             />
@@ -35,14 +38,14 @@ export default function Hero() {
                 <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-2 animate-in fade-in delay-700 fill-mode-both">
                     <Link
                         to="/signup"
-                        className="group relative px-10 py-4 bg-white text-background rounded-full font-bold text-lg transition-all hover:scale-110 active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.2)] overflow-hidden"
+                        className="group relative px-10 py-4 bg-text text-background rounded-full font-bold text-lg transition-all hover:scale-110 active:scale-95 shadow-[0_0_40px_var(--accent-glow)] overflow-hidden"
                     >
                         <span className="relative z-10">Commencer maintenant</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-secondary opacity-0 group-hover:opacity-10 transition-opacity" />
                     </Link>
                     <a
                         href="#features"
-                        className="px-10 py-4 glass-morphism border border-white/10 hover:border-accent/40 text-text rounded-full font-bold text-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center backdrop-blur-3xl shadow-xl"
+                        className="px-10 py-4 glass-morphism border border-border hover:border-accent/40 text-text rounded-full font-bold text-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center backdrop-blur-3xl shadow-xl"
                     >
                         Explorer
                     </a>

@@ -108,7 +108,7 @@ export default function UserManagementTab() {
                         placeholder="Rechercher par username ou email..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 bg-background border border-white/10 rounded-xl text-white placeholder-text-muted focus:outline-none focus:border-accent/50 transition-colors"
+                        className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl text-text placeholder-text-muted focus:outline-none focus:border-accent/50 transition-colors"
                     />
                 </div>
 
@@ -116,10 +116,10 @@ export default function UserManagementTab() {
                 <p className="text-sm text-text-muted">{filtered.length} utilisateur{filtered.length !== 1 ? 's' : ''}</p>
 
                 {}
-                <div className="overflow-x-auto rounded-2xl border border-white/5">
+                <div className="overflow-x-auto rounded-2xl border border-border">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-white/5 bg-white/5 text-text-muted uppercase text-xs tracking-wider whitespace-nowrap">
+                            <tr className="border-b border-border bg-surface text-text-muted uppercase text-xs tracking-wider whitespace-nowrap">
                                 <th className="p-4 text-left">Utilisateur</th>
                                 <th className="p-4 text-left">Rôle</th>
                                 <th className="p-4 text-right cursor-pointer hover:text-white transition-colors" onClick={() => toggleSort('xp')}>
@@ -137,16 +137,16 @@ export default function UserManagementTab() {
                                 <th className="p-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5 whitespace-nowrap">
+                        <tbody className="divide-y divide-border whitespace-nowrap">
                             {filtered.map(u => (
-                                <tr key={u.id} className="hover:bg-white/[0.02] transition-colors group">
+                                <tr key={u.id} className="hover:bg-surface-hover/30 transition-colors group">
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
                                                 {(u.username ?? u.email ?? '?').charAt(0).toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-white">{u.username ?? <span className="text-text-muted italic">Sans pseudo</span>}</p>
+                                                <p className="font-semibold text-text">{u.username ?? <span className="text-text-muted italic">Sans pseudo</span>}</p>
                                                 <p className="text-xs text-text-muted">{u.email}</p>
                                             </div>
                                         </div>
@@ -161,12 +161,12 @@ export default function UserManagementTab() {
                                                 <BookOpen className="w-3 h-3" /> Contributeur
                                             </span>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-white/5 text-text-muted rounded-lg text-xs font-bold">
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface/50 text-text-muted rounded-lg text-xs font-bold">
                                                 <User className="w-3 h-3" /> Étudiant
                                             </span>
                                         )}
                                     </td>
-                                    <td className="p-4 text-right font-bold text-white">{u.xp.toLocaleString()}</td>
+                                    <td className="p-4 text-right font-bold text-text">{u.xp.toLocaleString()}</td>
                                     <td className="p-4 text-right text-text-muted">{u.level}</td>
                                     <td className="p-4 text-right text-orange-400 font-bold">{u.streak}🔥</td>
                                     <td className="p-4 text-right text-text-muted text-xs">

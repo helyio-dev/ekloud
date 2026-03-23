@@ -8,6 +8,7 @@ interface ModuleFormData {
     category: string;
     order_index: number;
     prerequisite_id?: string | null;
+    difficulty: 'Découverte' | 'Fondamentaux' | 'Avancé' | 'Expert';
 }
 
 interface ModuleFormProps {
@@ -21,7 +22,8 @@ interface ModuleFormProps {
 export default function ModuleForm({ initialData, onSubmit, isSubmitting, buttonText, currentModuleId }: ModuleFormProps) {
     const [title, setTitle] = useState(initialData?.title || '');
     const [description, setDescription] = useState(initialData?.description || '');
-    const [category, setCategory] = useState(initialData?.category || 'programming');
+    const [category, setCategory] = useState(initialData?.category || 'Systèmes & réseaux');
+    const [difficulty, setDifficulty] = useState(initialData?.difficulty || 'Découverte');
     const [orderIndex, setOrderIndex] = useState(initialData?.order_index || 1);
     const [prerequisiteId, setPrerequisiteId] = useState<string>(initialData?.prerequisite_id || '');
     const [existingModules, setExistingModules] = useState<any[]>([]);
@@ -39,6 +41,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
             setTitle(initialData.title);
             setDescription(initialData.description);
             setCategory(initialData.category);
+            setDifficulty(initialData.difficulty || 'Découverte');
             setOrderIndex(initialData.order_index);
             setPrerequisiteId(initialData.prerequisite_id || '');
         }
@@ -51,12 +54,13 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
             description,
             category,
             order_index: orderIndex,
-            prerequisite_id: prerequisiteId || null
+            prerequisite_id: prerequisiteId || null,
+            difficulty
         });
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 bg-surface border border-white/5 p-8 rounded-3xl">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-surface border border-border p-8 rounded-3xl">
             <div>
                 <label className="block text-sm font-medium mb-2 text-text-muted">Titre du Module</label>
                 <input
@@ -64,7 +68,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold"
+                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-text"
                     placeholder="Ex: Introduction à React"
                 />
             </div>
@@ -75,7 +79,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                     required
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all min-h-[100px]"
+                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all min-h-[100px] text-text"
                     placeholder="Ce que les étudiants vont apprendre..."
                 />
             </div>
@@ -86,32 +90,37 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                     <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none text-text"
                     >
-                        <option value="programming">Programmation</option>
-                        <option value="design">Design UI/UX</option>
-                        <option value="systems">Systèmes & Réseaux</option>
-                        <option value="security">Cybersécurité</option>
+                        <option value="Systèmes & réseaux">Systèmes & réseaux</option>
+                        <option value="Cybersécurité">Cybersécurité</option>
+                        <option value="Design">Design</option>
+                        <option value="Data">Data</option>
+                        <option value="IA">IA</option>
+                        <option value="Web3">Web3</option>
+                        <option value="Cloud & DevOps">Cloud & DevOps</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-2 text-text-muted">Difficulté</label>
+                    <select
+                        value={difficulty}
+                        onChange={(e) => setDifficulty(e.target.value as any)}
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none font-bold text-text"
+                    >
+                        <option value="Découverte">Découverte</option>
+                        <option value="Fondamentaux">Fondamentaux</option>
+                        <option value="Avancé">Avancé</option>
+                        <option value="Expert">Expert</option>
                     </select>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium mb-2 text-text-muted">Ordre d'affichage (Index)</label>
-                    <input
-                        type="number"
-                        min="1"
-                        required
-                        value={orderIndex}
-                        onChange={(e) => setOrderIndex(parseInt(e.target.value))}
-                        className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
-                    />
-                </div>
                 <div className="col-span-2">
                     <label className="block text-sm font-medium mb-2 text-text-muted">Prérequis (Optionnel)</label>
                     <select
                         value={prerequisiteId}
                         onChange={(e) => setPrerequisiteId(e.target.value)}
-                        className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none"
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all appearance-none text-text"
                     >
                         <option value="">Aucun (Accessible immédiatement)</option>
                         {existingModules
@@ -124,7 +133,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                 </div>
             </div>
 
-            <div className="pt-6 border-t border-white/5 flex justify-end">
+            <div className="pt-6 border-t border-border flex justify-end">
                 <button
                     type="submit"
                     disabled={isSubmitting}

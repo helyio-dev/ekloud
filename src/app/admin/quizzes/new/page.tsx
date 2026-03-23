@@ -34,7 +34,6 @@ export default function CreateQuizPage() {
                     module_id: data.module_id || null,
                     skill_id: data.skill_id || null,
                     question_text: data.question_text,
-                    difficulty: data.difficulty,
                     type: data.type
                 }])
                 .select()
@@ -104,7 +103,6 @@ export default function CreateQuizPage() {
                         module_id: initialModuleId || null,
                         skill_id: initialSkillId || null,
                         question_text: '',
-                        difficulty: 'easy',
                         type: 'multiple_choice',
                         answers: [
                             { text: '', isCorrect: true },

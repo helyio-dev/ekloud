@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Register theme variables for smooth interpolation */
+@property --background { syntax: '<color>'; inherits: true; initial-value: #030406; }
+@property --surface { syntax: '<color>'; inherits: true; initial-value: #0a0c10; }
+@property --surface-hover { syntax: '<color>'; inherits: true; initial-value: #12151c; }
+@property --accent { syntax: '<color>'; inherits: true; initial-value: #6366f1; }
+@property --accent-secondary { syntax: '<color>'; inherits: true; initial-value: #a855f7; }
+@property --accent-glow { syntax: '<color>'; inherits: true; initial-value: rgba(99, 102, 241, 0.4); }
+@property --text { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+@property --text-muted { syntax: '<color>'; inherits: true; initial-value: #94a3b8; }
+@property --border { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.1); }
+@property --grid-color { syntax: '<color>'; inherits: true; initial-value: rgba(255, 255, 255, 0.02); }
+
 @font-face {
   font-family: 'Equinox';
   src: url('../fonts/equinox/Webfonts/Equinox Regular.woff') format('woff');
@@ -121,7 +133,7 @@
 }
 
 .glass-morphism {
-  background: rgba(18, 20, 26, 0.6);
+  background: var(--surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
@@ -130,8 +142,8 @@
 .bg-grid-pattern {
   background-size: 40px 40px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
 }
 
 .shine-effect {
@@ -171,7 +183,10 @@
   animation: float-subtle 4s ease-in-out infinite;
 }
 
-:root {
+/* ===== THEME SYSTEM: 8 palettes × dark/light ===== */
+
+/* NEBULA (default) */
+:root, .nebula-dark {
   --background: #030406;
   --surface: #0a0c10;
   --surface-hover: #12151c;
@@ -183,7 +198,474 @@
   --text: #ffffff;
   --text-muted: #94a3b8;
   --border: rgba(255, 255, 255, 0.1);
+  --grid-color: rgba(255, 255, 255, 0.02);
 }
+.nebula-light {
+  --background: #e2e8f0;
+  --surface: #f1f5f9;
+  --surface-hover: #cbd5e1;
+  --accent: #3730a3;
+  --accent-secondary: #6b21a8;
+  --accent-glow: rgba(55, 48, 163, 0.1);
+  --neon-cyan: #155e75;
+  --neon-pink: #9d174d;
+  --text: #020617;
+  --text-muted: #334155;
+  --border: rgba(0, 0, 0, 0.15);
+  --grid-color: rgba(0, 0, 0, 0.05);
+}
+
+/* NORMAL */
+.normal-dark {
+  --background: #0f1117;
+  --surface: #1a1d24;
+  --surface-hover: #22262f;
+  --accent: #818cf8;
+  --accent-secondary: #c084fc;
+  --accent-glow: rgba(129, 140, 248, 0.35);
+  --neon-cyan: #38bdf8;
+  --neon-pink: #f9a8d4;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --grid-color: rgba(255, 255, 255, 0.025);
+}
+.normal-light {
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-hover: #f1f5f9;
+  --accent: #4f46e5;
+  --accent-secondary: #7c3aed;
+  --accent-glow: rgba(79, 70, 229, 0.12);
+  --neon-cyan: #0369a1;
+  --neon-pink: #be185d;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --border: rgba(0, 0, 0, 0.1);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* AMOLED */
+.amoled-dark {
+  --background: #000000;
+  --surface: #080808;
+  --surface-hover: #111111;
+  --accent: #6366f1;
+  --accent-secondary: #a855f7;
+  --accent-glow: rgba(99, 102, 241, 0.5);
+  --neon-cyan: #22d3ee;
+  --neon-pink: #f472b6;
+  --text: #ffffff;
+  --text-muted: #64748b;
+  --border: rgba(255, 255, 255, 0.06);
+  --grid-color: rgba(255, 255, 255, 0.015);
+}
+.amoled-light {
+  --background: #ffffff;
+  --surface: #f8f8f8;
+  --surface-hover: #f0f0f0;
+  --accent: #4338ca;
+  --accent-secondary: #7c3aed;
+  --accent-glow: rgba(67, 56, 202, 0.1);
+  --neon-cyan: #0e7490;
+  --neon-pink: #9d174d;
+  --text: #000000;
+  --text-muted: #404040;
+  --border: rgba(0, 0, 0, 0.08);
+  --grid-color: rgba(0, 0, 0, 0.03);
+}
+
+/* AURORA */
+.aurora-dark {
+  --background: #021208;
+  --surface: #0b2015;
+  --surface-hover: #132e1e;
+  --accent: #10b981;
+  --accent-secondary: #34d399;
+  --accent-glow: rgba(16, 185, 129, 0.4);
+  --neon-cyan: #06b6d4;
+  --neon-pink: #a3e635;
+  --text: #ecfdf5;
+  --text-muted: #6ee7b7;
+  --border: rgba(16, 185, 129, 0.15);
+  --grid-color: rgba(16, 185, 129, 0.03);
+}
+.aurora-light {
+  --background: #d1fae5;
+  --surface: #ecfdf5;
+  --surface-hover: #a7f3d0;
+  --accent: #059669;
+  --accent-secondary: #047857;
+  --accent-glow: rgba(5, 150, 105, 0.15);
+  --neon-cyan: #0891b2;
+  --neon-pink: #65a30d;
+  --text: #022c22;
+  --text-muted: #065f46;
+  --border: rgba(0, 0, 0, 0.12);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* SUNSET */
+.sunset-dark {
+  --background: #150609;
+  --surface: #220c10;
+  --surface-hover: #2e1118;
+  --accent: #f97316;
+  --accent-secondary: #fb923c;
+  --accent-glow: rgba(249, 115, 22, 0.4);
+  --neon-cyan: #fbbf24;
+  --neon-pink: #f43f5e;
+  --text: #fff7ed;
+  --text-muted: #fdba74;
+  --border: rgba(249, 115, 22, 0.15);
+  --grid-color: rgba(249, 115, 22, 0.03);
+}
+.sunset-light {
+  --background: #fff7ed;
+  --surface: #ffedd5;
+  --surface-hover: #fed7aa;
+  --accent: #ea580c;
+  --accent-secondary: #c2410c;
+  --accent-glow: rgba(234, 88, 12, 0.15);
+  --neon-cyan: #d97706;
+  --neon-pink: #e11d48;
+  --text: #431407;
+  --text-muted: #9a3412;
+  --border: rgba(0, 0, 0, 0.12);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* OCEAN */
+.ocean-dark {
+  --background: #020d1a;
+  --surface: #081929;
+  --surface-hover: #0d2438;
+  --accent: #22d3ee;
+  --accent-secondary: #38bdf8;
+  --accent-glow: rgba(34, 211, 238, 0.35);
+  --neon-cyan: #60a5fa;
+  --neon-pink: #818cf8;
+  --text: #e0f2fe;
+  --text-muted: #7dd3fc;
+  --border: rgba(34, 211, 238, 0.12);
+  --grid-color: rgba(34, 211, 238, 0.03);
+}
+.ocean-light {
+  --background: #e0f2fe;
+  --surface: #f0f9ff;
+  --surface-hover: #bae6fd;
+  --accent: #0284c7;
+  --accent-secondary: #0369a1;
+  --accent-glow: rgba(2, 132, 199, 0.15);
+  --neon-cyan: #2563eb;
+  --neon-pink: #4f46e5;
+  --text: #0c4a6e;
+  --text-muted: #075985;
+  --border: rgba(0, 0, 0, 0.12);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* SAKURA */
+.sakura-dark {
+  --background: #1a0812;
+  --surface: #28101e;
+  --surface-hover: #35172a;
+  --accent: #ec4899;
+  --accent-secondary: #f472b6;
+  --accent-glow: rgba(236, 72, 153, 0.4);
+  --neon-cyan: #e879f9;
+  --neon-pink: #fb7185;
+  --text: #fdf2f8;
+  --text-muted: #f9a8d4;
+  --border: rgba(236, 72, 153, 0.15);
+  --grid-color: rgba(236, 72, 153, 0.03);
+}
+.sakura-light {
+  --background: #fdf2f8;
+  --surface: #fce7f3;
+  --surface-hover: #fbcfe8;
+  --accent: #db2777;
+  --accent-secondary: #be185d;
+  --accent-glow: rgba(219, 39, 119, 0.15);
+  --neon-cyan: #a21caf;
+  --neon-pink: #e11d48;
+  --text: #500724;
+  --text-muted: #9d174d;
+  --border: rgba(0, 0, 0, 0.12);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* HACKER */
+.hacker-dark {
+  --background: #000000;
+  --surface: #0a0f0a;
+  --surface-hover: #121a12;
+  --accent: #00ff41;
+  --accent-secondary: #39d353;
+  --accent-glow: rgba(0, 255, 65, 0.4);
+  --neon-cyan: #00ffff;
+  --neon-pink: #ff00ff;
+  --text: #00ff41;
+  --text-muted: #39d353;
+  --border: rgba(0, 255, 65, 0.15);
+  --grid-color: rgba(0, 255, 65, 0.04);
+}
+.hacker-light {
+  --background: #0d1f0d;
+  --surface: #162416;
+  --surface-hover: #1e301e;
+  --accent: #39d353;
+  --accent-secondary: #4ade80;
+  --accent-glow: rgba(57, 211, 83, 0.4);
+  --neon-cyan: #22d3ee;
+  --neon-pink: #a3e635;
+  --text: #dcfce7;
+  --text-muted: #86efac;
+  --border: rgba(57, 211, 83, 0.2);
+  --grid-color: rgba(57, 211, 83, 0.04);
+}
+
+/* MIDNIGHT */
+.midnight-dark {
+  --background: #05060f;
+  --surface: #0e1029;
+  --surface-hover: #161838;
+  --accent: #818cf8;
+  --accent-secondary: #c084fc;
+  --accent-glow: rgba(129, 140, 248, 0.45);
+  --neon-cyan: #60a5fa;
+  --neon-pink: #e879f9;
+  --text: #e0e7ff;
+  --text-muted: #a5b4fc;
+  --border: rgba(129, 140, 248, 0.15);
+  --grid-color: rgba(129, 140, 248, 0.03);
+}
+.midnight-light {
+  --background: #eef2ff;
+  --surface: #f5f7ff;
+  --surface-hover: #e0e7ff;
+  --accent: #4f46e5;
+  --accent-secondary: #7c3aed;
+  --accent-glow: rgba(79, 70, 229, 0.12);
+  --neon-cyan: #2563eb;
+  --neon-pink: #9333ea;
+  --text: #1e1b4b;
+  --text-muted: #4338ca;
+  --border: rgba(0, 0, 0, 0.1);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* LAVA */
+.lava-dark {
+  --background: #0f0202;
+  --surface: #1e0505;
+  --surface-hover: #2c0808;
+  --accent: #ef4444;
+  --accent-secondary: #f97316;
+  --accent-glow: rgba(239, 68, 68, 0.45);
+  --neon-cyan: #fbbf24;
+  --neon-pink: #fb7185;
+  --text: #fff1f2;
+  --text-muted: #fca5a5;
+  --border: rgba(239, 68, 68, 0.15);
+  --grid-color: rgba(239, 68, 68, 0.04);
+}
+.lava-light {
+  --background: #fff1f2;
+  --surface: #ffe4e6;
+  --surface-hover: #fecdd3;
+  --accent: #dc2626;
+  --accent-secondary: #ea580c;
+  --accent-glow: rgba(220, 38, 38, 0.15);
+  --neon-cyan: #d97706;
+  --neon-pink: #e11d48;
+  --text: #450a0a;
+  --text-muted: #991b1b;
+  --border: rgba(0, 0, 0, 0.12);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* CYBER */
+.cyber-dark {
+  --background: #06000f;
+  --surface: #10011e;
+  --surface-hover: #18022e;
+  --accent: #d946ef;
+  --accent-secondary: #a855f7;
+  --accent-glow: rgba(217, 70, 239, 0.45);
+  --neon-cyan: #22d3ee;
+  --neon-pink: #f472b6;
+  --text: #fdf4ff;
+  --text-muted: #e879f9;
+  --border: rgba(217, 70, 239, 0.15);
+  --grid-color: rgba(217, 70, 239, 0.04);
+}
+.cyber-light {
+  --background: #fdf4ff;
+  --surface: #fae8ff;
+  --surface-hover: #f5d0fe;
+  --accent: #a21caf;
+  --accent-secondary: #7e22ce;
+  --accent-glow: rgba(162, 28, 175, 0.15);
+  --neon-cyan: #0891b2;
+  --neon-pink: #db2777;
+  --text: #3b0764;
+  --text-muted: #7e22ce;
+  --border: rgba(0, 0, 0, 0.12);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* COFFEE */
+.coffee-dark {
+  --background: #0f0a05;
+  --surface: #1e1008;
+  --surface-hover: #2c1a0e;
+  --accent: #d97706;
+  --accent-secondary: #b45309;
+  --accent-glow: rgba(217, 119, 6, 0.4);
+  --neon-cyan: #f59e0b;
+  --neon-pink: #f87171;
+  --text: #fef3c7;
+  --text-muted: #fcd34d;
+  --border: rgba(217, 119, 6, 0.15);
+  --grid-color: rgba(217, 119, 6, 0.04);
+}
+.coffee-light {
+  --background: #fef9f0;
+  --surface: #fef3c7;
+  --surface-hover: #fde68a;
+  --accent: #92400e;
+  --accent-secondary: #78350f;
+  --accent-glow: rgba(146, 64, 14, 0.12);
+  --neon-cyan: #b45309;
+  --neon-pink: #b91c1c;
+  --text: #1c0a00;
+  --text-muted: #78350f;
+  --border: rgba(0, 0, 0, 0.12);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* MINT */
+.mint-dark {
+  --background: #011a16;
+  --surface: #052e26;
+  --surface-hover: #083d34;
+  --accent: #2dd4bf;
+  --accent-secondary: #34d399;
+  --accent-glow: rgba(45, 212, 191, 0.4);
+  --neon-cyan: #60a5fa;
+  --neon-pink: #a3e635;
+  --text: #f0fdfa;
+  --text-muted: #5eead4;
+  --border: rgba(45, 212, 191, 0.15);
+  --grid-color: rgba(45, 212, 191, 0.03);
+}
+.mint-light {
+  --background: #f0fdfa;
+  --surface: #ccfbf1;
+  --surface-hover: #99f6e4;
+  --accent: #0d9488;
+  --accent-secondary: #059669;
+  --accent-glow: rgba(13, 148, 136, 0.15);
+  --neon-cyan: #0369a1;
+  --neon-pink: #0891b2;
+  --text: #042f2e;
+  --text-muted: #134e4a;
+  --border: rgba(0, 0, 0, 0.1);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* LAVENDER */
+.lavender-dark {
+  --background: #0d0814;
+  --surface: #1a0f22;
+  --surface-hover: #251630;
+  --accent: #c084fc;
+  --accent-secondary: #a855f7;
+  --accent-glow: rgba(192, 132, 252, 0.4);
+  --neon-cyan: #e879f9;
+  --neon-pink: #f9a8d4;
+  --text: #faf5ff;
+  --text-muted: #d8b4fe;
+  --border: rgba(192, 132, 252, 0.15);
+  --grid-color: rgba(192, 132, 252, 0.03);
+}
+.lavender-light {
+  --background: #faf5ff;
+  --surface: #f3e8ff;
+  --surface-hover: #e9d5ff;
+  --accent: #7c3aed;
+  --accent-secondary: #6d28d9;
+  --accent-glow: rgba(124, 58, 237, 0.12);
+  --neon-cyan: #9333ea;
+  --neon-pink: #be185d;
+  --text: #2e1065;
+  --text-muted: #5b21b6;
+  --border: rgba(0, 0, 0, 0.1);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* SLATE */
+.slate-dark {
+  --background: #020617;
+  --surface: #0f172a;
+  --surface-hover: #1e293b;
+  --accent: #38bdf8;
+  --accent-secondary: #7dd3fc;
+  --accent-glow: rgba(56, 189, 248, 0.3);
+  --neon-cyan: #818cf8;
+  --neon-pink: #94a3b8;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --grid-color: rgba(255, 255, 255, 0.02);
+}
+.slate-light {
+  --background: #f8fafc;
+  --surface: #f1f5f9;
+  --surface-hover: #e2e8f0;
+  --accent: #0284c7;
+  --accent-secondary: #0369a1;
+  --accent-glow: rgba(2, 132, 199, 0.1);
+  --neon-cyan: #4f46e5;
+  --neon-pink: #475569;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --border: rgba(0, 0, 0, 0.1);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+/* ROSE */
+.rose-dark {
+  --background: #0f0208;
+  --surface: #1e0510;
+  --surface-hover: #2c0718;
+  --accent: #fb7185;
+  --accent-secondary: #f43f5e;
+  --accent-glow: rgba(251, 113, 133, 0.4);
+  --neon-cyan: #fda4af;
+  --neon-pink: #fb923c;
+  --text: #fff1f2;
+  --text-muted: #fda4af;
+  --border: rgba(251, 113, 133, 0.15);
+  --grid-color: rgba(251, 113, 133, 0.03);
+}
+.rose-light {
+  --background: #fff1f2;
+  --surface: #ffe4e6;
+  --surface-hover: #fecdd3;
+  --accent: #e11d48;
+  --accent-secondary: #be123c;
+  --accent-glow: rgba(225, 29, 72, 0.12);
+  --neon-cyan: #be185d;
+  --neon-pink: #db2777;
+  --text: #4c0519;
+  --text-muted: #9f1239;
+  --border: rgba(0, 0, 0, 0.1);
+  --grid-color: rgba(0, 0, 0, 0.04);
+}
+
+
 
 .text-gradient {
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
@@ -226,6 +708,27 @@
 
 .animate-title-impact {
   animation: title-pulse 3s ease-in-out infinite;
+}
+
+/* Performance-optimized theme transitions */
+*, *::before, *::after {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Exclude specific elements that shouldn't transition or have conflict */
+.no-transition, 
+.no-transition *,
+canvas,
+img,
+svg,
+[role="progressbar"],
+.animate-spin {
+  transition: none !important;
 }
 
 body {

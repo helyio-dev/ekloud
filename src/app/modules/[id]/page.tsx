@@ -101,7 +101,7 @@ export default function ModulePage() {
                                 <Link
                                     key={lesson.id}
                                     to={`/lessons/${lesson.id}`}
-                                    className="flex items-center justify-between p-5 bg-surface rounded-xl border border-white/5 hover:border-accent/30 transition-all group"
+                                    className="flex items-center justify-between p-5 bg-surface rounded-xl border border-border hover:border-accent/30 transition-all group"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className={`p-2 rounded-lg ${progress[lesson.id] ? 'bg-green-500/10 text-green-400' : 'bg-background text-accent'}`}>
@@ -114,7 +114,7 @@ export default function ModulePage() {
                             ))}
 
                             { }
-                            <div className="pt-8 border-t border-white/5 mt-8 space-y-4">
+                            <div className="pt-8 border-t border-border mt-8 space-y-4">
                                 <h3 className="text-sm font-bold text-text-muted uppercase tracking-wider mb-4">Évaluations</h3>
 
                                 {allLessonsCompleted ? (
@@ -138,7 +138,7 @@ export default function ModulePage() {
                                         )}
                                     </Link>
                                 ) : (
-                                    <div className="flex items-center justify-between p-5 bg-surface rounded-xl border border-white/5 transition-all group opacity-60 grayscale cursor-not-allowed">
+                                    <div className="flex items-center justify-between p-5 bg-surface rounded-xl border border-border transition-all group opacity-60 grayscale cursor-not-allowed">
                                         <div className="flex items-center gap-4">
                                             <div className="p-2 rounded-lg bg-background text-text-muted">
                                                 <HelpCircle className="w-5 h-5" />
@@ -173,7 +173,7 @@ export default function ModulePage() {
                                         )}
                                     </Link>
                                 ) : (
-                                    <div className="flex items-center justify-between p-5 bg-surface rounded-xl border border-white/5 transition-all group opacity-60 grayscale cursor-not-allowed">
+                                    <div className="flex items-center justify-between p-5 bg-surface rounded-xl border border-border transition-all group opacity-60 grayscale cursor-not-allowed">
                                         <div className="flex items-center gap-4">
                                             <div className="p-2 rounded-lg bg-background text-text-muted">
                                                 <Shield className="w-5 h-5" />

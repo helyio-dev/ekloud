@@ -38,7 +38,6 @@ export default function EditQuestionPage() {
                         module_id: data.module_id,
                         skill_id: data.skill_id,
                         question_text: data.question_text,
-                        difficulty: data.difficulty,
                         type: data.type,
                         answers: (data.quiz_options || []).map((o: any) => ({
                             id: o.id,
@@ -75,7 +74,6 @@ const handleSubmit = async (data: any) => {
                 module_id: data.module_id,
                 skill_id: data.skill_id,
                 question_text: data.question_text,
-                difficulty: data.difficulty,
                 type: data.type
             })
             .eq('id', questionId);

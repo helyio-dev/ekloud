@@ -98,31 +98,31 @@ export default function AccountPage() {
         <div className="min-h-screen bg-background p-6 md:p-12">
             <div className="max-w-4xl mx-auto space-y-8">
                 <div>
-                    <h1 className="text-4xl font-bold mb-2 uppercase tracking-tight">{username}</h1>
+                    <h1 className="text-4xl font-bold mb-2 uppercase tracking-tight text-text">{username}</h1>
                     <p className="text-text-muted text-lg">Gérez vos informations personnelles et sécurisez votre compte.</p>
                 </div>
 
                 {/* Stats Summary */}
                 <div className="grid grid-cols-3 gap-3 md:gap-6">
-                    <div className="bg-surface border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
+                    <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
                         <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">Niveau</span>
                         <span className="text-2xl md:text-4xl font-black text-accent">{level}</span>
                     </div>
-                    <div className="bg-surface border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
+                    <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
                         <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">Streak</span>
                         <span className="text-2xl md:text-4xl font-black text-orange-400">{streak} 🔥</span>
                     </div>
-                    <div className="bg-surface border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center overflow-hidden">
+                    <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center overflow-hidden">
                         <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">XP Total</span>
-                        <span className="text-2xl md:text-4xl font-black text-white px-1 max-w-full overflow-hidden text-ellipsis">{formatXP(xp)}</span>
+                        <span className="text-2xl md:text-4xl font-black text-text px-1 max-w-full overflow-hidden text-ellipsis">{formatXP(xp)}</span>
                     </div>
                 </div>
 
                 {/* Public Profile Link Section - CLEAN VERSION */}
                 {username && (
-                    <div className="bg-surface border border-white/5 p-6 md:p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8 relative">
+                    <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8 relative">
                         <div className="flex items-center gap-6">
-                            <div className="hidden md:flex w-14 h-14 bg-white/5 rounded-2xl items-center justify-center border border-white/10 shrink-0">
+                            <div className="hidden md:flex w-14 h-14 bg-surface-hover/30 rounded-2xl items-center justify-center border border-border shrink-0">
                                 <Share2 className="w-6 h-6 text-text-muted" />
                             </div>
                             <div className="space-y-1 text-center md:text-left">
@@ -130,8 +130,8 @@ export default function AccountPage() {
                                     <Globe className="w-4 h-4 text-accent" />
                                     <span className="text-[10px] font-black tracking-[0.2em] text-accent uppercase">Réseau Ekloud • Profil Public</span>
                                 </div>
-                                <h3 className="text-xl font-bold text-white uppercase tracking-tight">Partager mon profil</h3>
-                                <div className="mt-2 text-xs font-mono text-text-muted/80 bg-black/20 px-3 py-1.5 rounded-lg border border-white/5 inline-block">
+                                <h3 className="text-xl font-bold text-text uppercase tracking-tight">Partager mon profil</h3>
+                                <div className="mt-2 text-xs font-mono text-text-muted/80 bg-surface px-3 py-1.5 rounded-lg border border-border inline-block">
                                     ekloud.qzz.io/u/{username}
                                 </div>
                             </div>
@@ -147,7 +147,7 @@ export default function AccountPage() {
                                 className={`px-6 py-3.5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all active:scale-95 ${
                                     showCopyToast 
                                     ? 'bg-green-500/20 border border-green-500/50 text-green-400' 
-                                    : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
+                                    : 'bg-surface border border-border text-text hover:bg-surface-hover'
                                 }`}
                             >
                                 {showCopyToast ? (
@@ -182,32 +182,32 @@ export default function AccountPage() {
                 )}
 
                 {/* Level Progress */}
-                <div className="bg-surface border border-white/5 p-8 rounded-3xl">
+                <div className="bg-surface border border-border p-8 rounded-3xl">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="bg-accent/10 p-2 rounded-xl border border-accent/20">
                             <Trophy className="w-5 h-5 text-accent" />
                         </div>
-                        <h2 className="text-xl font-bold uppercase tracking-tight">Votre Progression</h2>
+                        <h2 className="text-xl font-bold uppercase tracking-tight text-text">Votre Progression</h2>
                     </div>
 
                     <div className="space-y-4">
                         <div className="flex justify-between items-center text-sm font-bold">
-                            <span className="bg-white/5 px-4 py-1.5 rounded-xl border border-white/10 text-text-muted">LVL {level}</span>
-                            <span className="bg-accent/10 px-4 py-1.5 rounded-xl border border-accent/20 text-accent shadow-[0_0_15px_rgba(99,102,241,0.15)]">LVL {level + 1}</span>
+                            <span className="bg-surface-hover/30 px-4 py-1.5 rounded-xl border border-border text-text-muted">LVL {level}</span>
+                            <span className="bg-accent/10 px-4 py-1.5 rounded-xl border border-accent/20 text-accent shadow-[0_0_15px_var(--accent-glow)]">LVL {level + 1}</span>
                         </div>
 
-                        <div className="h-4 w-full bg-background rounded-full overflow-hidden border border-white/5 relative">
+                        <div className="h-4 w-full bg-background rounded-full overflow-hidden border border-border relative">
                             <div
-                                className="h-full bg-accent relative transition-all duration-1000 shadow-[0_0_15px_rgba(99,102,241,0.5)]"
+                                className="h-full bg-accent relative transition-all duration-1000 shadow-[0_0_15px_var(--accent-glow)]"
                                 style={{ width: `${progress}%` }}
                             >
-                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                                <div className="absolute inset-0 bg-surface/20 animate-pulse"></div>
                             </div>
                         </div>
 
                         <div className="flex flex-col md:flex-row justify-between items-center gap-2">
                             <span className="text-xs font-bold text-text-muted order-2 md:order-1">
-                                <span className="text-white">{formatXP(currentLevelXp)}</span> / {formatXP(requiredXpForNext)} XP
+                                <span className="text-text">{formatXP(currentLevelXp)}</span> / {formatXP(requiredXpForNext)} XP
                             </span>
                             <span className="text-xs font-black text-accent uppercase tracking-wider order-1 md:order-2 flex items-center gap-2">
                                 <Zap className="w-3 h-3" />
@@ -219,12 +219,12 @@ export default function AccountPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Username Update */}
-                    <div className="bg-surface border border-white/5 p-6 md:p-8 rounded-3xl flex flex-col">
+                    <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="bg-blue-500/10 p-2 rounded-xl border border-blue-500/20">
                                 <User className="w-5 h-5 text-blue-400" />
                             </div>
-                            <h2 className="text-lg md:text-xl font-bold">CHANGER MON PSEUDO</h2>
+                            <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">Pseudo</h2>
                         </div>
 
                         <form onSubmit={handleUpdateUsername} className="space-y-4 flex-grow">
@@ -234,7 +234,7 @@ export default function AccountPage() {
                                     type="text"
                                     value={newUsername}
                                     onChange={(e) => setNewUsername(e.target.value)}
-                                    className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-white placeholder:opacity-30"
+                                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-text placeholder:opacity-30"
                                     placeholder="Nouveau pseudo"
                                 />
                             </div>
@@ -265,12 +265,12 @@ export default function AccountPage() {
                     </div>
 
                     {/* Password Update */}
-                    <div className="bg-surface border border-white/5 p-6 md:p-8 rounded-3xl flex flex-col">
+                    <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="bg-purple-500/10 p-2 rounded-xl border border-purple-500/20">
                                 <Lock className="w-5 h-5 text-purple-400" />
                             </div>
-                            <h2 className="text-lg md:text-xl font-bold">SÉCURITÉ</h2>
+                            <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">Mot de passe</h2>
                         </div>
 
                         <form onSubmit={handleUpdatePassword} className="space-y-4 flex-grow">
@@ -280,7 +280,7 @@ export default function AccountPage() {
                                     type="password"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-white placeholder:opacity-30"
+                                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text placeholder:opacity-30"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -290,7 +290,7 @@ export default function AccountPage() {
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-background border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-white placeholder:opacity-30"
+                                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text placeholder:opacity-30"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -312,7 +312,7 @@ export default function AccountPage() {
                             <button
                                 type="submit"
                                 disabled={isUpdatingPassword || !newPassword}
-                                className="w-full py-3 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed border border-white/5 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-4"
+                                className="w-full py-3 bg-surface hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed border border-border text-text rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-4"
                             >
                                 {isUpdatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                 Mettre à jour le mot de passe

@@ -87,7 +87,7 @@ export default function PublicProfilePage() {
                 </div>
                 <button
                     onClick={() => navigate('/')}
-                    className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl flex items-center gap-3 text-white font-bold transition-all"
+                    className="px-8 py-4 bg-surface hover:bg-surface-hover border border-border rounded-2xl flex items-center gap-3 text-text font-bold transition-all"
                 >
                     <ArrowLeft className="w-5 h-5" /> RETOUR AU RÉSEAU
                 </button>
@@ -98,13 +98,13 @@ export default function PublicProfilePage() {
     return (
         <div className="h-screen bg-background flex flex-col overflow-hidden">
             {/* Header / Profile Card */}
-            <div className="bg-surface/30 border-b border-white/5 backdrop-blur-xl relative z-20">
+            <div className="bg-surface/30 border-b border-border backdrop-blur-xl relative z-20">
                 <div className="max-w-7xl mx-auto px-6 py-8 md:py-12">
                     <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
                         <div className="flex items-center gap-6">
                             <div className="relative">
-                                <div className="w-24 h-24 md:w-32 md:h-32 bg-accent rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(99,102,241,0.3)]">
-                                    <span className="text-4xl md:text-6xl font-black text-white">{profile.username.charAt(0).toUpperCase()}</span>
+                                <div className="w-24 h-24 md:w-32 md:h-32 bg-accent rounded-3xl flex items-center justify-center shadow-[0_0_50px_var(--accent-glow)]">
+                                    <span className="text-4xl md:text-6xl font-black text-text">{profile.username.charAt(0).toUpperCase()}</span>
                                 </div>
                                 <div className="absolute -bottom-2 -right-2 bg-background border-4 border-surface p-2 rounded-2xl">
                                     <Shield className="w-6 h-6 text-accent" />
@@ -112,7 +112,7 @@ export default function PublicProfilePage() {
                             </div>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3 flex-wrap">
-                                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white font-equinox uppercase leading-none">{profile.username}</h1>
+                                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-text font-equinox uppercase leading-none">{profile.username}</h1>
                                 </div>
                                 <p className="text-text-muted font-bold flex items-center gap-2">
                                     <Globe className="w-4 h-4" /> Niveau {profile.level} • 
@@ -142,17 +142,17 @@ export default function PublicProfilePage() {
 
                     {/* Quick Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                        <div className="bg-white/5 border border-white/5 p-6 rounded-3xl overflow-hidden relative group">
+                        <div className="bg-surface-hover/30 border border-border p-6 rounded-3xl overflow-hidden relative group">
                             <div className="absolute -top-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><Zap size={100} /></div>
                             <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-1 font-equinox">Expérience globale</p>
-                            <p className="text-2xl font-black text-white">{formatXP(profile.xp)} XP</p>
+                            <p className="text-2xl font-black text-text">{formatXP(profile.xp)} XP</p>
                         </div>
-                        <div className="bg-white/5 border border-white/5 p-6 rounded-3xl overflow-hidden relative group">
+                        <div className="bg-surface-hover/30 border border-border p-6 rounded-3xl overflow-hidden relative group">
                             <div className="absolute -top-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><Flame size={100} /></div>
                             <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-1 font-equinox">Série d'activités</p>
                             <p className="text-2xl font-black text-orange-400">{profile.streak} JOURS 🔥</p>
                         </div>
-                        <div className="bg-white/5 border border-white/5 p-6 rounded-3xl overflow-hidden relative group text-accent border-accent/20 bg-accent/5">
+                        <div className="bg-surface border border-border p-6 rounded-3xl overflow-hidden relative group text-accent border-accent/20 bg-accent/5">
                             <div className="absolute -top-4 -right-4 opacity-10 group-hover:opacity-20 transition-opacity"><Trophy size={100} /></div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-60 font-equinox">Niveau Actuel</p>
                             <p className="text-3xl font-black">{profile.level}</p>
@@ -164,7 +164,7 @@ export default function PublicProfilePage() {
 
             {/* Notification Toast */}
             {notification && (
-                <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-4 rounded-2xl border backdrop-blur-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 ${notification.type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-white/10 border-white/20 text-white/80'}`}>
+                <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-4 rounded-2xl border backdrop-blur-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 ${notification.type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-surface border-border text-text-muted/80'}`}>
                     <Sparkles size={20} />
                     <span className="font-bold tracking-wide">{notification.message}</span>
                 </div>

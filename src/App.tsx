@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
+import KloudyAssistant from '@/components/KloudyAssistant';
 import LandingPage from '@/app/page';
 import Dashboard from '@/app/dashboard/page';
 import FriendsPage from '@/app/friends/page';
@@ -14,6 +16,7 @@ import QuizPage from '@/app/quiz/[id]/page';
 import ExamPage from '@/app/exam/[id]/page';
 import CoursesPage from '@/app/courses/page';
 import AccountPage from '@/app/account/page';
+import SettingsPage from '@/app/settings/page';
 import PublicProfilePage from '@/app/u/[username]/page';
 
 
@@ -66,6 +69,8 @@ const AppContent = () => {
                     <Route path="/quiz/:id" element={<QuizPage />} />
                     <Route path="/exam/:id" element={<ExamPage />} />
                     <Route path="/courses" element={<CoursesPage />} />
+                    <Route path="/account" element={<Navigate to="/settings" replace />} />
+                    <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/modules/new" element={<CreateModulePage />} />
                     <Route path="/admin/modules/:id/edit" element={<EditModulePage />} />
@@ -83,17 +88,20 @@ const AppContent = () => {
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>
+            <KloudyAssistant />
         </div>
     );
 };
 
 function App() {
     return (
-        <AuthProvider>
-            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                <AppContent />
-            </Router>
-        </AuthProvider>
+        <ThemeProvider>
+            <AuthProvider>
+                <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                    <AppContent />
+                </Router>
+            </AuthProvider>
+        </ThemeProvider>
     );
 }
 

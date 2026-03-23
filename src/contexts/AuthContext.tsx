@@ -119,10 +119,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const safetyTimer = setTimeout(() => {
             setIsLoading(prev => {
-                if (prev) console.warn('AuthProvider: Safety timeout triggered.');
+                if (prev) {
+                    console.warn('AuthProvider: Safety timeout triggered (15s). Authentication state may be failing to resolve due to network issues.');
+                }
                 return false;
             });
-        }, 4000);
+        }, 15000);
 
         return () => {
             clearTimeout(safetyTimer);

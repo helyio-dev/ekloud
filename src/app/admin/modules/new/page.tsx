@@ -47,7 +47,7 @@ export default function CreateModulePage() {
             <div className="max-w-3xl mx-auto">
                 <Link to="/admin" className="inline-flex items-center gap-2 text-text-muted hover:text-white transition-colors mb-8 group">
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                    Retour au Dashboard
+                    Retour à l'Administration
                 </Link>
 
                 <h1 className="text-3xl font-black mb-8">Créer un Nouveau Module</h1>

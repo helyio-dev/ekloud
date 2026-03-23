@@ -83,10 +83,10 @@ export default function AdminDashboard() {
                         <Link to="/admin/modules/new" className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-accent/20 text-sm">
                             <Plus className="w-4 h-4" /> Module
                         </Link>
-                        <Link to="/admin/lessons/new" className="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface/80 border border-white/10 text-white rounded-xl font-bold transition-all text-sm">
+                        <Link to="/admin/lessons/new" className="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface-hover border border-border text-text rounded-xl font-bold transition-all text-sm">
                             <Plus className="w-4 h-4" /> Leçon
                         </Link>
-                        <Link to="/admin/quizzes/new" className="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface/80 border border-white/10 text-white rounded-xl font-bold transition-all text-sm">
+                        <Link to="/admin/quizzes/new" className="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface-hover border border-border text-text rounded-xl font-bold transition-all text-sm">
                             <Plus className="w-4 h-4" /> Quiz
                         </Link>
                     </div>
@@ -94,14 +94,14 @@ export default function AdminDashboard() {
 
                 {/* Main Content Sections */}
                 <div>
-                    <div className="flex gap-1 p-1 bg-surface/50 border border-white/5 rounded-xl w-fit mb-6">
+                    <div className="flex gap-1 p-1 bg-surface/50 border border-border rounded-xl w-fit mb-6">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === tab.id
                                     ? 'bg-accent text-white shadow-lg shadow-accent/20'
-                                    : 'text-text-muted hover:text-white hover:bg-white/5'
+                                    : 'text-text-muted hover:text-text hover:bg-surface-hover'
                                     }`}
                             >
                                 {tab.icon}
@@ -116,11 +116,11 @@ export default function AdminDashboard() {
                             <Loader2 className="w-10 h-10 text-accent animate-spin" />
                         </div>
                     ) : activeTab === 'modules' ? (
-                        <section className="bg-surface border border-white/5 rounded-3xl p-6 md:p-8">
+                        <section className="bg-surface border border-border rounded-3xl p-6 md:p-8">
                             <h2 className="text-xl font-bold mb-6">Modules Actuels ({modules.length})</h2>
                             <div className="space-y-3">
                                 {modules.map((mod) => (
-                                    <div key={mod.id} className="flex items-center justify-between p-4 bg-background/50 border border-white/5 rounded-2xl hover:border-accent/20 transition-all">
+                                    <div key={mod.id} className="flex items-center justify-between p-4 bg-background/50 border border-border rounded-2xl hover:border-accent/20 transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center font-bold text-accent text-sm shrink-0">
                                                 {mod.order_index}
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
                                             </Link>
                                             <Link
                                                 to={`/admin/modules/${mod.id}/edit`}
-                                                className="px-3 py-1.5 hover:bg-white/5 rounded-lg text-text-muted hover:text-white transition-colors text-sm font-bold"
+                                                className="px-3 py-1.5 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors text-sm font-bold"
                                             >
                                                 Éditer
                                             </Link>
@@ -158,11 +158,11 @@ export default function AdminDashboard() {
                             </div>
                         </section>
                     ) : activeTab === 'skills' ? (
-                        <section className="bg-surface border border-white/5 rounded-3xl p-6 md:p-8">
+                        <section className="bg-surface border border-border rounded-3xl p-6 md:p-8">
                             <SkillManagementTab />
                         </section>
                     ) : (
-                        <section className="bg-surface border border-white/5 rounded-3xl p-6 md:p-8">
+                        <section className="bg-surface border border-border rounded-3xl p-6 md:p-8">
                             <h2 className="text-xl font-bold mb-6">Gestion des Utilisateurs</h2>
                             <UserManagementTab />
                         </section>
@@ -179,12 +179,12 @@ function StatCard({ title, value, icon, color }: { title: string; value: string;
         purple: 'from-purple-500/10',
     };
     return (
-        <div className={`p-6 bg-surface border border-white/5 rounded-2xl bg-gradient-to-br ${gradient[color]} to-transparent`}>
+        <div className={`p-6 bg-surface border border-border rounded-2xl bg-gradient-to-br ${gradient[color]} to-transparent`}>
             <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-background rounded-xl border border-white/5">{icon}</div>
+                <div className="p-2 bg-background rounded-xl border border-border">{icon}</div>
                 <span className="text-sm font-medium text-text-muted">{title}</span>
             </div>
-            <div className="text-4xl font-black text-white">{value}</div>
+            <div className="text-4xl font-black text-text">{value}</div>
         </div>
     );
 }
