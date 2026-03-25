@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="./public/og-image.png" alt="Ekloud Banner" width="800">
+</p>
+
+---
+
 ## 💡 À propos du projet
 Ekloud est une plateforme d’apprentissage **100 % gratuite**, dédiée à rendre l'éducation tech accessible à tous. Pas de mur payant, pas de frais cachés — **juste du savoir pur.**
 
