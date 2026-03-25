@@ -3,7 +3,7 @@
 </p>
 
 ---
-
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)
 ## 💡 À propos du projet
 Ekloud est une plateforme d’apprentissage **100 % gratuite**, dédiée à rendre l'éducation tech accessible à tous. Pas de mur payant, pas de frais cachés — **juste du savoir pur.**
 
