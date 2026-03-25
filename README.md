@@ -8,3 +8,21 @@ Si Ekloud t'a aidé à monter en compétences, considère m'offrir un café. Cha
 
 > [!TIP]
 > **Pourquoi me soutenir ?** L'infrastructure (hosting, base de données) a un coût. Ton aide permet de garder l'accès gratuit pour les étudiants et les autodidactes.
+
+## 🌐 Roadmap
+- [X] Création du MVP
+- [X] Ajout des fonctionnalités essentiels
+  - [X] Classement
+  - [X] Système social
+  - [X] Système de TechSquad
+- [ ] Création de l'application
+  - [ ] Plateforme Windows / Linux
+    - [ ] Intégration de CodeMirror6
+    - [ ] Intégration d'un agent mentor
+    - [ ] Ajout d'un auto-updater
+  - [ ] Plateforme Android
+    - [ ] Lecture des cours
+    - [ ] Notifications
+      - [ ] Envoie lors d'une perte de streak
+      - [ ] Envoie lors d'une communication
+      - [ ] Envoie lors d'un ajout de cours
