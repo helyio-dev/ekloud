@@ -31,7 +31,16 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         const modes: ThemeMode[] = ['dark', 'light'];
         allPalettes.forEach(p => modes.forEach(m => root.classList.remove(`${p}-${m}`)));
 
+        // Add theme palette-mode class
         root.classList.add(`${palette}-${mode}`);
+        
+        // Add/Remove standard 'dark' class for Tailwind's darkMode: 'class'
+        if (mode === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+
         localStorage.setItem('theme-palette', palette);
         localStorage.setItem('theme-mode', mode);
     }, [palette, mode]);

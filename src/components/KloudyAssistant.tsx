@@ -148,10 +148,10 @@ export default function KloudyAssistant() {
         <div className="fixed bottom-8 right-8 z-[999999] flex flex-col items-end gap-4 pointer-events-none animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
             {/* Chat Window */}
             {isOpen && (
-                <div className={`w-[95vw] md:w-[420px] bg-background border border-white/5 rounded-[32px] shadow-[0_24px_80px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-auto origin-bottom-right ${isMinimized ? 'h-[64px] opacity-0 scale-95 pointer-events-none' : 'h-[600px] md:h-[680px] max-h-[calc(100vh-140px)] opacity-100 scale-100'}`}>
+                <div className={`w-[95vw] md:w-[420px] bg-background border border-border rounded-[32px] shadow-[0_24px_80px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] pointer-events-auto origin-bottom-right ${isMinimized ? 'h-[64px] opacity-0 scale-95 pointer-events-none' : 'h-[600px] md:h-[680px] max-h-[calc(100vh-140px)] opacity-100 scale-100'}`}>
                     
                     {/* Header */}
-                    <div className="px-6 py-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+                    <div className="px-6 py-4 flex items-center justify-between border-b border-border bg-surface/30">
                         <div className="flex items-center gap-3">
                             <div className={`w-8 h-8 rounded-xl flex items-center justify-center relative transition-all duration-500 ${isRecalibrating ? 'bg-violet-500 shadow-[0_0_15px_-2px_rgba(167,139,250,1)] scale-110' : 'bg-accent/10'}`}>
                                 <Bot className={`w-5 h-5 transition-colors duration-500 ${isRecalibrating ? 'text-white' : 'text-accent'}`} />
@@ -165,7 +165,7 @@ export default function KloudyAssistant() {
                             </div>
                         </div>
                         <div className="flex items-center gap-1">
-                            <button onClick={() => setIsMinimized(true)} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-text-muted hover:text-text">
+                            <button onClick={() => setIsMinimized(true)} className="p-2 hover:bg-surface-hover rounded-xl transition-colors text-text-muted hover:text-text">
                                 <Minus className="w-4 h-4" />
                             </button>
                             <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-text-muted hover:text-red-500">
@@ -200,9 +200,9 @@ export default function KloudyAssistant() {
                                         <div className={`max-w-[85%] p-4 rounded-2xl text-[13px] leading-relaxed ${
                                             msg.role === 'user' 
                                             ? 'bg-accent text-white rounded-tr-none' 
-                                            : 'bg-white/5 border border-white/5 text-text rounded-tl-none'
+                                            : 'bg-surface border border-border text-text rounded-tl-none'
                                         }`}>
-                                            <div className="prose prose-invert prose-sm max-w-none prose-pre:bg-black/20 prose-pre:border prose-pre:border-white/5 prose-code:text-accent prose-code:bg-accent/5 prose-code:px-1 prose-code:rounded">
+                                            <div className="prose prose-invert prose-sm max-w-none prose-pre:bg-surface-hover/50 prose-pre:border prose-pre:border-border prose-code:text-accent prose-code:bg-accent/5 prose-code:px-1 prose-code:rounded">
                                                 {msg.role === 'assistant' ? (
                                                     <TypingMessage 
                                                         content={msg.content} 
@@ -218,7 +218,7 @@ export default function KloudyAssistant() {
 
                                 {isLoading && !isRecalibrating && (
                                     <div className="flex justify-start animate-pulse">
-                                        <div className="bg-white/5 border border-white/5 p-4 rounded-2xl rounded-tl-none flex items-center gap-3">
+                                        <div className="bg-surface border border-border p-4 rounded-2xl rounded-tl-none flex items-center gap-3">
                                             <div className="w-1.5 h-1.5 bg-accent/40 rounded-full" />
                                             <span className="text-[10px] text-text-muted font-bold uppercase tracking-widest">Réflexion...</span>
                                         </div>
@@ -228,14 +228,14 @@ export default function KloudyAssistant() {
                             </div>
 
                             {/* Input Form */}
-                            <div className="p-6 bg-white/[0.01]">
+                            <div className="p-6 bg-surface/10">
                                 <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="relative">
                                     <input
                                         type="text"
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
                                         placeholder="Pose ta question..."
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-5 pr-12 text-sm text-text focus:outline-none focus:border-accent/40 transition-all placeholder:text-text-muted/30"
+                                        className="w-full bg-surface border border-border rounded-2xl py-3.5 pl-5 pr-12 text-sm text-text focus:outline-none focus:border-accent/40 transition-all placeholder:text-text-muted/30"
                                     />
                                     <button
                                         type="submit"
@@ -257,7 +257,7 @@ export default function KloudyAssistant() {
                     if (isMinimized) setIsMinimized(false);
                     else setIsOpen(!isOpen)
                 }}
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 pointer-events-auto group ${isOpen && !isMinimized ? 'bg-white/5 border border-white/5' : 'bg-accent text-white'}`}
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 pointer-events-auto group ${isOpen && !isMinimized ? 'bg-surface border border-border' : 'bg-accent text-white'}`}
             >
                 {isOpen && !isMinimized ? <X className="w-6 h-6 text-text" /> : (
                     <div className="relative duration-500">

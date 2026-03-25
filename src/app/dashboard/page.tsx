@@ -259,7 +259,7 @@ export default function Dashboard() {
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3">
                                         {status === 'completed' ? (
-                                            <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-green-500">
+                                            <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-green-600 dark:text-green-500">
                                                 <CheckCircle className="w-3 h-3" /> Maîtrisé
                                             </div>
                                         ) : status === 'available' ? (
@@ -267,7 +267,7 @@ export default function Dashboard() {
                                                 <Sparkles className="w-3 h-3" /> Disponible
                                             </div>
                                         ) : selectedSkill.is_locked ? (
-                                            <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-red-500">
+                                            <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-red-600 dark:text-red-500">
                                                 <Lock className="w-3 h-3" /> Construction
                                             </div>
                                         ) : (
@@ -333,7 +333,7 @@ export default function Dashboard() {
                                                                 {completed ? <CheckCircle className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
                                                             </div>
                                                             <div className="space-y-1.5">
-                                                                <span className={`text-sm font-black leading-tight block ${completed ? 'text-green-500/80' : 'text-text'}`}>
+                                                                <span className={`text-sm font-black leading-tight block ${completed ? 'text-green-600/80 dark:text-green-500/80' : 'text-text'}`}>
                                                                     {mod?.title || 'Activité'}
                                                                 </span>
                                                                 <span className="text-[8px] font-black uppercase tracking-widest text-text-muted/40">

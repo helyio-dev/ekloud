@@ -144,7 +144,7 @@ export default function Navbar() {
                                             <Link 
                                                 onClick={() => setIsMenuOpen(false)} 
                                                 to="/clan-quiz" 
-                                                className="group/tile flex flex-col items-center justify-center gap-2 p-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                                                className="group/tile flex flex-col items-center justify-center gap-2 p-3 bg-surface/30 hover:bg-surface-hover border border-border rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                             >
                                                 <div className={`p-2.5 rounded-xl group-hover/tile:scale-110 transition-transform ${
                                                     clan === 'ROOT' ? 'bg-orange-500/20 text-orange-400 shadow-[0_0_15px_-4px_rgba(249,115,22,0.4)]' : 
@@ -183,12 +183,12 @@ export default function Navbar() {
                                             <Link 
                                                 onClick={() => setIsMenuOpen(false)} 
                                                 to="/settings" 
-                                                className="group/tile flex flex-col items-center justify-center gap-2 p-3 bg-zinc-500/5 hover:bg-zinc-500/10 border border-zinc-500/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-zinc-500/10"
+                                                className="group/tile flex flex-col items-center justify-center gap-2 p-3 bg-surface/30 hover:bg-surface-hover border border-border rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                             >
-                                                <div className="p-2.5 bg-zinc-500/10 rounded-xl group-hover/tile:scale-110 transition-transform">
-                                                    <Settings className="w-5 h-5 text-zinc-400 group-hover:rotate-45 transition-transform duration-500" />
+                                                <div className="p-2.5 bg-surface-hover rounded-xl group-hover/tile:scale-110 transition-transform">
+                                                    <Settings className="w-5 h-5 text-text-muted group-hover:rotate-45 transition-transform duration-500" />
                                                 </div>
-                                                <span className="text-[10px] font-black uppercase tracking-wider text-text-muted group-hover/tile:text-zinc-400 transition-colors">Param.</span>
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-text-muted group-hover/tile:text-text transition-colors">Param.</span>
                                             </Link>
                                         </div>
 
@@ -199,12 +199,12 @@ export default function Navbar() {
                                                     href="https://discord.gg/WnwyMHm4Gc" 
                                                     target="_blank" 
                                                     rel="noopener noreferrer" 
-                                                    className="px-3 py-2 text-xs font-bold text-blue-400 hover:text-blue-300 hover:bg-blue-400/5 rounded-xl transition-colors flex items-center gap-3"
+                                                    className="px-3 py-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-500/5 rounded-xl transition-colors flex items-center gap-3"
                                                 >
-                                                    <MessageSquare className="w-4 h-4 fill-blue-400/20" />
+                                                    <MessageSquare className="w-4 h-4 fill-current/10" />
                                                     Rejoindre le Discord
                                                 </a>
-                                                <Link onClick={() => setIsMenuOpen(false)} to="/support" className="px-3 py-2 text-xs font-bold text-text-muted hover:text-rose-400 hover:bg-rose-400/5 rounded-xl transition-colors flex items-center gap-3">
+                                                <Link onClick={() => setIsMenuOpen(false)} to="/support" className="px-3 py-2 text-xs font-bold text-text-muted hover:text-rose-500 hover:bg-rose-500/5 rounded-xl transition-colors flex items-center gap-3">
                                                     <Heart className="w-4 h-4 text-rose-500 fill-rose-500/20" />
                                                     Soutenir le projet
                                                 </Link>
@@ -222,7 +222,7 @@ export default function Navbar() {
                                                 </button>
                                                 
                                                 {(isAdmin || isContributor) && (
-                                                    <Link onClick={() => setIsMenuOpen(false)} to="/admin" className="px-3 py-2 text-xs font-black text-purple-400 hover:bg-purple-400/5 rounded-xl transition-colors flex items-center gap-3 border-t border-border mt-2 pt-2">
+                                                    <Link onClick={() => setIsMenuOpen(false)} to="/admin" className="px-3 py-2 text-xs font-black text-purple-600 dark:text-purple-400 hover:bg-purple-400/5 rounded-xl transition-colors flex items-center gap-3 border-t border-border mt-2 pt-2">
                                                         <Settings className="w-4 h-4" />
                                                         {isAdmin ? 'ADMINISTRATION' : 'CONTRIBUTION'}
                                                     </Link>

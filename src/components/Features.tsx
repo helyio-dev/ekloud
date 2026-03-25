@@ -7,19 +7,19 @@ export default function Features() {
         <section id="features" className="relative z-10 py-16 px-6 max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FeatureCard
-                    icon={<BookOpen className="w-8 h-8 text-accent" />}
+                    icon={<BookOpen className="w-8 h-8" />}
                     title="PARCOURS ACCESSIBLES"
                     description="Chaque module est conçu pour être compris par tous, sans jargon inutile, pour une progression sereine."
                     delay="delay-100"
                 />
                 <FeatureCard
-                    icon={<ShieldCheck className="w-8 h-8 text-accent" />}
+                    icon={<ShieldCheck className="w-8 h-8" />}
                     title="APPRENTISSAGE CONCRET"
                     description="Validez vos connaissances avec des exercices pratiques et des quiz basés sur des cas réels."
                     delay="delay-300"
                 />
                 <FeatureCard
-                    icon={<Cpu className="w-8 h-8 text-accent" />}
+                    icon={<Cpu className="w-8 h-8" />}
                     title="TECHNO DE DEMAIN"
                     description="Explorez les domaines qui vous passionnent, du développement web à l'administration système."
                     delay="delay-500"

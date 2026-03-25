@@ -462,7 +462,7 @@ export default function SkillTree({
 
     return (
         <div 
-            className="relative w-full h-[calc(100dvh-70px)] md:h-[calc(100vh-80px)] min-h-[600px] z-0 overflow-hidden bg-background text-[#f1f5f9] flex flex-col font-mono select-none mesh-gradient"
+            className="relative w-full h-[calc(100dvh-70px)] md:h-[calc(100vh-80px)] min-h-[600px] z-0 overflow-hidden bg-background text-text flex flex-col font-mono select-none mesh-gradient"
             onClick={() => setSelectedSkillId(null)}
         >
             {/* Base grid - Unified with theme */}
@@ -485,7 +485,7 @@ export default function SkillTree({
                                 key={category}
                                 onClick={() => setActiveModuleId(category)}
                                 className={`px-5 py-2.5 rounded-xl text-[10px] md:text-[11px] font-bold uppercase tracking-widest transition-all max-w-[160px] truncate
-                                    ${activeModuleId === category ? 'bg-[#38bdf8] text-[#0f172a] shadow-[0_0_15px_rgba(56,189,248,0.3)] md:scale-105' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}
+                                    ${activeModuleId === category ? 'bg-accent text-white shadow-[0_0_15px_rgba(56,189,248,0.3)] md:scale-105' : 'text-text-muted hover:text-text hover:bg-surface-hover'}`}
                             >
                                 {category}
                             </button>
@@ -623,9 +623,9 @@ export default function SkillTree({
                                                         <div 
                                                             key={p.prerequisite_skill_id} 
                                                             className={`flex items-center gap-3 px-3 md:px-4 py-2 md:py-3 rounded-[10px] border text-[11px] md:text-[12px] font-bold tracking-wide transition-all
-                                                                ${isPreMet ? 'bg-[#10b981]/10 border-[#10b981]/30 text-[#f8fafc]' : 'bg-[#0f172a]/50 border-[#334155] text-[#94a3b8]'}`}
+                                                                ${isPreMet ? 'bg-green-500/10 border-green-500/30 text-text' : 'bg-surface/50 border-border text-text-muted'}`}
                                                         >
-                                                            <div className={`w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center ${isPreMet ? 'bg-[#10b981] text-[#0f172a]' : 'bg-[#334155] text-[#94a3b8]'}`}>
+                                                            <div className={`w-5 h-5 flex-shrink-0 rounded-full flex-center ${isPreMet ? 'bg-green-500 text-white' : 'bg-surface-hover text-text-muted'}`}>
                                                                 {isPreMet ? <CheckCircle className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
                                                             </div>
                                                             <span>{preSkill?.name || 'Inconnu'}</span>

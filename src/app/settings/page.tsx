@@ -243,7 +243,7 @@ export default function SettingsPage() {
                             </div>
                             <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
                                 <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">Streak</span>
-                                <span className="text-2xl md:text-4xl font-black text-orange-400">{streak} 🔥</span>
+                                <span className="text-2xl md:text-4xl font-black text-orange-600 dark:text-orange-400">{streak} 🔥</span>
                             </div>
                             <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center overflow-hidden">
                                 <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">XP Total</span>
@@ -318,7 +318,7 @@ export default function SettingsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="bg-blue-500/10 p-2 rounded-xl border border-blue-500/20"><User className="w-5 h-5 text-blue-400" /></div>
+                                    <div className="bg-blue-600/10 dark:bg-blue-500/10 p-2 rounded-xl border border-blue-600/20 dark:border-blue-500/20"><User className="w-5 h-5 text-blue-600 dark:text-blue-400" /></div>
                                     <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">Pseudo</h2>
                                 </div>
                                 <form onSubmit={handleUpdateUsername} className="space-y-4 flex-grow">
@@ -326,8 +326,8 @@ export default function SettingsPage() {
                                         <label className="block text-sm font-medium mb-2 text-text-muted">NOUVEAU PSEUDO</label>
                                         <input type="text" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-text placeholder:opacity-30" placeholder="Nouveau pseudo" />
                                     </div>
-                                    {usernameError && <div className="flex items-center gap-2 text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20"><AlertCircle className="w-4 h-4" />{usernameError}</div>}
-                                    {usernameSuccess && <div className="flex items-center gap-2 text-green-400 text-sm bg-green-400/10 p-3 rounded-lg border border-green-400/20"><CheckCircle2 className="w-4 h-4" />Pseudo mis à jour !</div>}
+                                    {usernameError && <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20"><AlertCircle className="w-4 h-4" />{usernameError}</div>}
+                                    {usernameSuccess && <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-500/10 p-3 rounded-lg border-green-500/20"><CheckCircle2 className="w-4 h-4" />Pseudo mis à jour !</div>}
                                     <button type="submit" disabled={isUpdatingUsername || newUsername === username} className="w-full py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-4">
                                         {isUpdatingUsername ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                         Enregistrer
@@ -337,7 +337,7 @@ export default function SettingsPage() {
 
                             <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="bg-purple-500/10 p-2 rounded-xl border border-purple-500/20"><Lock className="w-5 h-5 text-purple-400" /></div>
+                                    <div className="bg-purple-600/10 dark:bg-purple-500/10 p-2 rounded-xl border border-purple-600/20 dark:border-purple-500/20"><Lock className="w-5 h-5 text-purple-600 dark:text-purple-400" /></div>
                                     <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">Mot de passe</h2>
                                 </div>
                                 <form onSubmit={handleUpdatePassword} className="space-y-4 flex-grow">
@@ -349,8 +349,8 @@ export default function SettingsPage() {
                                         <label className="block text-sm font-medium mb-2 text-text-muted">CONFIRMER</label>
                                         <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text placeholder:opacity-30" placeholder="••••••••" />
                                     </div>
-                                    {passwordError && <div className="flex items-center gap-2 text-red-400 text-sm bg-red-400/10 p-3 rounded-lg border border-red-400/20"><AlertCircle className="w-4 h-4" />{passwordError}</div>}
-                                    {passwordSuccess && <div className="flex items-center gap-2 text-green-400 text-sm bg-green-400/10 p-3 rounded-lg border border-green-400/20"><CheckCircle2 className="w-4 h-4" />Mis à jour !</div>}
+                                    {passwordError && <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border-red-500/20"><AlertCircle className="w-4 h-4" />{passwordError}</div>}
+                                    {passwordSuccess && <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-500/10 p-3 rounded-lg border-green-500/20"><CheckCircle2 className="w-4 h-4" />Mis à jour !</div>}
                                     <button type="submit" disabled={isUpdatingPassword || !newPassword} className="w-full py-3 bg-surface hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed border border-border text-text rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-4">
                                         {isUpdatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                         Mettre à jour
