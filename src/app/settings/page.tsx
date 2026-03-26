@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme, ThemePalette } from '@/contexts/ThemeContext';
 import { supabase } from '@/lib/supabase';
@@ -8,7 +8,8 @@ import {
     ExternalLink, Copy, Share2, Globe, Sparkles, Trophy, Zap,
     Settings, Palette, Sun, Moon, Check, Monitor, Smartphone,
     Stars, Leaf, Sunset, Waves, Flower2, Terminal,
-    MoonStar, Flame, Cpu, Coffee, Droplets, Flower, Layers, Heart,
+    MoonStar, Flame, Cpu, Coffee, Droplets, Flower, Layers, Heart, Link as LinkIcon,
+    Github, Twitch, Linkedin,
     type LucideIcon
 } from 'lucide-react';
 import { formatXP, calculateLevelProgress } from '@/lib/gamification';
@@ -139,6 +140,10 @@ export default function SettingsPage() {
     const { palette, mode, setPalette, toggleMode } = useTheme();
     const [activeTab, setActiveTab] = useState<'account' | 'appearance'>('account');
 
+    // Linked accounts state
+    const [identities, setIdentities] = useState<any[]>([]);
+    const [isLinking, setIsLinking] = useState<string | null>(null);
+
     // Username state
     const [newUsername, setNewUsername] = useState(username || '');
     const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
@@ -155,6 +160,36 @@ export default function SettingsPage() {
     const [showCopyToast, setShowCopyToast] = useState(false);
 
     const { progress, currentLevelXp, requiredXpForNext } = calculateLevelProgress(xp || 0);
+
+    const fetchIdentities = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.identities) {
+            setIdentities(user.identities);
+        }
+    };
+
+    useEffect(() => {
+        fetchIdentities();
+    }, []);
+
+    const handleLinkAccount = async (provider: string) => {
+        setIsLinking(provider);
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: provider as any,
+            options: {
+                redirectTo: `${window.location.origin}/settings`,
+                skipBrowserRedirect: false,
+            },
+        });
+        if (error) {
+            console.error('Error linking account:', error.message);
+            setIsLinking(null);
+        }
+    };
+
+    const isProviderLinked = (provider: string) => {
+        return identities.some(id => id.provider === provider);
+    };
 
     const handleUpdateUsername = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -290,6 +325,55 @@ export default function SettingsPage() {
                                 )}
                             </div>
                         )}
+
+                        {/* Linked Accounts */}
+                        <div className="bg-surface border border-border p-8 rounded-3xl">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="bg-accent/10 p-2 rounded-xl border border-accent/20">
+                                    <LinkIcon className="w-5 h-5 text-accent" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold uppercase tracking-tight text-text">Comptes liés</h2>
+                                    <p className="text-xs text-text-muted">Associez plusieurs comptes pour sécuriser votre progression.</p>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {[
+                                    { id: 'github', name: 'GitHub', icon: <Github className="w-5 h-5" /> },
+                                    { id: 'discord', name: 'Discord', icon: <div className="w-5 h-5 flex items-center justify-center"><svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.923 2.991.076.076 0 0 0 .084-.027c.458-.627.866-1.287 1.21-1.982.028-.056.012-.112-.04-.132a13.104 13.104 0 0 1-1.859-.884.078.078 0 0 1-.008-.128c.125-.094.25-.192.37-.294a.076.076 0 0 1 .1-.01c3.931 1.807 8.18 1.807 12.069 0a.076.076 0 0 1 .1.01c.12.102.245.2.372.294a.077.077 0 0 1-.008.128c-.59.352-1.187.647-1.86.884-.052.02-.068.076-.04.132.344.695.752 1.355 1.21 1.982a.076.076 0 0 0 .084.027 19.856 19.856 0 0 0 6.023-2.991.082.082 0 0 0 .031-.057c.475-5.23-.839-9.742-3.601-13.66a.066.066 0 0 0-.032-.027zm-12.064 10.1c-1.184 0-2.164-1.09-2.164-2.427 0-1.337.957-2.427 2.164-2.427 1.219 0 2.185 1.09 2.165 2.427 0 1.337-.957 2.427-2.165 2.427zm7.983 0c-1.184 0-2.164-1.09-2.164-2.427 0-1.337.957-2.427 2.164-2.427 1.219 0 2.185 1.09 2.165 2.427 0 1.337-.957 2.427-2.165 2.427z" /></svg></div> },
+                                    { id: 'azure', name: 'Microsoft', icon: <div className="w-5 h-5 flex items-center justify-center scale-75"><svg viewBox="0 0 23 23" fill="currentColor"><path fill="#f35325" d="M1 1h10v10H1z" /><path fill="#81bc06" d="M12 1h10v10H12z" /><path fill="#05a6f0" d="M1 12h10v10H1z" /><path fill="#ffba08" d="M12 12h10v10H12z" /></svg></div> },
+                                    { id: 'gitlab', name: 'GitLab', icon: <div className="w-5 h-5 flex items-center justify-center scale-90"><svg viewBox="0 0 24 24" fill="#e24329"><path d="m23.498 13.528-.158-.485L12 1.36 1.356 12.347l2.844 8.76L12 24l7.8-2.893 3.698-7.579Zm-11.5-12.168 1.95 6.023H9.55l1.95-6.023h.498ZM8.677 8.355l-2.617 8.08L12 24l5.94-7.565-2.617-8.08H8.677ZM1.356 12.347h6.444l4.2 11.653-9.288-11.653Zm14.844 0h6.444l-9.288 11.653 2.844-11.653Z" /></svg></div> },
+                                    { id: 'linkedin_oidc', name: 'LinkedIn', icon: <Linkedin className="w-5 h-5" /> },
+                                    { id: 'twitch', name: 'Twitch', icon: <Twitch className="w-5 h-5" /> },
+                                ].map((p) => {
+                                    const linked = isProviderLinked(p.id);
+                                    return (
+                                        <div key={p.id} className={`p-4 rounded-2xl border transition-all flex items-center justify-between ${linked ? 'bg-accent/5 border-accent/20' : 'bg-background border-border opacity-60 hover:opacity-100'}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className={`${linked ? 'text-accent' : 'text-text-muted'}`}>
+                                                    {p.icon}
+                                                </div>
+                                                <span className={`text-sm font-bold ${linked ? 'text-text' : 'text-text-muted'}`}>{p.name}</span>
+                                            </div>
+                                            {linked ? (
+                                                <div className="flex items-center gap-1.5 text-[10px] font-black text-accent uppercase">
+                                                    <CheckCircle2 className="w-3.5 h-3.5" /> Lié
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleLinkAccount(p.id)}
+                                                    disabled={isLinking !== null}
+                                                    className="text-[10px] font-black text-text-muted hover:text-accent uppercase underline underline-offset-4 tracking-wider transition-colors disabled:opacity-50"
+                                                >
+                                                    {isLinking === p.id ? 'Connexion...' : 'Lier'}
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
 
                         {/* Level Progress */}
                         <div className="bg-surface border border-border p-8 rounded-3xl">
