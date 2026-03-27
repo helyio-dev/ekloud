@@ -9,7 +9,6 @@ import { supabase } from './supabase';
 export interface LessonContext {
   title?: string;
   difficulty?: 'Débutant' | 'Intermédiaire' | 'Avancé';
-  tags?: string[];
 }
 
 export interface FetchOptions {

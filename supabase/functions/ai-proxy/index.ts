@@ -14,7 +14,6 @@ interface Message {
 interface LessonContext {
   title?: string;
   difficulty?: string;
-  tags?: string[];
 }
 
 interface RequestBody {
@@ -70,7 +69,7 @@ serve(async (req) => {
 
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized — invalid token' }), {
+      return new Response(JSON.stringify({ error: `Unauthorized — ${authError?.message || 'invalid token'}` }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -89,7 +88,7 @@ serve(async (req) => {
 
     // Build contextual system prompt
     const contextText = lessonContext
-      ? `\n### CONTEXTE DU COURS :\n- Titre : ${lessonContext.title || 'Inconnu'}\n- Difficulté : ${lessonContext.difficulty || 'N/A'}\n- Tags : ${lessonContext.tags?.join(', ') || 'Aucun'}`
+      ? `\n### CONTEXTE DU COURS :\n- Titre : ${lessonContext.title || 'Inconnu'}\n- Difficulté : ${lessonContext.difficulty || 'N/A'}`
       : '';
 
     const systemMessage: Message = {

@@ -31,7 +31,6 @@ type LessonContext = {
     title: string;
     content: string;
     difficulty?: 'Débutant' | 'Intermédiaire' | 'Avancé';
-    tags?: string[];
 } | null;
 
 export default function KloudyAssistant() {
@@ -53,7 +52,7 @@ export default function KloudyAssistant() {
                 // Fetching extended metadata (difficulty, tags) for AI context
                 const { data, error } = await supabase
                     .from('lessons')
-                    .select('title, content, difficulty, tags')
+                    .select('title, content, difficulty')
                     .eq('id', lessonId)
                     .single();
 
@@ -123,8 +122,7 @@ export default function KloudyAssistant() {
             const assistantContent = await fetchAIResponse(updatedMessages, {
                 lessonContext: lessonContext ? {
                     title: lessonContext.title,
-                    difficulty: lessonContext.difficulty,
-                    tags: lessonContext.tags
+                    difficulty: lessonContext.difficulty
                 } : undefined,
                 onRetry: () => {
                     setIsRecalibrating(true);
