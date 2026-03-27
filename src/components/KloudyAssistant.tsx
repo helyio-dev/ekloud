@@ -68,7 +68,13 @@ export default function KloudyAssistant() {
         const path = location.pathname;
         if (path.startsWith('/lessons/')) {
             const id = path.split('/').pop();
-            if (id) fetchLessonContext(id);
+            // Basic UUID validation regex to prevent Supabase 400 Bad Request
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (id && uuidRegex.test(id)) {
+                fetchLessonContext(id);
+            } else {
+                setLessonContext(null);
+            }
         } else {
             setLessonContext(null);
         }

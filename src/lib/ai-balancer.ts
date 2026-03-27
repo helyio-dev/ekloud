@@ -39,6 +39,9 @@ export async function fetchAIResponse(
       messages,
       lessonContext: options?.lessonContext,
     },
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
   });
 
   if (error) {

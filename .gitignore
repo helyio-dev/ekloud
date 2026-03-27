@@ -17,7 +17,6 @@ tsconfig.tsbuildinfo
 supabase/.temp
 supabase/.branches
 
-# ===== Internal AI workspace (Gemini) =====
 /.gemini
 
 # ===== Database schema (contains sensitive info) =====
