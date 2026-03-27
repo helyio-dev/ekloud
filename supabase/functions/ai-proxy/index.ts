@@ -55,8 +55,8 @@ serve(async (req) => {
     // 🔒 Verify user is authenticated via Supabase JWT
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
+      return new Response(JSON.stringify({ error: 'Unauthorized — Auth header missing in request' }), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -69,8 +69,8 @@ serve(async (req) => {
 
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: `Unauthorized — ${authError?.message || 'invalid token'}` }), {
-        status: 401,
+      return new Response(JSON.stringify({ error: `Unauthorized — getUser failed: ${authError?.message || 'no user'}` }), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

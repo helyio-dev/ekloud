@@ -38,13 +38,14 @@ export async function fetchAIResponse(
       messages,
       lessonContext: options?.lessonContext,
     },
-    headers: {
-      Authorization: `Bearer ${session.access_token}`,
-    },
   });
 
   if (error) {
     throw new Error(error.message || '☁️ **Éclair de bug !** Kloudy a un petit souci.');
+  }
+
+  if (data?.error) {
+    throw new Error(data.error);
   }
 
   if (!data?.content) {
