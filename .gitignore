@@ -1,9 +1,41 @@
+# ===== Dependencies =====
 /node_modules
 
+# ===== Build output =====
 /dist
 
+# ===== TypeScript build cache =====
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# ===== Environment & Secrets =====
+.env
+.env.local
+.env.*.local
+
+# ===== Supabase =====
+supabase/.temp
+supabase/.branches
+
+# ===== Internal AI workspace (Gemini) =====
 /.gemini
 
-.env
-
+# ===== Database schema (contains sensitive info) =====
 bdd.sql
+
+# ===== Logs =====
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== OS artifacts =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== Editor artifacts =====
+*.swp
+*.swo
+.idea/

@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
 import KloudyAssistant from '@/components/KloudyAssistant';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import LandingPage from '@/app/page';
 import Dashboard from '@/app/dashboard/page';
 import FriendsPage from '@/app/friends/page';
@@ -70,16 +71,16 @@ const AppContent = () => {
                     <Route path="/exam/:id" element={<ExamPage />} />
                     <Route path="/courses" element={<CoursesPage />} />
                     <Route path="/account" element={<Navigate to="/settings" replace />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/admin/modules/new" element={<CreateModulePage />} />
-                    <Route path="/admin/modules/:id/edit" element={<EditModulePage />} />
-                    <Route path="/admin/modules/:id/content" element={<ModuleContentPage />} />
-                    <Route path="/admin/lessons/new" element={<CreateLessonPage />} />
-                    <Route path="/admin/lessons/:id/edit" element={<EditLessonPage />} />
-                    <Route path="/admin/quizzes/new" element={<CreateQuizPage />} />
-                    <Route path="/admin/quizzes/:id/edit" element={<EditQuestionPage />} />
-                    <Route path="/admin/skills/:id/exam" element={<SkillExamQuestionsPage />} />
+                    <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+                    <Route path="/admin" element={<ProtectedRoute roles={['admin', 'contributor']}><AdminDashboard /></ProtectedRoute>} />
+                    <Route path="/admin/modules/new" element={<ProtectedRoute roles={['admin', 'contributor']}><CreateModulePage /></ProtectedRoute>} />
+                    <Route path="/admin/modules/:id/edit" element={<ProtectedRoute roles={['admin', 'contributor']}><EditModulePage /></ProtectedRoute>} />
+                    <Route path="/admin/modules/:id/content" element={<ProtectedRoute roles={['admin', 'contributor']}><ModuleContentPage /></ProtectedRoute>} />
+                    <Route path="/admin/lessons/new" element={<ProtectedRoute roles={['admin', 'contributor']}><CreateLessonPage /></ProtectedRoute>} />
+                    <Route path="/admin/lessons/:id/edit" element={<ProtectedRoute roles={['admin', 'contributor']}><EditLessonPage /></ProtectedRoute>} />
+                    <Route path="/admin/quizzes/new" element={<ProtectedRoute roles={['admin', 'contributor']}><CreateQuizPage /></ProtectedRoute>} />
+                    <Route path="/admin/quizzes/:id/edit" element={<ProtectedRoute roles={['admin', 'contributor']}><EditQuestionPage /></ProtectedRoute>} />
+                    <Route path="/admin/skills/:id/exam" element={<ProtectedRoute roles={['admin']}><SkillExamQuestionsPage /></ProtectedRoute>} />
                     <Route path="/clan-quiz" element={<ClanQuizPage />} />
                     <Route path="/support" element={<SupportPage />} />
                     <Route path="/account" element={<AccountPage />} />
