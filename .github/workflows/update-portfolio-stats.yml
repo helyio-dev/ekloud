@@ -26,7 +26,6 @@ jobs:
               source: raw.summary.total.source,
               comment: raw.summary.total.comment,
               files: raw.summary.total.files,
-              todo: raw.summary.total.todo || 0,
               updated_at: new Date().toISOString()
             };
             fs.writeFileSync('ekloud-stats.json', JSON.stringify(summary, null, 2));
