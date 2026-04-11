@@ -20,15 +20,25 @@ jobs:
           
           node -e "
             const fs = require('fs');
-            const raw = JSON.parse(fs.readFileSync('raw-stats.json', 'utf8'));
-            const summary = {
-              physical: raw.summary.total.physical,
-              source: raw.summary.total.source,
-              comment: raw.summary.total.comment,
-              files: raw.summary.total.files,
-              updated_at: new Date().toISOString()
-            };
-            fs.writeFileSync('ekloud-stats.json', JSON.stringify(summary, null, 2));
+            try {
+              const raw = JSON.parse(fs.readFileSync('raw-stats.json', 'utf8'));
+              const total = raw.summary?.total || raw.total || {};
+              
+              const summary = {
+                physical: total.physical || 0,
+                source: total.source || 0,
+                comment: total.comment || 0,
+                files: total.files || 0,
+                updated_at: new Date().toISOString()
+              };
+              
+              if (summary.source === 0) throw new Error('Données vides');
+              
+              fs.writeFileSync('ekloud-stats.json', JSON.stringify(summary, null, 2));
+            } catch (err) {
+              console.error(err);
+              process.exit(1);
+            }
           "
 
       - name: update gist
