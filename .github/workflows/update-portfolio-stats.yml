@@ -16,7 +16,7 @@ jobs:
 
       - name: calculate sloc
         run: |
-          pnpm dlx sloc src/ --format json > ekloud-stats.json
+          pnpm dlx sloc src/ > ekloud-stats.json
 
       - name: update gist
         env:
