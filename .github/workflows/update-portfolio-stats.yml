@@ -1,0 +1,26 @@
+name: portfolio stats
+on:
+  push:
+    branches: [ main ] 
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10 
+
+      - name: calculate sloc
+        run: |
+          pnpm dlx sloc src/ --format json > ekloud-stats.json
+
+      - name: update gist
+        env:
+          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: |
+          gh gist edit $GIST_ID ekloud-stats.json
