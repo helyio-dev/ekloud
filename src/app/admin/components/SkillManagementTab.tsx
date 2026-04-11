@@ -4,7 +4,7 @@ import * as LucideIcons from 'lucide-react';
 import { 
     Plus, Trash2, Edit2, Link, Book, Save, X, Loader2, LayoutList, Eye, 
     ArrowUp, ArrowDown, Sparkles, ChevronRight, Trophy, Lock, HelpCircle,
-    Zap, Rocket, Target, Settings2
+    Zap, Rocket, Target, Settings2, Database
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
