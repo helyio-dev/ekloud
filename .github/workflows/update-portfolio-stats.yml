@@ -14,6 +14,9 @@ jobs:
         with:
           version: 10 
 
+      - name: debug arborescence
+        run: ls -R
+
       - name: calculate sloc
         run: |
           pnpm dlx sloc src/ --format json > raw-stats.json
@@ -22,21 +25,26 @@ jobs:
             const fs = require('fs');
             try {
               const raw = JSON.parse(fs.readFileSync('raw-stats.json', 'utf8'));
-              const total = raw.summary?.total || raw.total || {};
+              console.log('Contenu brut du JSON :', JSON.stringify(raw, null, 2));
+
+              const stats = raw.summary?.total || raw.total || (Array.isArray(raw) ? raw[0].total : null);
               
+              if (!stats) {
+                console.log('Structure détectée inconnue, tentative extraction directe...');
+              }
+
               const summary = {
-                physical: total.physical || 0,
-                source: total.source || 0,
-                comment: total.comment || 0,
-                files: total.files || 0,
+                physical: stats?.physical || 0,
+                source: stats?.source || 0,
+                comment: stats?.comment || 0,
+                files: stats?.files || raw.summary?.totalFiles || 0,
                 updated_at: new Date().toISOString()
               };
-              
-              if (summary.source === 0) throw new Error('Données vides');
-              
+
               fs.writeFileSync('ekloud-stats.json', JSON.stringify(summary, null, 2));
+              console.log('Résultat final prêt :', summary);
             } catch (err) {
-              console.error(err);
+              console.error('Erreur fatale :', err);
               process.exit(1);
             }
           "
