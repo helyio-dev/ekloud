@@ -8,6 +8,7 @@ import { ChevronRight, Loader2, Crown, Users, Zap, Terminal, Ghost, Cpu, ShieldC
 
 type SquadId = 'ROOT' | 'VOID' | 'CORE' | 'CYPHER';
 
+// définition statique des squads et de leurs propriétés
 const SQUADS: Record<SquadId, {
     tagline: string;
     description: string;
@@ -53,6 +54,7 @@ const SQUADS: Record<SquadId, {
 type Answer = { text: string; scores: Partial<Record<SquadId, number>> };
 type Question = { question: string; answers: Answer[] };
 
+// questions du quiz de répartition
 const QUESTIONS: Question[] = [
     {
         question: "Tu découvres un bug critique en production à 3h du matin. Tu…",
@@ -163,6 +165,7 @@ export default function TechSquadPage() {
     const [isLoadingStats, setIsLoadingStats] = useState(true);
 
     
+    // états du parcours de sélection
     const [phase, setPhase] = useState<Phase>('intro');
     const [currentQ, setCurrentQ] = useState(0);
     const [selected, setSelected] = useState<number | null>(null);
@@ -175,6 +178,7 @@ export default function TechSquadPage() {
     }, [user, authLoading, navigate]);
 
     
+    // chargement des statistiques des clans pour l'affichage du leaderboard
     useEffect(() => {
         if (authLoading) return;
         const fetchStats = async () => {
@@ -211,6 +215,7 @@ export default function TechSquadPage() {
         fetchStats();
     }, [authLoading, clan]);
 
+    // gère la sélection d'une réponse utilisateur au quiz
     const handleAnswer = (answerIndex: number) => {
         if (selected !== null) return;
         setSelected(answerIndex);
@@ -237,6 +242,7 @@ export default function TechSquadPage() {
         }, 700);
     };
 
+    // sauvegarde le résultat du quiz dans le profil (définitif)
     const saveSquad = async (squad: SquadId) => {
         if (!user || clan) return; 
         setIsSaving(true);
@@ -260,6 +266,7 @@ export default function TechSquadPage() {
     }
 
     
+    // si l'utilisateur a déjà un clan, affichage de son dashboard
     if (clan) {
         const userSquad = SQUADS[clan as SquadId];
         return (
@@ -366,6 +373,7 @@ export default function TechSquadPage() {
     }
 
     
+    // phase de calcul des résultats
     if (phase === 'revealing') {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
@@ -378,6 +386,7 @@ export default function TechSquadPage() {
     }
 
     
+    // phase d'affichage du résultat avant confirmation finale
     if (phase === 'result' && resultSquad) {
         const sq = SQUADS[resultSquad];
         const totalPts = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
@@ -449,6 +458,7 @@ export default function TechSquadPage() {
     }
 
     
+    // phase d'introduction
     if (phase === 'intro') {
         return (
             <div className="min-h-screen bg-background text-text flex flex-col items-center justify-center px-6 py-12">
@@ -566,6 +576,7 @@ export default function TechSquadPage() {
     }
 
     
+    // déroulement du quiz
     const q = QUESTIONS[currentQ];
     const progress = (currentQ / QUESTIONS.length) * 100;
 

@@ -7,15 +7,15 @@ type Role = 'admin' | 'contributor';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  /** If provided, user must have at least one of these roles. */
+  /** si fourni, l'utilisateur doit avoir au moins un de ces rôles */
   roles?: Role[];
-  /** Where to redirect if unauthorized. Defaults to /dashboard */
+  /** où rediriger en cas de non-autorisation (par défaut /dashboard) */
   redirectTo?: string;
 }
 
 /**
- * Blocks rendering of protected routes until auth is fully resolved.
- * Redirects unauthenticated or unauthorized users early.
+ * bloque le rendu des routes protégées jusqu'à résolution de l'authentification.
+ * redirige prématurément les utilisateurs non authentifiés ou non autorisés.
  */
 export default function ProtectedRoute({
   children,
@@ -24,7 +24,7 @@ export default function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, isAdmin, isContributor, isLoading } = useAuth();
 
-  // Show a spinner while the auth state is being resolved
+  // affichage d'un loader pendant la résolution de session
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -33,12 +33,12 @@ export default function ProtectedRoute({
     );
   }
 
-  // Not logged in at all
+  // redirection si aucun utilisateur n'est connecté
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Role check
+  // vérification fine des droits d'accès par rôle
   if (roles && roles.length > 0) {
     const hasRole =
       (roles.includes('admin') && isAdmin) ||

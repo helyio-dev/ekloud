@@ -1,18 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Loader2, Save, Plus, Trash2, CheckCircle2, Bold, Italic, List, ListTodo, Heading1, Heading2, Heading3, Code, Link, Quote, Eye, Edit3, Type, Sparkles, Paintbrush, Highlighter } from 'lucide-react';
+import { 
+    Loader2, Save, Plus, Trash2, CheckCircle2, Bold, Italic, List, ListTodo, 
+    Heading1, Heading2, Heading3, Code, Link, Quote, Eye, Edit3, Type, 
+    Sparkles, Paintbrush, Highlighter, Target, Settings2, HelpCircle, Zap, 
+    ChevronRight, Info
+} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import { parseShortcodes } from '@/lib/shortcodes';
 
+/**
+ * structure de définition d'une proposition de réponse.
+ */
 interface Answer {
     id?: string;
     text: string;
     isCorrect: boolean;
 }
 
+/**
+ * définition du schéma de transport pour les questions ekloud.
+ */
 interface QuestionFormData {
     module_id: string | null;
     skill_id: string | null;
@@ -29,6 +40,10 @@ interface QuestionFormProps {
     context?: 'module' | 'skill';
 }
 
+/**
+ * interface de configuration de l'évaluation formative/sommative.
+ * permet la création de qcm immersifs avec support markdown intégral.
+ */
 export default function QuestionForm({ initialData, onSubmit, isSubmitting, buttonText, context = 'module' }: QuestionFormProps) {
     const [modules, setModules] = useState<any[]>([]);
     const [skills, setSkills] = useState<any[]>([]);
@@ -44,8 +59,11 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
 
     const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
 
-    useEffect(() => {
-        const fetchData = async () => {
+    /**
+     * synchronisation des listes de rattachement (modules/skills).
+     */
+    const fetchData = useCallback(async () => {
+        try {
             const [
                 { data: modData },
                 { data: skillData }
@@ -55,9 +73,14 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
             ]);
             if (modData) setModules(modData);
             if (skillData) setSkills(skillData);
-        };
-        fetchData();
+        } catch (err) {
+            console.error('erreur synchronisation contextes évaluation:', err);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const handleAddAnswer = () => {
         if (answers.length < 5) {
@@ -74,6 +97,9 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
         }
     };
 
+    /**
+     * injection de tokens markdown via la toolbar ekloud.
+     */
     const insertFormatting = (prefix: string, suffix: string = '') => {
         const textarea = document.getElementById('question-text') as HTMLTextAreaElement;
         if (!textarea) return;
@@ -87,7 +113,6 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
         const newText = before + prefix + selectedText + suffix + after;
         setQuestionText(newText);
 
-        // Reset focus and selection
         setTimeout(() => {
             textarea.focus();
             const newCursorPos = start + prefix.length + selectedText.length + suffix.length;
@@ -127,155 +152,155 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8 bg-surface border border-border p-8 rounded-[32px]">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {context === 'module' ? (
-                    <div>
-                        <label className="block text-xs font-black uppercase tracking-widest mb-3 text-text-muted ml-1">Module Parent</label>
-                        <select
-                            required
-                            value={moduleId}
-                            onChange={(e) => setModuleId(e.target.value)}
-                            className="w-full px-5 py-4 bg-background border border-border rounded-2xl outline-none focus:border-accent transition-all appearance-none text-text font-bold"
-                        >
-                            <option value="" disabled>Sélectionnez un module</option>
-                            {modules.map(mod => (
-                                <option key={mod.id} value={mod.id}>{mod.title}</option>
-                            ))}
-                        </select>
-                    </div>
-                ) : (
-                    <div>
-                        <label className="block text-xs font-black uppercase tracking-widest mb-3 text-text-muted ml-1">Compétence (Examen)</label>
-                        <select
-                            required
-                            value={skillId}
-                            onChange={(e) => setSkillId(e.target.value)}
-                            className="w-full px-5 py-4 bg-background border border-border rounded-2xl outline-none focus:border-accent transition-all appearance-none text-text font-bold"
-                        >
-                            <option value="" disabled>Sélectionnez une compétence</option>
-                            {skills.map(s => (
-                                <option key={s.id} value={s.id}>{s.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-
-                <div>
-                    <label className="block text-xs font-black uppercase tracking-widest mb-3 text-text-muted ml-1">Type de question</label>
-                    <select
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                        className="w-full px-5 py-4 bg-background border border-border rounded-2xl outline-none focus:border-accent transition-all appearance-none text-text font-bold"
-                    >
-                        <option value="multiple_choice">Choix Multiple</option>
-                        <option value="true_false">Vrai / Faux</option>
-                    </select>
-                </div>
-            </div>
-
-            <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-text-muted ml-1">Énoncé de la question</label>
-                    <div className="flex bg-background border border-border p-1 rounded-xl shrink-0">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('edit')}
-                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'edit' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
-                        >
-                            <Edit3 size={12} /> ÉDITION
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('preview')}
-                            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${activeTab === 'preview' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
-                        >
-                            <Eye size={12} /> APERÇU
-                        </button>
-                    </div>
+        <form onSubmit={handleSubmit} className="space-y-12 animate-in fade-in duration-700">
+            <div className="bg-surface/40 backdrop-blur-3xl border border-border/80 p-8 md:p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none group-hover:scale-110 transition-transform duration-[2s]">
+                    <HelpCircle size={400} />
                 </div>
 
-                {activeTab === 'edit' ? (
-                    <div className="space-y-2">
-                        {/* Toolbar */}
-                        <div className="flex flex-wrap items-center gap-1 p-2 bg-background border border-border rounded-2xl overflow-x-auto no-scrollbar">
-                            <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Gras"><Bold size={16} /></button>
-                            <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Italique"><Italic size={16} /></button>
-                            <div className="w-px h-6 bg-border mx-1"></div>
-                            <button type="button" onClick={() => insertBlock('# ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 1"><Heading1 size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('## ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 2"><Heading2 size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('### ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Titre 3"><Heading3 size={16} /></button>
-                            <div className="w-px h-6 bg-border mx-1"></div>
-                            <button type="button" onClick={() => insertBlock('- ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Liste"><List size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Liste de tâches"><ListTodo size={16} /></button>
-                            <div className="w-px h-6 bg-border mx-1"></div>
-                            <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Code en ligne"><Type size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Bloc de code"><Code size={16} /></button>
-                            <div className="w-px h-6 bg-border mx-1"></div>
-                            <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Lien"><Link size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('> ')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Citation"><Quote size={16} /></button>
-                            <button type="button" onClick={() => insertBlock('---\n')} className="p-2 hover:bg-surface-hover rounded-lg text-text-muted hover:text-text transition-colors" title="Ligne horizontale"><div className="w-4 h-px bg-current opacity-50"></div></button>
-                            <div className="w-px h-6 bg-border mx-1"></div>
-                            <div className="flex items-center gap-1 px-2 border-x border-border">
-                                <span className="text-[10px] text-text-muted mr-1">TEXTE</span>
-                                <button type="button" onClick={() => insertFormatting('[[indigo:', ']]')} className="w-5 h-5 rounded-full bg-[#818cf8] border border-white/20 hover:scale-110 transition-transform" title="Texte Indigo"></button>
-                                <button type="button" onClick={() => insertFormatting('[[vert:', ']]')} className="w-5 h-5 rounded-full bg-[#22c55e] border border-white/20 hover:scale-110 transition-transform" title="Texte Vert"></button>
-                                <button type="button" onClick={() => insertFormatting('[[rouge:', ']]')} className="w-5 h-5 rounded-full bg-[#ef4444] border border-white/20 hover:scale-110 transition-transform" title="Texte Rouge"></button>
-                                <button type="button" onClick={() => insertFormatting('[[jaune:', ']]')} className="w-5 h-5 rounded-full bg-[#eab308] border border-white/20 hover:scale-110 transition-transform" title="Texte Jaune"></button>
-                            </div>
-                            <div className="flex items-center gap-1 px-2">
-                                <span className="text-[10px] text-text-muted mr-1">FOND</span>
-                                <button type="button" onClick={() => insertFormatting('[[bg-indigo:', ']]')} className="w-5 h-5 rounded bg-[#818cf8]/20 border border-[#818cf8]/40 hover:scale-110 transition-transform" title="Fond Indigo"></button>
-                                <button type="button" onClick={() => insertFormatting('[[bg-vert:', ']]')} className="w-5 h-5 rounded bg-[#22c55e]/20 border border-[#22c55e]/40 hover:scale-110 transition-transform" title="Fond Vert"></button>
-                                <button type="button" onClick={() => insertFormatting('[[bg-jaune:', ']]')} className="w-5 h-5 rounded bg-[#eab308]/20 border border-[#eab308]/40 hover:scale-110 transition-transform" title="Fond Jaune"></button>
-                                <button type="button" onClick={() => insertFormatting('[[bg-rouge:', ']]')} className="w-5 h-5 rounded bg-[#ef4444]/20 border border-[#ef4444]/40 hover:scale-110 transition-transform" title="Fond Rouge"></button>
-                            </div>
-                        </div>
-                        <textarea
-                            id="question-text"
-                            required
-                            value={questionText}
-                            onChange={(e) => setQuestionText(e.target.value)}
-                            className="w-full px-6 py-5 bg-background border border-border rounded-[2rem] outline-none focus:border-accent transition-all text-text font-medium min-h-[150px] leading-relaxed shadow-inner"
-                            placeholder="Posez votre question ici... Utilisez le formatage Markdown si besoin."
-                        />
-                    </div>
-                ) : (
-                    <div className="min-h-[150px] p-8 bg-background border border-border rounded-[2rem] overflow-y-auto">
-                        <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-img:rounded-3xl">
-                            <ReactMarkdown 
-                                remarkPlugins={[remarkGfm, remarkBreaks]}
-                                rehypePlugins={[rehypeRaw]}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10">
+                    <div className="space-y-4">
+                        <label className="flex items-center gap-3 text-[10px] font-black tracking-[0.3em] text-text-muted/60 uppercase ml-1">
+                            <Target className="w-3.5 h-3.5 text-accent" /> {context === 'module' ? 'ciblage module' : 'accréditation skill'}
+                        </label>
+                        <div className="relative group/select">
+                            <select
+                                required
+                                value={context === 'module' ? moduleId : skillId}
+                                onChange={(e) => context === 'module' ? setModuleId(e.target.value) : setSkillId(e.target.value)}
+                                className="w-full px-8 py-5 bg-background/40 border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px]"
                             >
-                                {parseShortcodes(questionText) || "*Aucun énoncé à afficher pour le moment.*"}
-                            </ReactMarkdown>
+                                <option value="" disabled>choisir l'origine...</option>
+                                {context === 'module' ? (
+                                    modules.map(mod => <option key={mod.id} value={mod.id}>{mod.title}</option>)
+                                ) : (
+                                    skills.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+                                )}
+                            </select>
+                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                                <ChevronRight size={14} />
+                            </div>
                         </div>
                     </div>
-                )}
+
+                    <div className="space-y-4">
+                        <label className="flex items-center gap-3 text-[10px] font-black tracking-[0.3em] text-text-muted/60 uppercase ml-1">
+                            <Zap className="w-3.5 h-3.5 text-accent" /> format d'évaluation
+                        </label>
+                        <div className="relative group/select">
+                            <select
+                                value={type}
+                                onChange={(e) => setType(e.target.value)}
+                                className="w-full px-8 py-5 bg-background/40 border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px]"
+                            >
+                                <option value="multiple_choice">qcm standard</option>
+                                <option value="true_false">binaire (vrai/faux)</option>
+                            </select>
+                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                                <ChevronRight size={14} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-6 mt-12 relative z-10">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/40 pb-6">
+                        <div className="flex items-center gap-3">
+                            <Edit3 className="w-4 h-4 text-accent" />
+                            <label className="text-[10px] font-black tracking-[0.3em] text-text-muted/60 uppercase">énoncé dynamique (markdown)</label>
+                        </div>
+                        
+                        <div className="flex bg-background/60 border border-border/60 p-1.5 rounded-2xl">
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('edit')}
+                                className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'edit' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-text-muted hover:text-text'}`}
+                            >
+                                <Edit3 size={14} /> console
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('preview')}
+                                className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'preview' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-text-muted hover:text-text'}`}
+                            >
+                                <Eye size={14} /> rendu
+                            </button>
+                        </div>
+                    </div>
+
+                    {activeTab === 'edit' ? (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-300">
+                            {/* barre d'outils héritée */}
+                            <div className="flex flex-wrap items-center gap-1.5 p-3 bg-surface/40 backdrop-blur-md border border-border/60 rounded-[1.8rem] overflow-x-auto no-scrollbar">
+                                <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Bold size={18} /></button>
+                                <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Italic size={18} /></button>
+                                <div className="w-px h-6 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertBlock('# ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Heading1 size={18} /></button>
+                                <button type="button" onClick={() => insertBlock('## ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Heading2 size={18} /></button>
+                                <button type="button" onClick={() => insertBlock('### ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Heading3 size={18} /></button>
+                                <div className="w-px h-6 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertBlock('- ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><List size={18} /></button>
+                                <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><ListTodo size={18} /></button>
+                                <div className="w-px h-6 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Code size={18} /></button>
+                                <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Settings2 size={18} /></button>
+                                <div className="w-px h-6 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Link size={18} /></button>
+                                <button type="button" onClick={() => insertBlock('> ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Quote size={18} /></button>
+                            </div>
+                            <textarea
+                                id="question-text"
+                                required
+                                value={questionText}
+                                onChange={(e) => setQuestionText(e.target.value)}
+                                className="w-full px-8 py-6 bg-background/40 border border-border/60 rounded-[2.5rem] outline-none focus:border-accent/40 focus:bg-background transition-all text-text font-medium min-h-[200px] leading-relaxed italic shadow-inner custom-scrollbar"
+                                placeholder="écrivez l'énoncé de la question ici..."
+                            />
+                        </div>
+                    ) : (
+                        <div className="min-h-[200px] p-10 bg-background/40 border border-border/60 rounded-[2.5rem] overflow-y-auto animate-in fade-in duration-500">
+                            <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-img:rounded-3xl italic opacity-80">
+                                <ReactMarkdown 
+                                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                                    rehypePlugins={[rehypeRaw]}
+                                >
+                                    {parseShortcodes(questionText) || "*aucun énoncé rédigé par l'administrateur.*"}
+                                </ReactMarkdown>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            <div className="space-y-6 pt-4 border-t border-border">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-black text-text uppercase tracking-wider">Réponses</h2>
+            <div className="space-y-10 bg-surface/20 backdrop-blur-3xl border border-border/60 p-10 md:p-14 rounded-[3.5rem] shadow-xl">
+                <div className="flex justify-between items-center relative z-10 border-b border-border/40 pb-8">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                            <Info className="w-4 h-4 text-accent" />
+                            <h2 className="text-2xl font-black text-text uppercase tracking-tighter">vecteurs de réponse</h2>
+                        </div>
+                        <p className="text-[10px] text-text-muted/40 font-black uppercase tracking-widest italic">définissez les propositions et l'unique constante de vérité.</p>
+                    </div>
                     {answers.length < 5 && type !== 'true_false' && (
                         <button
                             type="button"
                             onClick={handleAddAnswer}
-                            className="flex items-center gap-2 px-4 py-2 bg-surface hover:bg-surface-hover border border-border rounded-xl text-xs font-black transition-all text-text"
+                            className="group flex items-center gap-3 px-6 py-3 bg-background/60 hover:bg-accent border border-border/60 hover:border-accent rounded-2xl text-[10px] font-black transition-all text-text-muted hover:text-white uppercase tracking-widest"
                         >
-                            <Plus className="w-4 h-4" /> AJOUTER
+                            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" /> proposition
                         </button>
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-6 relative z-10">
                     {answers.map((answer, index) => (
                         <div
                             key={index}
-                            className={`flex items-center gap-4 p-5 rounded-2xl border transition-all ${answer.isCorrect ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.1)]' : 'border-border bg-background hover:border-accent/30'}`}
+                            className={`flex flex-col md:flex-row items-start md:items-center gap-6 p-8 rounded-[2.5rem] border transition-all duration-500 ease-out animate-in slide-in-from-right-4 fill-mode-both ${answer.isCorrect ? 'border-accent/40 bg-accent/5 shadow-2xl shadow-accent/10' : 'border-border/40 bg-background/40 hover:border-accent/20'}`}
+                            style={{ animationDelay: `${index * 100}ms` }}
                         >
-                            <div className="shrink-0">
-                                <label className="relative flex items-center justify-center cursor-pointer">
+                            <div className="shrink-0 flex items-center gap-4">
+                                <label className="relative flex items-center justify-center cursor-pointer group/radio">
                                     <input
                                         type="radio"
                                         name="correctAnswer"
@@ -283,26 +308,29 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                                         onChange={() => handleAnswerChange(index, 'isCorrect', true)}
                                         className="hidden"
                                     />
-                                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${answer.isCorrect ? 'bg-green-500 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'border-border'}`}>
-                                        {answer.isCorrect && <CheckCircle2 className="w-5 h-5 text-black" />}
+                                    <div className={`w-12 h-12 rounded-[1.2rem] border-2 flex items-center justify-center transition-all duration-300 ${answer.isCorrect ? 'bg-accent border-accent shadow-lg shadow-accent/40 scale-110' : 'border-border/60 group-hover/radio:border-accent/40 bg-background/60'}`}>
+                                        {answer.isCorrect && <CheckCircle2 className="w-6 h-6 text-white" />}
                                     </div>
                                 </label>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${answer.isCorrect ? 'text-accent' : 'text-text-muted/20'}`}>id: 0{index + 1}</span>
                             </div>
-                            <div className="flex-1">
+
+                            <div className="flex-1 w-full">
                                 <input
                                     type="text"
                                     required
                                     value={answer.text}
                                     onChange={(e) => handleAnswerChange(index, 'text', e.target.value)}
-                                    className="w-full bg-transparent outline-none text-white font-bold"
-                                    placeholder={`Réponse ${index + 1}`}
+                                    className={`w-full bg-transparent outline-none text-xl font-black uppercase tracking-tight transition-colors ${answer.isCorrect ? 'text-text placeholder:text-accent/20' : 'text-text-muted/40 focus:text-text'}`}
+                                    placeholder={`RÉPONSE ${index + 1}`}
                                 />
                             </div>
+
                             {answers.length > 2 && type !== 'true_false' && (
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveAnswer(index)}
-                                    className="p-2 text-red-400/40 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                                    className="p-4 text-text-muted/20 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all active:scale-90"
                                 >
                                     <Trash2 className="w-5 h-5" />
                                 </button>
@@ -310,19 +338,30 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                         </div>
                     ))}
                 </div>
-                <p className="text-[10px] text-text-muted font-black uppercase tracking-widest text-center">Sélectionnez la réponse correcte via l'icône de gauche.</p>
             </div>
 
-            <div className="pt-8 border-t border-border flex justify-end">
+            <div className="pt-12 border-t border-border/40 flex justify-end">
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex items-center gap-3 px-10 py-4 bg-accent hover:bg-accent/90 text-white rounded-2xl font-black text-lg transition-all shadow-2xl shadow-accent/20 disabled:opacity-50 active:scale-95"
+                    className="group relative flex items-center gap-4 px-14 py-6 bg-accent hover:bg-accent/90 text-white rounded-[2.5rem] font-black uppercase tracking-[0.4em] text-sm transition-all disabled:opacity-50 shadow-2xl shadow-accent/40 active:scale-95"
                 >
-                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
-                    {buttonText}
+                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%)] bg-[length:250%_250%] group-hover:animate-[shimmer_2s_infinite]"></div>
+                    {isSubmitting ? <Loader2 className="w-7 h-7 animate-spin" /> : <Save className="w-7 h-7 group-hover:scale-110 transition-transform" />}
+                    {buttonText.toUpperCase()}
                 </button>
             </div>
+
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+                @keyframes shimmer {
+                    0% { background-position: 250% 0; }
+                    100% { background-position: -250% 0; }
+                }
+            `}</style>
         </form>
     );
 }

@@ -48,7 +48,7 @@ export default function SupportPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-up duration-1000 delay-300 fill-mode-both">
-                    {/* Liberapay Card */}
+                    {/* carte liberapay */}
                     <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-surface border border-border hover:border-rose-500/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
                         <div className="w-14 h-14 rounded-2xl bg-rose-500/5 border border-rose-500/10 flex items-center justify-center text-rose-500/50 group-hover:text-rose-500 group-hover:bg-rose-500/10 transition-all duration-500">
                             <Heart className="w-7 h-7 fill-current" />
@@ -67,7 +67,7 @@ export default function SupportPage() {
                         </a>
                     </div>
 
-                    {/* Crypto Support Info */}
+                    {/* info support crypto */}
                     <div className="group relative p-6 md:p-8 rounded-2xl md:rounded-3xl bg-surface border border-border hover:border-accent/20 transition-all duration-500 flex flex-col items-center gap-6 glass-morphism">
                         <div className="w-14 h-14 rounded-2xl bg-accent/5 border border-accent/10 flex items-center justify-center text-accent/50 group-hover:text-accent group-hover:bg-accent/10 transition-all duration-500">
                             <Coins className="w-7 h-7" />

@@ -1,10 +1,14 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, HelpCircle, Sparkles, Layout, Zap } from 'lucide-react';
 import QuestionForm from '../../components/QuestionForm';
 
+/**
+ * orchestrateur de création d'évaluations interactives (quiz/examens).
+ * gère l'injection atomique des questions et de leurs vecteurs de réponse.
+ */
 export default function CreateQuizPage() {
     const { isAdmin, isContributor, isLoading } = useAuth();
     const navigate = useNavigate();
@@ -19,10 +23,16 @@ export default function CreateQuizPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    /**
+     * guard d'intégrité de session admin.
+     */
     useEffect(() => {
         if (!isLoading && !isAdmin && !isContributor) navigate('/dashboard');
     }, [isAdmin, isContributor, isLoading, navigate]);
 
+    /**
+     * transaction composite : insertion question + mapping des options de réponse.
+     */
     const handleSubmit = async (data: any) => {
         setIsSubmitting(true);
         setError(null);
@@ -53,6 +63,7 @@ export default function CreateQuizPage() {
 
             if (answersError) throw answersError;
 
+            // routage contextuel post-injection
             if (data.skill_id) {
                 navigate(`/admin/skills/${data.skill_id}/exam`);
             } else if (data.module_id) {
@@ -61,59 +72,85 @@ export default function CreateQuizPage() {
                 navigate('/admin');
             }
         } catch (err: any) {
-            setError(err.message);
+            setError(err.message || 'échec lors de la sérialisation de l\'évaluation.');
             setIsSubmitting(false);
         }
     };
 
     if (isLoading || (!isAdmin && !isContributor)) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-accent" />
+            <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
+                <Loader2 className="w-12 h-12 animate-spin text-accent opacity-20" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted/40 italic">génération studio évaluation...</span>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-background p-8">
-            <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen bg-background text-text font-sans selection:bg-accent/30 p-8 md:p-14 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-32 opacity-[0.02] pointer-events-none rotate-12">
+                <Layout size={600} />
+            </div>
+
+            <div className="max-w-5xl mx-auto space-y-12 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                 <Link
                     to={isSkillContext ? `/admin/skills/${initialSkillId}/exam` : initialModuleId ? `/admin/modules/${initialModuleId}/content` : '/admin'}
-                    className="inline-flex items-center gap-2 text-text-muted hover:text-white transition-colors mb-8 group"
+                    className="inline-flex items-center gap-4 text-[10px] font-black text-text-muted hover:text-accent uppercase tracking-[0.3em] transition-all group"
                 >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                    Retour
+                    <div className="p-2.5 bg-surface border border-border/40 rounded-xl group-hover:bg-accent group-hover:border-accent group-hover:text-white transition-all">
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                    </div>
+                    retour au contexte parent
                 </Link>
 
-                <div className="flex justify-between items-center mb-10">
-                    <h1 className="text-4xl font-black text-white tracking-tight">Nouvelle Question</h1>
-                    <div className={`px-4 py-2 rounded-xl text-xs font-black uppercase border ${isSkillContext ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' : 'bg-accent/10 border-accent/20 text-accent'}`}>
-                        {isSkillContext ? 'Question d\'Examen' : 'Création Quiz'}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <HelpCircle className="w-4 h-4 text-accent" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/60">module d'interrogation</span>
+                        </div>
+                        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter font-equinox leading-tight">nouvelle question</h1>
+                    </div>
+                    
+                    <div className={`px-8 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest border transition-all shadow-lg ${isSkillContext ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500' : 'bg-accent/10 border-accent/20 text-accent shadow-accent/5'}`}>
+                        {isSkillContext ? 'accréditation helix' : 'quiz standard'}
                     </div>
                 </div>
 
                 {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 mb-8 font-bold">
+                    <div className="p-8 bg-rose-500/5 border border-rose-500/20 rounded-[2rem] text-rose-500 text-xs font-bold uppercase tracking-widest italic animate-in shake-in">
                         {error}
                     </div>
                 )}
 
-                <QuestionForm
-                    initialData={{
-                        module_id: initialModuleId || null,
-                        skill_id: initialSkillId || null,
-                        question_text: '',
-                        type: 'multiple_choice',
-                        answers: [
-                            { text: '', isCorrect: true },
-                            { text: '', isCorrect: false }
-                        ]
-                    }}
-                    context={isSkillContext ? 'skill' : 'module'}
-                    onSubmit={handleSubmit}
-                    isSubmitting={isSubmitting}
-                    buttonText="Créer la question"
-                />
+                <div className="bg-surface/20 backdrop-blur-3xl border border-border/40 p-1 rounded-[3.5rem] shadow-2xl">
+                    <div className="p-8 md:p-14">
+                        <QuestionForm
+                            initialData={{
+                                module_id: initialModuleId || null,
+                                skill_id: initialSkillId || null,
+                                question_text: '',
+                                type: 'multiple_choice',
+                                answers: [
+                                    { text: '', isCorrect: true },
+                                    { text: '', isCorrect: false }
+                                ]
+                            }}
+                            context={isSkillContext ? 'skill' : 'module'}
+                            onSubmit={handleSubmit}
+                            isSubmitting={isSubmitting}
+                            buttonText="déployer la question"
+                        />
+                    </div>
+                </div>
+                
+                <footer className="flex justify-center pt-8 border-t border-border/20">
+                    <div className="flex items-center gap-2 opacity-20">
+                        <Sparkles size={12} />
+                        <p className="text-[9px] font-black uppercase tracking-[0.5em] italic">evaluation core v2.0</p>
+                        <Zap size={12} />
+                    </div>
+                </footer>
             </div>
         </div>
     );

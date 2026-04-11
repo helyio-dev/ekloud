@@ -15,6 +15,7 @@ export default function BackgroundParticles() {
         let particles: Particle[] = [];
         let animationFrameId: number;
 
+        // adapte le canva aux dimensions de l'écran local
         const resize = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -35,6 +36,7 @@ export default function BackgroundParticles() {
                 this.size = Math.random() * 2;
             }
 
+            // déplacement et rebondit sur les bordures
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
@@ -51,8 +53,8 @@ export default function BackgroundParticles() {
             }
         }
 
+        // génération initiale d'un nombre de particules en fonction de la taille de l'écran
         const init = () => {
-            console.log('Particles initializing...');
             particles = [];
             const count = Math.floor((canvas.width * canvas.height) / 10000); 
             for (let i = 0; i < count; i++) {
@@ -60,6 +62,7 @@ export default function BackgroundParticles() {
             }
         };
 
+        // dessine des lignes entre les particules proches pour créer un effet de connexion réseau
         const drawLines = () => {
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {

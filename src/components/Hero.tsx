@@ -1,53 +1,54 @@
 import { Link } from 'react-router-dom';
 import Typewriter from './Typewriter';
-import { Mail, Check } from 'lucide-react';
-import { useState } from 'react';
 
+/**
+ * section d'en-tête (hero) de la page d'accueil.
+ * affiche le message principal et les actions rapides avec des effets visuels immersifs.
+ */
 export default function Hero() {
-    const [copied, setCopied] = useState(false);
     return (
-        <section className="relative pt-16 pb-16 md:pt-32 md:pb-28 px-6 max-w-7xl mx-auto text-center overflow-visible">
-            {/* Ultra-Immersive Background Elements */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[800px] bg-accent/20 rounded-full blur-[180px] -z-10 opacity-70 animate-pulse" />
-            <div className="absolute top-0 right-[-15%] w-[600px] h-[600px] bg-accent-secondary/15 rounded-full blur-[160px] -z-10" />
+        <section className="relative pt-20 pb-20 md:pt-40 md:pb-32 px-6 max-w-7xl mx-auto text-center overflow-visible font-sans">
+            {/* couches atmosphériques et nappes de lumière pulsantes */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1600px] h-[900px] bg-accent/15 rounded-full blur-[200px] -z-10 opacity-60 animate-pulse pointer-events-none" />
+            <div className="absolute top-0 right-[-20%] w-[700px] h-[700px] bg-accent-secondary/10 rounded-full blur-[180px] -z-10 pointer-events-none" />
             
-            {/* Floating 3D Elements for the "Visual Slap" */}
-            <div className="absolute top-1/3 left-[-5%] w-32 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent -rotate-12" />
+            {/* lignes de force géométriques subtiles */}
+            <div className="absolute top-1/3 left-[-10%] w-48 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent -rotate-12 pointer-events-none" />
 
-
-            <div className="relative z-10 space-y-4 animate-in fade-in slide-up duration-1000 ease-out">
-                <div className="space-y-1">
-                    <div className="text-xl md:text-3xl font-black tracking-tight leading-tight max-w-4xl mx-auto text-text">
-                        <span className="text-gradient">
-                            <Typewriter
-                                words={["Apprendre", "Progresser", "Maîtriser"]}
-                            />
+            {/* contenu principal avec animations d'entrée séquencées */}
+            <div className="relative z-10 space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out fill-mode-both">
+                <header className="space-y-2">
+                    <h1 className="text-2xl md:text-5xl font-black tracking-tight leading-none max-w-5xl mx-auto text-text uppercase font-equinox">
+                        <span className="text-gradient drop-shadow-[0_0_20px_var(--accent-glow)]">
+                            <Typewriter words={["apprendre", "progresser", "maîtriser", "exceller"]} />
                         </span> simplement
-                    </div>
+                    </h1>
 
-                    <div className="text-xl md:text-3xl text-text-muted/80 max-w-3xl mx-auto leading-relaxed font-bold tracking-tight">
-                        Des parcours clairs pour progresser {' '}
-                        <span className="text-accent underline decoration-accent/40 underline-offset-[8px] font-black italic">
-                            <Typewriter
-                                words={["à votre rythme.", "sans pression.", "efficacement.", "pas à pas."]}
-                            />
+                    <p className="text-xl md:text-3xl text-text-muted/70 max-w-4xl mx-auto leading-relaxed font-bold tracking-tight">
+                        des parcours immersifs pour évoluer {' '}
+                        <span className="text-accent underline decoration-accent/30 underline-offset-[10px] font-black italic tracking-tighter">
+                            <Typewriter words={["à votre rythme.", "sans limites.", "efficacement.", "pas à pas.", "avec passion."]} />
                         </span>
-                    </div>
-                </div>
+                    </p>
+                </header>
 
-                <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-2 animate-in fade-in delay-700 fill-mode-both">
+                {/* boutons d'action principaux (cta) */}
+                <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-12 animate-in fade-in zoom-in-95 duration-1000 delay-500 fill-mode-both">
                     <Link
                         to="/signup"
-                        className="group relative px-10 py-4 bg-text text-background rounded-full font-bold text-lg transition-all hover:scale-110 active:scale-95 shadow-[0_0_40px_var(--accent-glow)] overflow-hidden"
+                        className="group relative px-12 py-6 bg-text text-background rounded-2xl font-black text-lg transition-all hover:scale-110 active:scale-95 shadow-2xl overflow-hidden"
+                        aria-label="commencer l'aventure"
                     >
-                        <span className="relative z-10">Commencer maintenant</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-secondary opacity-0 group-hover:opacity-10 transition-opacity" />
+                        <span className="relative z-10 uppercase tracking-widest">commencer</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-secondary opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
                     </Link>
+                    
                     <a
                         href="#features"
-                        className="px-10 py-4 glass-morphism border border-border hover:border-accent/40 text-text rounded-full font-bold text-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center backdrop-blur-3xl shadow-xl"
+                        className="px-12 py-6 glass-morphism border border-border/80 hover:border-accent/40 text-text rounded-2xl font-black text-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center backdrop-blur-3xl shadow-xl uppercase tracking-widest font-sans"
+                        aria-label="découvrir les fonctionnalités"
                     >
-                        Explorer
+                        explorer
                     </a>
                 </div>
             </div>

@@ -6,7 +6,7 @@ import { BookOpen, CheckCircle, Lock as LockIcon, Loader2, Award, ChevronRight, 
 
 type Module = {
     id: string;
-    name?: string; // Some modules might use name instead of title in other contexts, but keep title for consistency
+    name?: string; // certains modules pourraient utiliser name au lieu de title dans d'autres contextes, mais on garde title par cohérence
     title: string;
     description: string;
     category: string;
@@ -116,7 +116,7 @@ export default function CoursesPage() {
                 </div>
 
                 <div className="mb-10 space-y-6">
-                    {/* Search and Difficulty Row */}
+                    {/* ligne de recherche et difficulté */}
                     <div className="flex flex-col md:flex-row gap-4">
                         <div className="relative flex-1 group">
                             <input 
@@ -167,7 +167,7 @@ export default function CoursesPage() {
                         </div>
                     </div>
 
-                    {/* Category Row */}
+                    {/* ligne de catégorie */}
                     <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar pb-2">
                         <button
                             onClick={() => setFilterCategory('all')}

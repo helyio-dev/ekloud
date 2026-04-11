@@ -24,6 +24,16 @@
     <meta property="twitter:title" content="Ekloud | Level up your tech knowledge" />
     <meta property="twitter:description" content="Ekloud est une plateforme 100% gratuite dédiée à rendre l'éducation aux diverses technologies accessible." />
     <meta property="twitter:image" content="https://raw.githubusercontent.com/helyio-dev/ekloud/main/public/og-image.png" />
+    <script>
+      // Force-unregister old service workers that might interfere with authentication
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (const registration of registrations) {
+            registration.unregister();
+          }
+        }).catch(err => console.debug('SW unregister error:', err));
+      }
+    </script>
   </head>
   <body class="bg-background text-text">
     <div id="root"></div>

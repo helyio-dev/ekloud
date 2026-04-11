@@ -13,8 +13,8 @@ const BG_MAP: Record<string, string> = {
 };
 
 /**
- * Parses custom shortcodes [[color:text]] or [[bg-color:text]] into HTML spans.
- * Supports nesting like [[bg-jaune:[[rouge:text]]]].
+ * analyse les shortcodes personnalisés [[color:text]] ou [[bg-color:text]] en balises span html.
+ * prend en charge l'imbrication comme [[bg-jaune:[[rouge:text]]]].
  */
 export function parseShortcodes(text: string): string {
     if (!text) return '';
@@ -22,9 +22,9 @@ export function parseShortcodes(text: string): string {
     let result = text;
     const regex = /\[\[([\w-]+):(.*?)\]\]/g;
     
-    // We run the replacement multiple times to handle nesting from inside out.
-    // Pass 1: [[rouge:text]] -> <span...>text</span>
-    // Pass 2: [[bg-jaune:<span...>text</span>]] -> <span...><span...>text</span></span>
+    // on exécute le remplacement plusieurs fois pour gérer l'imbrication de l'intérieur vers l'extérieur.
+    // passe 1 : [[rouge:text]] -> <span...>text</span>
+    // passe 2 : [[bg-jaune:<span...>text</span>]] -> <span...><span...>text</span></span>
     let iterations = 0;
     while (iterations < 5) {
         const next = result.replace(regex, (match, key, content) => {

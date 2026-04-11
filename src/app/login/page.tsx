@@ -15,6 +15,7 @@ export default function LoginPage() {
                     </p>
                 </div>
 
+                {/* boutons de connexion via les fournisseurs oauth */}
                 <div className="space-y-6">
                     <SocialAuth />
                 </div>

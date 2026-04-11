@@ -19,9 +19,6 @@ supabase/.branches
 
 /.gemini
 
-# ===== Database schema (contains sensitive info) =====
-bdd.sql
-
 # ===== Logs =====
 *.log
 npm-debug.log*
@@ -38,3 +35,4 @@ Desktop.ini
 *.swp
 *.swo
 .idea/
+.vscod/

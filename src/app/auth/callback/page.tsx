@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldCheck } from 'lucide-react';
 
+/**
+ * page de traitement du retour d'authentification (oauth / magic link).
+ * gère l'échange de code pour une session et redirige vers le dashboard.
+ */
 export default function AuthCallbackPage() {
     const navigate = useNavigate();
 
@@ -12,39 +16,61 @@ export default function AuthCallbackPage() {
             const params = new URLSearchParams(window.location.search);
             const code = params.get('code');
 
+            // gestion du hash (souvent utilisé par supabase en mode implicite ou magic link legacy)
             if (hash && hash.includes('access_token')) {
                 const { data, error } = await supabase.auth.getSession();
                 if (error || !data.session) {
-                    console.error('Erreur lors de la récupération de la session:', error?.message);
-                    navigate('/login?error=Verification failed');
+                    console.error('erreur récupération session (hash):', error?.message);
+                    navigate('/login?error=verification_failed');
                 } else {
                     navigate('/dashboard');
                 }
                 return;
             }
 
+            // échange du code d'autorisation contre une session active
             if (code) {
-                const { error } = await supabase.auth.exchangeCodeForSession(code);
-                if (error) {
-                    console.error('Error exchanging code for session:', error.message);
-                    navigate('/login?error=Verification failed');
-                } else {
+                console.log('auth_callback: code détecté, échange en cours...');
+                
+                // mécanisme de sécurité contre les délais de réponse excessive (timeout supabase)
+                const timeoutHandler = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("délai d'attente dépassé (timeout 10s)")), 10000)
+                );
+
+                try {
+                    await Promise.race([
+                        supabase.auth.exchangeCodeForSession(code),
+                        timeoutHandler
+                    ]);
+                    console.log('auth_callback: succès de l\'échange, redirection...');
                     navigate('/dashboard');
+                } catch (err: any) {
+                    console.error('auth_callback_error:', err.message);
+                    navigate('/login?error=' + encodeURIComponent(err.message));
                 }
                 return;
             }
 
-            navigate('/login?error=No token provided');
+            // cas par défaut : aucun token ou code trouvé
+            navigate('/login?error=auth_token_missing');
         };
 
         handleAuthCallback();
     }, [navigate]);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background">
-            <Loader2 className="w-12 h-12 text-accent animate-spin mb-4" />
-            <h1 className="text-xl font-bold">Vérification de votre compte...</h1>
-            <p className="text-text-muted mt-2">Un instant, nous finalisons votre inscription.</p>
+        <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-background font-sans">
+            <div className="relative mb-8">
+                <Loader2 className="w-16 h-16 text-accent animate-spin opacity-20" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <ShieldCheck className="w-8 h-8 text-accent animate-pulse" />
+                </div>
+            </div>
+            
+            <h1 className="text-2xl font-black uppercase tracking-tight text-text mb-2">vérification sécurisée</h1>
+            <p className="text-text-muted font-medium text-sm text-center max-w-sm opacity-80">
+                un instant, nous synchronisons vos accès avec le réseau ekloud...
+            </p>
         </div>
     );
 }

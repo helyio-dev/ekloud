@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
+// interface définissant les propriétés du composant d'animation de texte
 interface TypewriterProps {
     words: string[];
     typingSpeed?: number;
@@ -15,6 +16,7 @@ export default function Typewriter({
     deletingSpeed = 50,
     pauseTime = 2000
 }: TypewriterProps) {
+    // états gérant la rotation des mots et l'effet visuel de frappe
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
     const [currentText, setCurrentText] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -23,6 +25,7 @@ export default function Typewriter({
         const word = words[currentWordIndex];
         let timer: NodeJS.Timeout;
 
+        // contrôle de l'animation d'écriture et de suppression
         if (isDeleting) {
             timer = setTimeout(() => {
                 setCurrentText(word.substring(0, currentText.length - 1));
@@ -33,7 +36,7 @@ export default function Typewriter({
             }, typingSpeed);
         }
 
-        
+        // passage au mot suivant ou attente une fois qu'un mot est complet
         if (!isDeleting && currentText === word) {
             timer = setTimeout(() => setIsDeleting(true), pauseTime);
         } else if (isDeleting && currentText === '') {

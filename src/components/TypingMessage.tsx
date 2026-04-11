@@ -11,10 +11,10 @@ interface TypingMessageProps {
 }
 
 export function TypingMessage({ content, isLast }: TypingMessageProps) {
-    // Only animate the very last message to maintain performance and readability
+    // animer uniquement le tout dernier message pour maintenir les performances et la lisibilité
     const { displayedText } = useTypingEffect(content, isLast ? 20 : 0);
     
-    // Ensure GitHub-style alerts are recognizeable as blockquotes
+    // s'assurer que les alertes de style github sont reconnaissables comme des blockquotes
     const textToRender = (isLast ? displayedText : content)
         .replace(/^> ?\[!(IMPORTANT|NOTE|TIP|WARNING|CAUTION)\]\r?\n>\r?\n/gim, '> [!$1]\n> ')
         .replace(/^> ?\[!/gim, '> [!');

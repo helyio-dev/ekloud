@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { formatXP, calculateLevelProgress } from '@/lib/gamification';
 
+// configuration des thèmes disponibles via le contexte global
 const THEMES: {
     id: ThemePalette;
     name: string;
@@ -136,31 +137,35 @@ const THEMES: {
 ];
 
 export default function SettingsPage() {
+    // hooks personnalisés pour l'état global
     const { user, username, xp, level, streak, refreshProfile } = useAuth();
     const { palette, mode, setPalette, toggleMode } = useTheme();
     const [activeTab, setActiveTab] = useState<'account' | 'appearance'>('account');
 
-    // Linked accounts state
+    // gestion des identités oauth liées au compte supabase
     const [identities, setIdentities] = useState<any[]>([]);
     const [isLinking, setIsLinking] = useState<string | null>(null);
 
-    // Username state
+    // état du formulaire de changement de pseudo
     const [newUsername, setNewUsername] = useState(username || '');
     const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
     const [usernameError, setUsernameError] = useState<string | null>(null);
     const [usernameSuccess, setUsernameSuccess] = useState(false);
 
-    // Password state
+    // état du formulaire de réinitialisation de mot de passe
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const [passwordError, setPasswordError] = useState<string | null>(null);
     const [passwordSuccess, setPasswordSuccess] = useState(false);
 
+    // état visuel pour le retour utilisateur (copie dans le presse-papiers)
     const [showCopyToast, setShowCopyToast] = useState(false);
 
+    // calcul de la progression gamifiée
     const { progress, currentLevelXp, requiredXpForNext } = calculateLevelProgress(xp || 0);
 
+    // récupération synchronisée des méthodes d'auth liées
     const fetchIdentities = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user?.identities) {
@@ -172,6 +177,7 @@ export default function SettingsPage() {
         fetchIdentities();
     }, []);
 
+    // déclenchement du flux oauth pour lier un nouveau fournisseur
     const handleLinkAccount = async (provider: string) => {
         setIsLinking(provider);
         const { error } = await supabase.auth.signInWithOAuth({
@@ -188,22 +194,27 @@ export default function SettingsPage() {
     };
 
 
+    // vérification de l'existence d'un lien oauth spécifique
     const isProviderLinked = (provider: string) => {
         return identities.some(id => id.provider === provider);
     };
 
+    // logique de mise à jour du pseudo avec vérification d'unicité
     const handleUpdateUsername = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) return;
         if (newUsername === username) return;
-        if (newUsername.length < 3) {
-            setUsernameError("Le pseudo doit contenir au moins 3 caractères.");
+        // validation pseudo : 3-20 caractères alphanumériques et tirets
+        const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+        if (!usernameRegex.test(newUsername)) {
+            setUsernameError("3 à 20 caractères : lettres, chiffres, tirets et underscores uniquement.");
             return;
         }
         setIsUpdatingUsername(true);
         setUsernameError(null);
         setUsernameSuccess(false);
 
+        // check préventif de disponibilité du pseudo
         const { data: existingUser } = await supabase
             .from('profiles')
             .select('id')
@@ -211,21 +222,34 @@ export default function SettingsPage() {
             .single();
 
         if (existingUser) {
-            setUsernameError("Ce pseudo est déjà utilisé.");
+            setUsernameError("ce pseudo est déjà utilisé.");
             setIsUpdatingUsername(false);
             return;
         }
 
+        // commit des changements dans la table profiles
         const { error } = await supabase.from('profiles').update({ username: newUsername }).eq('id', user.id);
         if (error) { setUsernameError(error.message); }
         else { setUsernameSuccess(true); await refreshProfile(); }
         setIsUpdatingUsername(false);
     };
 
+    // mise à jour sécurisée du mot de passe via supabase auth
     const handleUpdatePassword = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (newPassword.length < 6) { setPasswordError("Le mot de passe doit contenir au moins 6 caractères."); return; }
-        if (newPassword !== confirmPassword) { setPasswordError("Les mots de passe ne correspondent pas."); return; }
+        if (newPassword.length < 8) {
+            setPasswordError("le mot de passe doit contenir au moins 8 caractères.");
+            return;
+        }
+        if (!/[A-Z]/.test(newPassword)) {
+            setPasswordError("le mot de passe doit contenir au moins une majuscule.");
+            return;
+        }
+        if (!/[0-9]/.test(newPassword)) {
+            setPasswordError("le mot de passe doit contenir au moins un chiffre.");
+            return;
+        }
+        if (newPassword !== confirmPassword) { setPasswordError("les mots de passe ne correspondent pas."); return; }
         setIsUpdatingPassword(true);
         setPasswordError(null);
         setPasswordSuccess(false);
@@ -239,55 +263,55 @@ export default function SettingsPage() {
         <div className="min-h-screen bg-background">
             <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12">
 
-                {/* Header */}
+                {/* entête de la page de configuration */}
                 <div className="mb-8">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-10 h-10 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-center">
                             <Settings className="w-5 h-5 text-accent" />
                         </div>
-                        <h1 className="text-3xl font-black uppercase tracking-tight text-text">Paramètres</h1>
+                        <h1 className="text-3xl font-black uppercase tracking-tight text-text">paramètres</h1>
                     </div>
-                    <p className="text-text-muted ml-13">Gérez votre compte et personnalisez votre expérience.</p>
+                    <p className="text-text-muted ml-13">gérez votre compte et personnalisez votre expérience.</p>
                 </div>
 
-                {/* Tab Navigation */}
+                {/* navigation par onglets (compte vs apparence) */}
                 <div className="flex gap-1 p-1 bg-surface border border-border rounded-2xl w-fit mb-8">
                     <button
                         onClick={() => setActiveTab('account')}
                         className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'account' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-text-muted hover:text-text'}`}
                     >
                         <User className="w-4 h-4" />
-                        Compte
+                        compte
                     </button>
                     <button
                         onClick={() => setActiveTab('appearance')}
                         className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'appearance' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-text-muted hover:text-text'}`}
                     >
                         <Palette className="w-4 h-4" />
-                        Apparence
+                        apparence
                     </button>
                 </div>
 
-                {/* ===== TAB: COMPTE ===== */}
+                {/* rendu conditionnel de l'onglet compte */}
                 {activeTab === 'account' && (
                     <div className="space-y-6">
-                        {/* Stats */}
+                        {/* résumé des statistiques de progression de l'utilisateur */}
                         <div className="grid grid-cols-3 gap-3 md:gap-6">
                             <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
-                                <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">Niveau</span>
+                                <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">niveau</span>
                                 <span className="text-2xl md:text-4xl font-black text-accent">{level}</span>
                             </div>
                             <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center">
-                                <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">Streak</span>
+                                <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">streak</span>
                                 <span className="text-2xl md:text-4xl font-black text-orange-600 dark:text-orange-400">{streak} 🔥</span>
                             </div>
                             <div className="bg-surface border border-border p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center text-center overflow-hidden">
-                                <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">XP Total</span>
+                                <span className="text-[10px] md:text-sm font-bold text-text-muted uppercase mb-1">xp total</span>
                                 <span className="text-2xl md:text-4xl font-black text-text px-1 max-w-full overflow-hidden text-ellipsis">{formatXP(xp)}</span>
                             </div>
                         </div>
 
-                        {/* Public Profile Link */}
+                        {/* partage du profil avec lien unique basé sur l'username */}
                         {username && (
                             <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 relative">
                                 <div className="flex items-center gap-6">
@@ -297,9 +321,9 @@ export default function SettingsPage() {
                                     <div className="space-y-1 text-center md:text-left">
                                         <div className="flex items-center justify-center md:justify-start gap-2">
                                             <Globe className="w-4 h-4 text-accent" />
-                                            <span className="text-[10px] font-black tracking-[0.2em] text-accent uppercase">Profil Public</span>
+                                            <span className="text-[10px] font-black tracking-[0.2em] text-accent uppercase">profil public</span>
                                         </div>
-                                        <h3 className="text-xl font-bold text-text uppercase tracking-tight">Partager mon profil</h3>
+                                        <h3 className="text-xl font-bold text-text uppercase tracking-tight">partager mon profil</h3>
                                         <div className="mt-2 text-xs font-mono text-text-muted/80 bg-surface px-3 py-1.5 rounded-lg border border-border inline-block">
                                             ekloud.qzz.io/u/{username}
                                         </div>
@@ -310,32 +334,32 @@ export default function SettingsPage() {
                                         onClick={() => { navigator.clipboard.writeText(`https://ekloud.qzz.io/u/${username}`); setShowCopyToast(true); setTimeout(() => setShowCopyToast(false), 3000); }}
                                         className={`px-6 py-3.5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all active:scale-95 ${showCopyToast ? 'bg-green-500/20 border border-green-500/50 text-green-400' : 'bg-surface border border-border text-text hover:bg-surface-hover'}`}
                                     >
-                                        {showCopyToast ? <><CheckCircle2 className="w-4 h-4" /><span>COPIÉ !</span></> : <><Copy className="w-4 h-4 opacity-70" /><span>COPIER</span></>}
+                                        {showCopyToast ? <><CheckCircle2 className="w-4 h-4" /><span>copié !</span></> : <><Copy className="w-4 h-4 opacity-70" /><span>copier</span></>}
                                     </button>
                                     <button
                                         onClick={() => window.open(`/u/${username}`, '_blank')}
                                         className="px-6 py-3.5 bg-accent text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-accent/90 transition-all active:scale-95"
                                     >
-                                        <ExternalLink className="w-4 h-4" /> VOIR
+                                        <ExternalLink className="w-4 h-4" /> voir
                                     </button>
                                 </div>
                                 {showCopyToast && (
                                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                        <Sparkles className="w-3 h-3" /> LIEN COPIÉ
+                                        <Sparkles className="w-3 h-3" /> lien copié
                                     </div>
                                 )}
                             </div>
                         )}
 
-                        {/* Linked Accounts */}
+                        {/* section de gestion des liens avec les fournisseurs oidc/oauth tiers */}
                         <div className="bg-surface border border-border p-8 rounded-3xl">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="bg-accent/10 p-2 rounded-xl border border-accent/20">
                                     <LinkIcon className="w-5 h-5 text-accent" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold uppercase tracking-tight text-text">Comptes liés</h2>
-                                    <p className="text-xs text-text-muted">Associez plusieurs comptes pour sécuriser votre progression.</p>
+                                    <h2 className="text-xl font-bold uppercase tracking-tight text-text">comptes liés</h2>
+                                    <p className="text-xs text-text-muted">associez plusieurs comptes pour sécuriser votre progression.</p>
                                 </div>
                             </div>
                             
@@ -358,7 +382,7 @@ export default function SettingsPage() {
                                             </div>
                                             {linked ? (
                                                 <div className="flex items-center gap-1.5 text-[10px] font-black text-accent uppercase">
-                                                    <CheckCircle2 className="w-3.5 h-3.5" /> Lié
+                                                    <CheckCircle2 className="w-3.5 h-3.5" /> lié
                                                 </div>
                                             ) : (
                                                 <button
@@ -366,7 +390,7 @@ export default function SettingsPage() {
                                                     disabled={isLinking !== null}
                                                     className="text-[10px] font-black text-text-muted hover:text-accent uppercase underline underline-offset-4 tracking-wider transition-colors disabled:opacity-50"
                                                 >
-                                                    {isLinking === p.id ? 'Connexion...' : 'Lier'}
+                                                    {isLinking === p.id ? 'connexion...' : 'lier'}
                                                 </button>
                                             )}
                                         </div>
@@ -375,16 +399,16 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        {/* Level Progress */}
+                        {/* barre de progression interactive avec indicateurs xp dynamiques */}
                         <div className="bg-surface border border-border p-8 rounded-3xl">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="bg-accent/10 p-2 rounded-xl border border-accent/20"><Trophy className="w-5 h-5 text-accent" /></div>
-                                <h2 className="text-xl font-bold uppercase tracking-tight text-text">Progression</h2>
+                                <h2 className="text-xl font-bold uppercase tracking-tight text-text">progression</h2>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center text-sm font-bold">
-                                    <span className="bg-surface-hover/30 px-4 py-1.5 rounded-xl border border-border text-text-muted">LVL {level}</span>
-                                    <span className="bg-accent/10 px-4 py-1.5 rounded-xl border border-accent/20 text-accent">LVL {level + 1}</span>
+                                    <span className="bg-surface-hover/30 px-4 py-1.5 rounded-xl border border-border text-text-muted">lvl {level}</span>
+                                    <span className="bg-accent/10 px-4 py-1.5 rounded-xl border border-accent/20 text-accent">lvl {level + 1}</span>
                                 </div>
                                 <div className="h-4 w-full bg-background rounded-full overflow-hidden border border-border">
                                     <div className="h-full bg-accent relative transition-all duration-1000 shadow-[0_0_15px_var(--accent-glow)]" style={{ width: `${progress}%` }}>
@@ -392,29 +416,37 @@ export default function SettingsPage() {
                                     </div>
                                 </div>
                                 <div className="flex flex-col md:flex-row justify-between items-center gap-2">
-                                    <span className="text-xs font-bold text-text-muted"><span className="text-text">{formatXP(currentLevelXp)}</span> / {formatXP(requiredXpForNext)} XP</span>
-                                    <span className="text-xs font-black text-accent uppercase tracking-wider flex items-center gap-2"><Zap className="w-3 h-3" />+{formatXP(requiredXpForNext - currentLevelXp)} XP restants</span>
+                                    <span className="text-xs font-bold text-text-muted"><span className="text-text">{formatXP(currentLevelXp)}</span> / {formatXP(requiredXpForNext)} xp</span>
+                                    <span className="text-xs font-black text-accent uppercase tracking-wider flex items-center gap-2"><Zap className="w-3 h-3" />+{formatXP(requiredXpForNext - currentLevelXp)} xp restants</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Forms */}
+                        {/* formulaires de modification des informations de sécurité/profil */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="bg-blue-600/10 dark:bg-blue-500/10 p-2 rounded-xl border border-blue-600/20 dark:border-blue-500/20"><User className="w-5 h-5 text-blue-600 dark:text-blue-400" /></div>
-                                    <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">Pseudo</h2>
+                                    <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">pseudo</h2>
                                 </div>
                                 <form onSubmit={handleUpdateUsername} className="space-y-4 flex-grow">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2 text-text-muted">NOUVEAU PSEUDO</label>
-                                        <input type="text" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-text placeholder:opacity-30" placeholder="Nouveau pseudo" />
+                                        <label htmlFor="settings-username" className="block text-sm font-medium mb-2 text-text-muted">nouveau pseudo</label>
+                                        <input
+                                            id="settings-username"
+                                            type="text"
+                                            value={newUsername}
+                                            onChange={(e) => setNewUsername(e.target.value)}
+                                            className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold text-text placeholder:opacity-30"
+                                            placeholder="Ex: mon_pseudo-42"
+                                            maxLength={20}
+                                        />
                                     </div>
                                     {usernameError && <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20"><AlertCircle className="w-4 h-4" />{usernameError}</div>}
-                                    {usernameSuccess && <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-500/10 p-3 rounded-lg border-green-500/20"><CheckCircle2 className="w-4 h-4" />Pseudo mis à jour !</div>}
+                                    {usernameSuccess && <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-500/10 p-3 rounded-lg border-green-500/20"><CheckCircle2 className="w-4 h-4" />pseudo mis à jour !</div>}
                                     <button type="submit" disabled={isUpdatingUsername || newUsername === username} className="w-full py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-4">
                                         {isUpdatingUsername ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                        Enregistrer
+                                        enregistrer
                                     </button>
                                 </form>
                             </div>
@@ -422,22 +454,37 @@ export default function SettingsPage() {
                             <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col">
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="bg-purple-600/10 dark:bg-purple-500/10 p-2 rounded-xl border border-purple-600/20 dark:border-purple-500/20"><Lock className="w-5 h-5 text-purple-600 dark:text-purple-400" /></div>
-                                    <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">Mot de passe</h2>
+                                    <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight text-text">mot de passe</h2>
                                 </div>
                                 <form onSubmit={handleUpdatePassword} className="space-y-4 flex-grow">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2 text-text-muted">NOUVEAU MDP</label>
-                                        <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text placeholder:opacity-30" placeholder="••••••••" />
+                                        <label htmlFor="settings-password" className="block text-sm font-medium mb-2 text-text-muted">nouveau mdp</label>
+                                        <input
+                                            id="settings-password"
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text placeholder:opacity-30"
+                                            placeholder="••••••••"
+                                        />
+                                        <p className="text-[11px] text-text-muted/60 mt-1.5">Min. 8 caractères, 1 majuscule et 1 chiffre.</p>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-2 text-text-muted">CONFIRMER</label>
-                                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text placeholder:opacity-30" placeholder="••••••••" />
+                                        <label htmlFor="settings-confirm-password" className="block text-sm font-medium mb-2 text-text-muted">confirmer</label>
+                                        <input
+                                            id="settings-confirm-password"
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-text placeholder:opacity-30"
+                                            placeholder="••••••••"
+                                        />
                                     </div>
                                     {passwordError && <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border-red-500/20"><AlertCircle className="w-4 h-4" />{passwordError}</div>}
-                                    {passwordSuccess && <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-500/10 p-3 rounded-lg border-green-500/20"><CheckCircle2 className="w-4 h-4" />Mis à jour !</div>}
+                                    {passwordSuccess && <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-500/10 p-3 rounded-lg border-green-500/20"><CheckCircle2 className="w-4 h-4" />mis à jour !</div>}
                                     <button type="submit" disabled={isUpdatingPassword || !newPassword} className="w-full py-3 bg-surface hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed border border-border text-text rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-4">
                                         {isUpdatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                        Mettre à jour
+                                        mettre à jour
                                     </button>
                                 </form>
                             </div>
@@ -445,19 +492,19 @@ export default function SettingsPage() {
                     </div>
                 )}
 
-                {/* ===== TAB: APPARENCE ===== */}
+                {/* rendu conditionnel de l'onglet apparence et thèmes */}
                 {activeTab === 'appearance' && (
                     <div className="space-y-8">
 
-                        {/* Mode Jour / Nuit */}
+                        {/* sélecteur de mode jour/nuit indépendant du thème */}
                         <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="bg-accent/10 p-2 rounded-xl border border-accent/20">
                                     {mode === 'dark' ? <Moon className="w-5 h-5 text-accent" /> : <Sun className="w-5 h-5 text-accent" />}
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold uppercase tracking-tight text-text">Mode d'affichage</h2>
-                                    <p className="text-xs text-text-muted">Bascule entre le mode sombre et clair pour le thème actuel.</p>
+                                    <h2 className="text-xl font-bold uppercase tracking-tight text-text">mode d'affichage</h2>
+                                    <p className="text-xs text-text-muted">bascule entre le mode sombre et clair pour le thème actuel.</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
@@ -466,7 +513,7 @@ export default function SettingsPage() {
                                     className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border font-bold text-sm transition-all ${mode === 'dark' ? 'bg-accent/10 border-accent/40 text-accent shadow-[0_0_20px_var(--accent-glow)]' : 'bg-background border-border text-text-muted hover:border-accent/20'}`}
                                 >
                                     <Moon className="w-5 h-5" />
-                                    Sombre
+                                    sombre
                                     {mode === 'dark' && <Check className="w-4 h-4 ml-1" />}
                                 </button>
                                 <button
@@ -474,19 +521,19 @@ export default function SettingsPage() {
                                     className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border font-bold text-sm transition-all ${mode === 'light' ? 'bg-accent/10 border-accent/40 text-accent shadow-[0_0_20px_var(--accent-glow)]' : 'bg-background border-border text-text-muted hover:border-accent/20'}`}
                                 >
                                     <Sun className="w-5 h-5" />
-                                    Clair
+                                    clair
                                     {mode === 'light' && <Check className="w-4 h-4 ml-1" />}
                                 </button>
                             </div>
                         </div>
 
-                        {/* Theme Selector */}
+                        {/* grille de sélection visuelle des thèmes premium */}
                         <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="bg-accent/10 p-2 rounded-xl border border-accent/20"><Palette className="w-5 h-5 text-accent" /></div>
                                 <div>
-                                    <h2 className="text-xl font-bold uppercase tracking-tight text-text">Thème de couleurs</h2>
-                                    <p className="text-xs text-text-muted">Chaque thème possède sa variante sombre et claire.</p>
+                                    <h2 className="text-xl font-bold uppercase tracking-tight text-text">thème de couleurs</h2>
+                                    <p className="text-xs text-text-muted">chaque thème possède sa variante sombre et claire.</p>
                                 </div>
                             </div>
 
@@ -500,7 +547,7 @@ export default function SettingsPage() {
                                             onClick={() => setPalette(theme.id)}
                                             className={`relative group rounded-2xl overflow-hidden border-2 transition-all duration-300 ${isActive ? 'border-accent shadow-[0_0_25px_var(--accent-glow)] scale-[1.02]' : 'border-border hover:border-accent/40 hover:scale-[1.01]'}`}
                                         >
-                                            {/* Preview */}
+                                            {/* prévisualisation visuelle de la palette de couleurs */}
                                             <div className="h-24 p-3 flex flex-col gap-2" style={{ backgroundColor: preview.bg }}>
                                                 <div className="h-2.5 rounded-full w-3/4" style={{ backgroundColor: preview.surface }}></div>
                                                 <div className="h-2.5 rounded-full w-1/2" style={{ backgroundColor: preview.surface }}></div>
@@ -509,7 +556,7 @@ export default function SettingsPage() {
                                                     <div className="h-5 rounded-md flex-1" style={{ backgroundColor: preview.surface }}></div>
                                                 </div>
                                             </div>
-                                            {/* Label */}
+                                            {/* label et indicateur de sélection active */}
                                             <div className="p-3 text-left" style={{ backgroundColor: preview.surface }}>
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-1.5">

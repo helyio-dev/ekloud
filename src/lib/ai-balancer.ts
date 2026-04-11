@@ -1,7 +1,7 @@
 /**
- * AI Balancer for Ekloud — Secure Edition
- * All API calls go through the Supabase Edge Function `ai-proxy`.
- * No API keys are ever bundled into the client JS.
+ * équilibreur ia pour ekloud — édition sécurisée
+ * tous les appels d'api passent par la fonction edge supabase `ai-proxy`.
+ * aucune clé d'api n'est jamais incluse dans le js du client.
  */
 
 import { supabase } from './supabase';
@@ -25,14 +25,14 @@ export async function fetchAIResponse(
   messages: Message[],
   options?: FetchOptions
 ): Promise<string> {
-  // Get the current session token to authenticate the Edge Function call
+  // obtenir le jeton de session actuel pour authentifier l'appel à la fonction edge
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
     throw new Error('Vous devez être connecté pour utiliser Kloudy.');
   }
 
-  // Call the server-side AI proxy — keys never touch the client
+  // appeler le proxy ia côté serveur — les clés ne touchent jamais le client
   const { data, error } = await supabase.functions.invoke('ai-proxy', {
     body: {
       messages,

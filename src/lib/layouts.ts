@@ -1,6 +1,6 @@
 /**
- * Tech-Tree Layout Utility
- * Calculates X/Y positions for a branching dependency tree.
+ * utilitaire de mise en page pour l'arbre des compétences
+ * calcule les positions x/y pour un arbre de dépendances à branches.
  */
 
 export interface PositionedNode {
@@ -22,7 +22,7 @@ export function calculateTreeLayout(
     const skillIds = skills.map(s => s.id);
     const depths: Record<string, number> = {};
     
-    // 1. Calculate depths (longest path from any root)
+    // 1. calculer les profondeurs (chemin le plus long depuis n'importe quelle racine)
     const getDepth = (id: string, visited = new Set<string>()): number => {
         if (id in depths) return depths[id];
         if (visited.has(id)) return 0; 
@@ -37,19 +37,19 @@ export function calculateTreeLayout(
     
     skillIds.forEach(id => getDepth(id));
     
-    // 2. Group by depth and sort by original preference (y_pos)
+    // 2. grouper par profondeur et trier par préférence d'origine (y_pos)
     const levels: Record<number, string[]> = {};
     Object.entries(depths).forEach(([id, d]) => {
         if (!levels[d]) levels[d] = [];
         levels[d].push(id);
     });
     
-    // 3. Assign positions
+    // 3. assigner les positions
     Object.entries(levels).forEach(([dStr, ids]) => {
         const d = parseInt(dStr);
         const y = d * stepHeight;
         
-        // Sort ids at this level by their original y_pos preference
+        // trier les ids à ce niveau par leur préférence y_pos d'origine
         const sortedIds = [...ids].sort((a, b) => {
             const skillA = skills.find(s => s.id === a);
             const skillB = skills.find(s => s.id === b);
@@ -60,7 +60,7 @@ export function calculateTreeLayout(
         const spacing = width / Math.max(count, 1);
         
         sortedIds.forEach((id, i) => {
-            // Horizontal centering
+            // centrage horizontal
             const offset = (i - (count - 1) / 2) * spacing;
             
             layout[id] = { 
@@ -84,7 +84,7 @@ export function calculateStarLayout(
     const layout: Record<string, PositionedNode> = {};
     const skillIds = skills.map(s => s.id);
     
-    // 1. Identify roots (no prerequisites)
+    // 1. identifier les racines (pas de prérequis)
     const roots = skillIds.filter(id => !prereqs.some(p => p.skill_id === id));
     if (roots.length === 0 && skillIds.length > 0) roots.push(skillIds[0]);
 
@@ -118,7 +118,7 @@ export function calculateStarLayout(
                 nextY -= stepSize;
                 nextX += spread;
             } else {
-                // Root distribution
+                // distribution de racine
                 const dirs = ['right', 'down', 'left', 'up'];
                 const nextDir = dirs[index % 4] as 'up' | 'down' | 'left' | 'right';
                 if (nextDir === 'right') nextX += stepSize;
@@ -136,7 +136,7 @@ export function calculateStarLayout(
         assignPos(rootId, i * stepSize, 0, 'root', 0);
     });
 
-    // Handle unreachable skills
+    // gérer les compétences inaccessibles
     skillIds.forEach(id => {
         if (!visited.has(id)) {
             assignPos(id, 0, (Object.keys(layout).length + 1) * stepSize, 'down', 0);

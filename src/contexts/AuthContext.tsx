@@ -2,6 +2,9 @@ import React, { createContext, useContext, useEffect, useState, useRef } from 'r
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
 
+/**
+ * structure du contexte d'authentification ekloud.
+ */
 type AuthContextType = {
     user: User | null;
     session: Session | null;
@@ -34,6 +37,10 @@ export const AuthContext = createContext<AuthContextType>({
     refreshProfile: async () => { },
 });
 
+/**
+ * fournisseur du contexte d'authentification.
+ * gère la session utilisateur, les droits et les données de gamification.
+ */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
@@ -46,16 +53,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [username, setUsername] = useState<string | null>(null);
     const [clan, setClan] = useState<string | null>(null);
 
-
+    // référence pour éviter les boucles infinies de récupération de profil
     const lastFetchedIdRef = useRef<string | null>(null);
 
-    const fetchProfile = async (userId: string, retry = true) => {
-        setIsLoading(true);
-        if (lastFetchedIdRef.current === userId) {
-            setIsLoading(false);
-            return;
-        }
-
+    /**
+     * récupère les informations de profil depuis la base de données.
+     * crée un profil par défaut si l'utilisateur est nouveau.
+     */
+    const fetchProfile = async (userId: string, newUser?: any) => {
+        if (lastFetchedIdRef.current === userId) return;
+        lastFetchedIdRef.current = userId;
+        
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -63,18 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .eq('id', userId)
                 .single();
 
-            if (error) {
-                if (retry && (error.message?.includes('JWT expired') || error.code === 'PGRST303')) {
-                    console.log('AuthProvider: JWT expired, refreshing...');
-                    const session = await refreshSession();
-                    if (session) return fetchProfile(userId, false);
-                }
-                console.error('AuthProvider: fetchProfile error:', error);
-                setIsLoading(false);
-                return;
-            }
-
-            if (data) {
+            if (!error && data) {
+                // mise à jour des droits et statistiques utilisateur
                 setIsAdmin(data.role === 'admin');
                 setIsContributor(data.role === 'contributor');
                 setXp(data.xp || 0);
@@ -82,28 +80,74 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setStreak(data.streak || 0);
                 setUsername(data.username || null);
                 setClan(data.clan || null);
-                lastFetchedIdRef.current = userId;
+            } else if (error && (error.code === 'PGRST116' || error.message?.includes('no rows'))) {
+                // génération d'une identité visuelle par défaut
+                console.log('profil manquant, initialisation pour:', userId);
+                
+                const meta = newUser?.user_metadata;
+                const baseName = meta?.user_name || meta?.full_name || newUser?.email?.split('@')[0] || 'explorateur';
+                const finalName = `${baseName.toLowerCase().substring(0, 15)}_${Math.floor(Math.random() * 1000)}`;
+
+                const { data: newProfile, error: insertError } = await supabase
+                    .from('profiles')
+                    .insert([{ 
+                        id: userId, 
+                        username: finalName,
+                        xp: 0,
+                        level: 1,
+                        streak: 0,
+                        role: 'student'
+                    }])
+                    .select()
+                    .single();
+
+                if (!insertError && newProfile) {
+                    setIsAdmin(false);
+                    setIsContributor(false);
+                    setXp(0);
+                    setLevel(1);
+                    setStreak(0);
+                    setUsername(newProfile.username);
+                } else {
+                    console.error('échec de la création du profil:', insertError?.message);
+                }
+            } else if (error) {
+                console.error('erreur lors de la récupération du profil:', error.message);
             }
         } catch (err) {
-            console.error('AuthProvider: fetchProfile error:', err);
-        } finally {
-            setIsLoading(false);
+            console.error('erreur inattendue profile_fetch:', err);
         }
     };
 
     useEffect(() => {
+        /**
+         * initialise la session active au montage de l'application.
+         */
+        const initSession = async () => {
+            try {
+                const { data: { session: initialSession } } = await supabase.auth.getSession();
+                if (initialSession) {
+                    setSession(initialSession);
+                    setUser(initialSession.user);
+                    await fetchProfile(initialSession.user.id, initialSession.user);
+                }
+            } catch (err) {
+                console.error('erreur d\'initialisation de session:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+        // écoute des changements d'état (login, logout, token refresh)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
             const newUser = currentSession?.user ?? null;
-
             setSession(currentSession);
             setUser(newUser);
-
+            
             if (newUser) {
-                fetchProfile(newUser.id);
+                await fetchProfile(newUser.id, newUser);
             } else {
-
+                // remise à zéro des états d'authentification
                 lastFetchedIdRef.current = null;
                 setIsAdmin(false);
                 setIsContributor(false);
@@ -112,44 +156,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setStreak(0);
                 setUsername(null);
                 setClan(null);
-                setIsLoading(false);
             }
+            
+            setIsLoading(false);
         });
 
-
-        const safetyTimer = setTimeout(() => {
-            setIsLoading(prev => {
-                if (prev) {
-                    console.warn('AuthProvider: Safety timeout triggered (15s). Authentication state may be failing to resolve due to network issues.');
-                }
-                return false;
-            });
-        }, 15000);
+        initSession();
 
         return () => {
-            clearTimeout(safetyTimer);
             subscription.unsubscribe();
         };
     }, []);
 
+    // procédure de déconnexion globale
     const signOut = async () => {
         await supabase.auth.signOut();
     };
 
+    // rafraîchissement manuel de l'état de la session
     const refreshSession = async () => {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-            console.error('AuthProvider: refreshSession error:', error);
-            return null;
-        }
-        setSession(session);
-        setUser(session?.user ?? null);
-        return session;
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        return currentSession;
     };
 
+    // rafraîchissement forcé des données de profil
     const refreshProfile = async () => {
         if (user) {
-            lastFetchedIdRef.current = null; // Force fetch
+            lastFetchedIdRef.current = null;
             await fetchProfile(user.id);
         }
     };

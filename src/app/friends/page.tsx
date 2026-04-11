@@ -41,6 +41,7 @@ export default function FriendsPage() {
         }
     }, [user, authLoading, navigate]);
 
+    // récupération de la liste globale d'amis valides ou en attente
     const fetchFriendsData = async () => {
         if (!user) {
             setIsLoadingData(false);
@@ -64,7 +65,6 @@ export default function FriendsPage() {
 
             if (error) {
                 if (error.message?.includes('JWT expired') || error.code === 'PGRST303') {
-                    console.log("FRIENDS: JWT expired, refreshing...");
                     const session = await refreshSession();
                     if (session) {
                         const retry = await supabase
@@ -128,7 +128,7 @@ export default function FriendsPage() {
         }
     }, [user?.id, authLoading]);
 
-    
+    // effet de déboucheur pour limiter les requêtes de recherche utilisateur
     useEffect(() => {
         const timer = setTimeout(async () => {
             const query = searchQuery.trim();
@@ -141,8 +141,6 @@ export default function FriendsPage() {
 
             setIsSearching(true);
             try {
-                console.log("SEARCH FOR:", query, "AS USER:", user.id);
-
                 let { data, error } = await supabase
                     .from('profiles')
                     .select('id, username, level, xp, clan')
@@ -151,7 +149,6 @@ export default function FriendsPage() {
 
                 
                 if (error && (error.message?.includes('JWT expired') || error.code === 'PGRST303')) {
-                    console.log("SEARCH: JWT expired, refreshing...");
                     const session = await refreshSession();
                     if (session) {
                         const retry = await supabase
@@ -163,9 +160,6 @@ export default function FriendsPage() {
                         error = retry.error;
                     }
                 }
-
-                console.log("SEARCH DATA:", data);
-                console.log("SEARCH ERROR:", error);
 
                 if (!error && data) {
                     setSearchResults(data);
@@ -187,6 +181,7 @@ export default function FriendsPage() {
         e.preventDefault();
     };
 
+    // envoie une demande d'ami à un profil identifié
     const sendFriendRequest = async (targetUserId: string) => {
         if (!user) return;
 
@@ -208,6 +203,7 @@ export default function FriendsPage() {
         }
     };
 
+    // traiter une demande d'ami entrante et mettre à jour la base de données
     const respondToRequest = async (friendshipId: string, accept: boolean) => {
         if (!user) return;
 
@@ -235,6 +231,7 @@ export default function FriendsPage() {
         fetchFriendsData();
     };
 
+    // retire un ami de sa liste de façon définitive
     const removeFriend = async (friendId: string) => {
         if (!user || !confirm("Êtes-vous sûr de vouloir retirer cet ami ?")) return;
 
@@ -252,7 +249,7 @@ export default function FriendsPage() {
 
     return (
         <div className="min-h-screen bg-background text-text flex flex-col relative overflow-hidden">
-            {}
+            {/* effets de lumière en arrière-plan */}
             <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[150px] pointer-events-none opacity-20 bg-accent/40 mix-blend-screen" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full blur-[180px] pointer-events-none opacity-10 bg-indigo-500/30 mix-blend-screen" />
             <div className="absolute top-[40%] left-[60%] w-[30vw] h-[30vw] rounded-full blur-[120px] pointer-events-none opacity-5 bg-rose-500/20 mix-blend-screen" />
@@ -260,7 +257,7 @@ export default function FriendsPage() {
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
 
             <main className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-16 w-full relative z-10 flex-1 flex flex-col">
-                {}
+                {/* en-tête principal */}
                 <div className="mb-16 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 animate-in slide-in-from-bottom-8 fade-in duration-1000">
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
                         <div className="relative group">
@@ -280,7 +277,7 @@ export default function FriendsPage() {
                         </div>
                     </div>
 
-                    {}
+                    {/* statistiques de connexion en haut à droite */}
                     <div className="hidden lg:flex items-center gap-6 px-8 py-4 bg-surface/40 backdrop-blur-2xl border border-border rounded-full shadow-2xl">
                         <div className="text-center">
                             <div className="text-2xl font-black text-text">{friends.length}</div>
@@ -305,10 +302,10 @@ export default function FriendsPage() {
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-                        {}
+                        {/* panneau gauche : recherche d'amis et demandes */}
                         <div className="lg:col-span-4 flex flex-col gap-8">
 
-                            {}
+                            {/* barre de recherche */}
                             <div className="relative bg-surface/30 backdrop-blur-2xl border border-border p-1 rounded-[2.5rem] shadow-2xl animate-in slide-in-from-bottom-8 fade-in fill-mode-both overflow-hidden group/search" style={{ animationDelay: '100ms' }}>
                                 <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover/search:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
@@ -339,7 +336,7 @@ export default function FriendsPage() {
                                         </div>
                                     </form>
 
-                                    {}
+                                    {/* résultats de recherche */}
                                     {searchResults.length > 0 && (
                                         <div className="mt-6 flex flex-col gap-3">
                                             {searchResults.map((result, i) => (
@@ -379,7 +376,7 @@ export default function FriendsPage() {
                                 </div>
                             </div>
 
-                            {}
+                            {/* affichage des invitations reçues */}
                             {incomingRequests.length > 0 && (
                                 <div className="bg-orange-500/5 backdrop-blur-2xl border border-orange-500/20 px-6 py-7 rounded-[2.5rem] shadow-xl animate-in slide-in-from-bottom-8 fade-in fill-mode-both relative overflow-hidden" style={{ animationDelay: '200ms' }}>
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 blur-[50px] pointer-events-none rounded-full" />
@@ -422,7 +419,7 @@ export default function FriendsPage() {
                                 </div>
                             )}
 
-                            {}
+                            {/* affichage des pings envoyés en attente */}
                             {outgoingRequests.length > 0 && (
                                 <div className="bg-surface/20 backdrop-blur-xl border border-border p-6 rounded-[2rem] opacity-80 hover:opacity-100 transition-opacity duration-500 animate-in slide-in-from-bottom-8 fade-in fill-mode-both" style={{ animationDelay: '300ms' }}>
                                     <h2 className="text-xs font-black mb-4 text-text-muted uppercase tracking-[0.15em]">Pings envoyés ({outgoingRequests.length})</h2>
@@ -447,10 +444,10 @@ export default function FriendsPage() {
 
                         </div>
 
-                        {}
+                        {/* panneau principal de la liste d'amis connectés */}
                         <div className="lg:col-span-8">
                             <div className="bg-surface/30 backdrop-blur-2xl border border-border p-8 md:p-10 rounded-[2.5rem] h-full shadow-2xl animate-in slide-in-from-bottom-8 fade-in fill-mode-both relative overflow-hidden" style={{ animationDelay: '200ms' }}>
-                                {}
+                                {/* décorations subtiles */}
                                 <div className="absolute top-0 right-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                                 <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
 
@@ -489,7 +486,7 @@ export default function FriendsPage() {
                                                     className={`relative flex items-center justify-between p-5 bg-surface/50 backdrop-blur-lg rounded-[1.5rem] border border-border transition-all duration-500 group overflow-hidden hover:-translate-y-1 ${squadTheme.hoverShadow} animate-in fade-in zoom-in-95 fill-mode-both cursor-default`}
                                                     style={{ animationDelay: `${300 + (index * 50)}ms` }}
                                                 >
-                                                    {}
+                                                    {/* effet de dégradé au survol */}
                                                     <div className={`absolute inset-0 bg-gradient-to-r ${squadTheme.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
 
                                                     <div className="relative z-10 flex items-center gap-4 text-left min-w-0 flex-1">
@@ -513,7 +510,7 @@ export default function FriendsPage() {
                                                         </div>
                                                     </div>
 
-                                                    {}
+                                                    {/* bouton de déconnexion d'un ami */}
                                                     <div className="relative z-10 shrink-0 flex items-center pl-2">
                                                         <button
                                                             onClick={(e) => {

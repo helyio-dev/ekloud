@@ -27,7 +27,7 @@ export default function PublicProfilePage() {
             if (!username) return;
             setIsLoading(true);
             try {
-                // 1. Fetch Profile by Username
+                // 1. récupérer le profil par le pseudo
                 const { data: profileData, error: profileError } = await supabase
                     .from('profiles')
                     .select('*')
@@ -50,10 +50,10 @@ export default function PublicProfilePage() {
     }, [username]);
 
     useEffect(() => {
-        // Disable scroll on body when public profile is mounted
+        // désactiver le défilement sur le body lorsque le profil public est monté
         document.body.style.overflow = 'hidden';
         
-        // Re-enable scroll when component is unmounted
+        // réactiver le défilement lorsque le composant est démonté
         return () => {
             document.body.style.overflow = 'unset';
         };
@@ -97,7 +97,7 @@ export default function PublicProfilePage() {
 
     return (
         <div className="h-screen bg-background flex flex-col overflow-hidden">
-            {/* Header / Profile Card */}
+            {/* en-tête / carte de profil */}
             <div className="bg-surface/30 border-b border-border backdrop-blur-xl relative z-20">
                 <div className="max-w-7xl mx-auto px-6 py-8 md:py-12">
                     <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
@@ -140,7 +140,7 @@ export default function PublicProfilePage() {
                         </div>
                     </div>
 
-                    {/* Quick Stats Grid */}
+                    {/* grille des statistiques rapides */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
                         <div className="bg-surface-hover/30 border border-border p-6 rounded-3xl overflow-hidden relative group">
                             <div className="absolute -top-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity"><Zap size={100} /></div>
@@ -162,7 +162,7 @@ export default function PublicProfilePage() {
             </div>
 
 
-            {/* Notification Toast */}
+            {/* notification toast */}
             {notification && (
                 <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-4 rounded-2xl border backdrop-blur-xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 ${notification.type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-surface border-border text-text-muted/80'}`}>
                     <Sparkles size={20} />

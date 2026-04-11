@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Register theme variables for smooth interpolation */
+/* enregistrer les variables de thème pour une interpolation fluide */
 @property --background { syntax: '<color>'; inherits: true; initial-value: #030406; }
 @property --surface { syntax: '<color>'; inherits: true; initial-value: #0a0c10; }
 @property --surface-hover { syntax: '<color>'; inherits: true; initial-value: #12151c; }
@@ -114,11 +114,11 @@
 
   0%,
   100% {
-    box-shadow: 0 0 20px -5px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 20px -5px var(--accent-glow);
   }
 
   50% {
-    box-shadow: 0 0 40px 5px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 40px 5px var(--accent-glow);
   }
 }
 
@@ -128,7 +128,7 @@
 
 .hover-glow:hover {
   box-shadow: 0 20px 40px -20px var(--accent-glow);
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: var(--accent);
   transform: translateY(-4px);
 }
 
@@ -183,9 +183,47 @@
   animation: float-subtle 4s ease-in-out infinite;
 }
 
-/* ===== THEME SYSTEM: 8 palettes × dark/light ===== */
+/* keyframes partagés — page crédits & backgrounds */
+@keyframes shooting-star {
+    0% {
+        transform: translate(200px, -200px) rotate(-45deg) scale(0);
+        opacity: 0;
+    }
+    15% {
+        transform: translate(0px, 0px) rotate(-45deg) scale(1);
+        opacity: 1;
+    }
+    85% { opacity: 1; }
+    100% {
+        transform: translate(-2000px, 2000px) rotate(-45deg) scale(0.2);
+        opacity: 0;
+    }
+}
+.animate-shooting-star {
+    animation: shooting-star linear infinite;
+}
 
-/* NEBULA (default) */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.1; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+.animate-twinkle {
+    animation: twinkle ease-in-out infinite;
+}
+
+/* keyframe shimmer utilisé dans le dashboard */
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* masquage de la scrollbar (utilisé dans le dashboard) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ===== système de thème : 8 palettes × sombre/clair ===== */
+
+/* nebula (par défaut) */
 :root, .nebula-dark {
   --background: #030406;
   --surface: #0a0c10;
@@ -215,7 +253,7 @@
   --grid-color: rgba(0, 0, 0, 0.05);
 }
 
-/* NORMAL */
+/* normal */
 .normal-dark {
   --background: #0f1117;
   --surface: #1a1d24;
@@ -245,7 +283,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* AMOLED */
+/* amoled */
 .amoled-dark {
   --background: #000000;
   --surface: #080808;
@@ -275,7 +313,7 @@
   --grid-color: rgba(0, 0, 0, 0.03);
 }
 
-/* AURORA */
+/* aurora */
 .aurora-dark {
   --background: #021208;
   --surface: #0b2015;
@@ -305,7 +343,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* SUNSET */
+/* sunset */
 .sunset-dark {
   --background: #150609;
   --surface: #220c10;
@@ -335,7 +373,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* OCEAN */
+/* ocean */
 .ocean-dark {
   --background: #020d1a;
   --surface: #081929;
@@ -365,7 +403,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* SAKURA */
+/* sakura */
 .sakura-dark {
   --background: #1a0812;
   --surface: #28101e;
@@ -395,7 +433,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* HACKER */
+/* hacker */
 .hacker-dark {
   --background: #000000;
   --surface: #0a0f0a;
@@ -425,7 +463,7 @@
   --grid-color: rgba(57, 211, 83, 0.04);
 }
 
-/* MIDNIGHT */
+/* midnight */
 .midnight-dark {
   --background: #05060f;
   --surface: #0e1029;
@@ -455,7 +493,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* LAVA */
+/* lava */
 .lava-dark {
   --background: #0f0202;
   --surface: #1e0505;
@@ -485,7 +523,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* CYBER */
+/* cyber */
 .cyber-dark {
   --background: #06000f;
   --surface: #10011e;
@@ -515,7 +553,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* COFFEE */
+/* coffee */
 .coffee-dark {
   --background: #0f0a05;
   --surface: #1e1008;
@@ -545,7 +583,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* MINT */
+/* mint */
 .mint-dark {
   --background: #011a16;
   --surface: #052e26;
@@ -575,7 +613,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* LAVENDER */
+/* lavender */
 .lavender-dark {
   --background: #0d0814;
   --surface: #1a0f22;
@@ -605,7 +643,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* SLATE */
+/* slate */
 .slate-dark {
   --background: #020617;
   --surface: #0f172a;
@@ -635,7 +673,7 @@
   --grid-color: rgba(0, 0, 0, 0.04);
 }
 
-/* ROSE */
+/* rose */
 .rose-dark {
   --background: #0f0208;
   --surface: #1e0510;
@@ -668,7 +706,7 @@
 
 
 .text-gradient {
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 50%, var(--neon-pink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -683,13 +721,13 @@
 }
 
 .neon-border {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.05);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 0 20px var(--accent-glow);
 }
 
 .neon-border:hover {
   border-color: var(--accent);
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.2), inset 0 0 20px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 30px var(--accent-glow), inset 0 0 20px var(--accent-glow);
 }
 
 .hero-glow-main {
@@ -702,15 +740,15 @@
 }
 
 @keyframes title-pulse {
-  0%, 100% { opacity: 0.95; filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.4)); }
-  50% { opacity: 1; filter: drop-shadow(0 0 50px rgba(99, 102, 241, 0.6)); }
+  0%, 100% { opacity: 0.95; filter: drop-shadow(0 0 30px var(--accent-glow)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 50px var(--accent-glow)); }
 }
 
 .animate-title-impact {
   animation: title-pulse 3s ease-in-out infinite;
 }
 
-/* Performance-optimized theme transitions */
+/* transitions de thème optimisées pour la performance */
 *, *::before, *::after {
   transition: 
     background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -720,7 +758,7 @@
     text-decoration-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Exclude specific elements that shouldn't transition or have conflict */
+/* exclure les éléments spécifiques qui ne devraient pas transitionner ou avoir de conflits */
 .no-transition, 
 .no-transition *,
 canvas,

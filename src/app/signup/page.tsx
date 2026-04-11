@@ -15,6 +15,7 @@ export default function SignupPage() {
                     </p>
                 </div>
 
+                {/* fournisseurs d'authentification sociale */}
                 <div className="space-y-6">
                     <SocialAuth />
                 </div>

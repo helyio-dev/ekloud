@@ -1,63 +1,73 @@
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import BackgroundParticles from '@/components/BackgroundParticles';
-import { Rocket, GraduationCap, Target } from 'lucide-react';
+import { Rocket, GraduationCap, Target, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
+/**
+ * page d'accueil principale de la plateforme ekloud.
+ * propose une expérience immersive avec animations et présentation de la méthodologie.
+ */
 export default function LandingPage() {
     const [copied, setCopied] = useState(false);
+
     return (
-        <main className="flex-grow flex flex-col items-center w-full bg-grid-pattern">
+        <main className="flex-grow flex flex-col items-center w-full bg-grid-pattern overflow-x-hidden font-sans">
             <BackgroundParticles />
             <Hero />
             <Features />
 
-            {/* Concept Section - Immersive Timeline */}
-            <section className="py-20 px-6 w-full relative overflow-hidden mesh-gradient">
-                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-border/20 -z-10" />
+            {/* section concept : présentation de la méthodologie pédagogique */}
+            <section className="py-20 px-6 w-full relative overflow-hidden mesh-gradient border-t border-border/50">
+                <div className="absolute top-1/2 left-0 w-full h-px bg-border/20 -z-10" />
 
                 <div className="max-w-5xl mx-auto relative">
-                    <div className="text-center mb-12 space-y-4">
-                        <div className="text-accent font-black tracking-[0.5em] uppercase text-sm">Méthodologie</div>
-                        <h2 className="text-4xl md:text-7xl font-black tracking-tighter">
+                    <header className="text-center mb-16 space-y-4">
+                        <div className="text-accent font-black tracking-[0.5em] uppercase text-[10px]">méthodologie</div>
+                        <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase font-equinox">
                             conçu pour la <span className="text-gradient drop-shadow-[0_0_30px_rgba(168,85,247,0.3)]">réussite</span>
                         </h2>
-                    </div>
+                    </header>
 
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 gap-8">
                         <ConceptItem
                             icon={<Rocket className="w-8 h-8" />}
                             num="01"
-                            title="LEçOns structuréEs"
-                            desc="Des contenus clairs, optimisés pour un apprentissage rapide et efficace. Sans perte de temps."
+                            title="leçons structurées"
+                            desc="des contenus clairs, optimisés pour un apprentissage rapide et efficace. aucune perte de temps."
                         />
                         <ConceptItem
                             icon={<GraduationCap className="w-8 h-8" />}
                             num="02"
-                            title="Quiz & feEDbAck"
-                            desc="Validez chaque concept avec des tests interactifs immédiats pour ancrer vos savoirs."
+                            title="quiz & feedback"
+                            desc="validez chaque concept avec des tests interactifs immédiats pour ancrer vos savoirs durablement."
                         />
                         <ConceptItem
                             icon={<Target className="w-8 h-8" />}
                             num="03"
-                            title="ExAmEn finAl"
-                            desc="Démontrez votre maîtrise réelle, validez vos acquis et débloquez la suite du parcours."
+                            title="examen final"
+                            desc="démontrez votre maîtrise réelle, validez vos acquis et débloquez la suite de votre parcours."
                         />
                     </div>
                 </div>
             </section>
 
-            <footer className="py-12 px-6 border-t border-border w-full text-center mesh-gradient">
-                <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">
-                    <div className="text-3xl font-black tracking-tighter text-gradient mb-2 font-equinox">EKLOUD</div>
-                    <p className="text-text-muted text-lg font-medium tracking-widest uppercase opacity-80">
-                        © {new Date().getFullYear()} • Plateforme d'apprentissage technologique
+            {/* pied de page global : navigation secondaire et réseaux */}
+            <footer className="py-20 px-6 border-t border-border w-full text-center mesh-gradient bg-surface/5">
+                <div className="max-w-7xl mx-auto flex flex-col items-center gap-10">
+                    <div className="text-4xl font-black tracking-tighter text-gradient font-equinox uppercase">EKLOUD</div>
+                    
+                    <p className="text-text-muted text-[10px] font-black tracking-[0.3em] uppercase opacity-60">
+                        © {new Date().getFullYear()} • plateforme d'apprentissage technologique avancée
                     </p>
-                    <div className="flex gap-8 text-text-muted/60 text-sm font-bold tracking-widest uppercase items-center">
-                        <a href="https://discord.gg/WnwyMHm4Gc" target="_blank" rel="noopener noreferrer" className="hover:text-accent cursor-pointer transition-colors">Discord</a>
-                        <Link to="/support" className="hover:text-accent cursor-pointer transition-colors">Soutenir</Link>
+
+                    <nav className="flex flex-wrap justify-center gap-8 text-text-muted/60 text-[10px] font-black tracking-widest uppercase">
+                        <a href="https://discord.gg/WnwyMHm4Gc" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-accent transition-colors group">
+                            discord <ExternalLink size={10} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </a>
+                        <Link to="/support" className="hover:text-accent transition-colors underline-offset-4 hover:underline">soutenir</Link>
+                        <Link to="/terms" className="hover:text-accent transition-colors underline-offset-4 hover:underline">cgu</Link>
                         <button 
                             onClick={(e) => {
                                 e.preventDefault();
@@ -65,37 +75,43 @@ export default function LandingPage() {
                                 setCopied(true);
                                 setTimeout(() => setCopied(false), 2000);
                             }}
-                            className="hover:text-accent cursor-pointer transition-colors uppercase font-bold tracking-widest"
+                            className="hover:text-accent transition-colors underline-offset-4 hover:underline"
                         >
-                            {copied ? "Email Copié !" : "Support"}
+                            {copied ? "email copié !" : "contact support"}
                         </button>
-                    </div>
-
+                    </nav>
                 </div>
             </footer>
         </main>
     );
 }
 
+/**
+ * composant interne pour illustrer une phase de la méthodologie.
+ */
 function ConceptItem({ icon, num, title, desc }: { icon: React.ReactNode; num: string; title: string; desc: string }) {
     return (
-        <div className="group relative flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start p-8 md:p-12 rounded-[2rem] md:rounded-[3.5rem] transition-all duration-700 hover:bg-accent/5 border border-border hover:border-accent/20 glass-morphism backdrop-blur-3xl overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-[100px] -z-10 group-hover:bg-accent/10 transition-colors" />
+        <article className="group relative flex flex-col md:flex-row gap-8 md:gap-16 items-center md:items-start p-10 md:p-16 rounded-[4rem] transition-all duration-700 hover:bg-accent/[0.02] border border-border/40 hover:border-accent/20 glass-morphism backdrop-blur-3xl overflow-hidden shadow-2xl">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-accent/[0.01] rounded-full blur-[128px] -z-10 group-hover:bg-accent/[0.04] transition-colors duration-1000" />
 
-            <div className="flex-shrink-0 w-16 h-16 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-surface border border-border flex items-center justify-center font-black text-text text-2xl md:text-4xl shadow-2xl group-hover:bg-accent group-hover:border-accent/50 group-hover:text-white group-hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] transition-all duration-700 relative overflow-hidden">
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-surface-hover/30" />
-                <span className="relative z-10 group-hover:hidden">{num}</span>
-                <span className="hidden group-hover:flex items-center justify-center relative z-10 animate-in zoom-in duration-500">{icon}</span>
-            </div>
-
-            <div className="md:pt-4 text-center md:text-left space-y-4 max-w-2xl">
-                <div className="flex items-center gap-4 justify-center md:justify-start">
-                    <div className="h-px w-8 bg-accent/30" />
-                    <span className="text-accent font-black text-xs tracking-[0.4em] uppercase">Phase {num}</span>
+            {/* indicateur numérique et icône au survol */}
+            <div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] bg-surface-hover/30 border border-border/60 flex items-center justify-center font-black text-text text-4xl md:text-6xl shadow-inner group-hover:bg-accent group-hover:border-accent/40 group-hover:text-white group-hover:shadow-[0_0_60px_rgba(99,102,241,0.25)] transition-all duration-1000 relative overflow-hidden">
+                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative z-10 group-hover:scale-0 transition-transform duration-500">{num}</span>
+                <div className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-110 transition-all duration-700 delay-100 z-10">
+                    {icon}
                 </div>
-                <h3 className="text-3xl md:text-4xl font-black tracking-tight text-text group-hover:text-accent transition-colors duration-500 font-equinox">{title}</h3>
-                <p className="text-text-muted text-xl leading-relaxed font-medium group-hover:text-text transition-colors duration-500">{desc}</p>
             </div>
-        </div>
+
+            {/* contenu textuel descriptif */}
+            <div className="md:pt-4 text-center md:text-left space-y-6 max-w-2xl">
+                <div className="flex items-center gap-6 justify-center md:justify-start overflow-hidden">
+                    <div className="h-[2px] w-12 bg-accent/20 group-hover:w-20 transition-all duration-700" />
+                    <span className="text-accent font-black text-[10px] tracking-[0.5em] uppercase whitespace-nowrap">phase {num}</span>
+                </div>
+                <h3 className="text-3xl md:text-5xl font-black tracking-tight text-text group-hover:text-accent transition-colors duration-500 font-equinox uppercase leading-none">{title}</h3>
+                <p className="text-text-muted text-lg md:text-2xl leading-relaxed font-medium group-hover:text-text transition-colors duration-500 opacity-80 group-hover:opacity-100">{desc}</p>
+            </div>
+        </article>
     );
 }
