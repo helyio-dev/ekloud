@@ -16,31 +16,31 @@ jobs:
 
       - name: calculate sloc
         run: |
-          pnpm dlx sloc . --exclude "node_modules|.git|.next" --extensions "ts,tsx,js,jsx,css,scss" --format json > raw-stats.json
+          pnpm dlx sloc src/ > raw-table.txt
           
           node -e "
             const fs = require('fs');
             try {
-              const raw = JSON.parse(fs.readFileSync('raw-stats.json', 'utf8'));
-              
-              const stats = raw.summary?.total || raw.total || (Array.isArray(raw) ? raw[0].total : null);
-              
-              if (!stats || stats.physical === 0) {
-                 console.log('SLOC n a rien trouvé, vérification manuelle...');
-              }
+              const content = fs.readFileSync('raw-table.txt', 'utf8');
+              console.log('Tableau reçu :\n', content);
+
+              const getVal = (regex) => {
+                const match = content.match(regex);
+                return match ? parseInt(match[1].trim(), 10) : 0;
+              };
 
               const summary = {
-                physical: stats?.physical || 0,
-                source: stats?.source || 0,
-                comment: stats?.comment || 0,
-                files: stats?.files || 0,
+                physical: getVal(/Physical\s*:\s*(\d+)/),
+                source: getVal(/Source\s*:\s*(\d+)/),
+                comment: getVal(/Comment\s*:\s*(\d+)/),
+                files: getVal(/Number of files read\s*:\s*(\d+)/),
                 updated_at: new Date().toISOString()
               };
 
+              console.log('JSON extrait :', summary);
               fs.writeFileSync('ekloud-stats.json', JSON.stringify(summary, null, 2));
-              console.log('Exportation :', summary);
             } catch (err) {
-              console.error(err);
+              console.error('Erreur lors du parsing :', err);
               process.exit(1);
             }
           "
