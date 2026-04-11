@@ -15,8 +15,22 @@ jobs:
           version: 10 
 
       - name: calculate sloc
+        id: sloc
         run: |
-          pnpm dlx sloc src/ > ekloud-stats.json
+          pnpm dlx sloc src/ --format json > full-stats.json
+          
+          node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('full-stats.json', 'utf8'));
+            const summary = {
+              physical: data.summary.total.physical,
+              source: data.summary.total.source,
+              comment: data.summary.total.comment,
+              files: data.summary.total.files,
+              updated_at: new Date().toISOString()
+            };
+            fs.writeFileSync('ekloud-stats.json', JSON.stringify(summary, null, 2));
+          "
 
       - name: update gist
         env:
