@@ -114,7 +114,6 @@ export default function CreditsPage() {
                             <div className="flex items-center gap-6 mb-12">
                                 <h2 className="text-[13px] font-black uppercase tracking-[0.5em] text-accent italic whitespace-nowrap">
                                     {group.category}
-                               States
                                 </h2>
                                 <div className="h-px w-full bg-border/20"></div>
                             </div>

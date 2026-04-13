@@ -8,4 +8,12 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
  * instance partagée du client supabase pour l'application. 
  * permet d'interagir avec l'authentification et la base de données.
  */
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'ekloud-auth-token', // clé unique pour éviter les collisions
+        storage: window.localStorage
+    }
+});

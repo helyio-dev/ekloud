@@ -173,21 +173,8 @@ export default function Navbar() {
                                                 contribuer
                                             </Link>
                                             <Link onClick={() => setIsMenuOpen(false)} to="/credits" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-indigo-400 hover:bg-indigo-400/5 rounded-2xl transition-all flex items-center gap-4 group">
-                                                <Info size={16} className="text-indigo-400/60 group-hover:text-indigo-400" />
-                                                technologies
-                                            </Link>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    navigator.clipboard.writeText('contact@ekoud.qzz.io');
-                                                    setCopied(true);
-                                                    setTimeout(() => setCopied(false), 2000);
-                                                }}
-                                                className="w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-emerald-400 hover:bg-emerald-400/5 rounded-2xl transition-all flex items-center gap-4 group"
-                                            >
-                                                {copied ? <Check size={16} className="text-emerald-500" /> : <Mail size={16} className="text-emerald-500/60 group-hover:text-emerald-500" />}
                                                 {copied ? "info copiée !" : "aide & support"}
-                                            </button>
+                                            </Link>
                                             
                                             {/* outils d'administration conditionnels */}
                                             {(isAdmin || isContributor) && (

@@ -1,7 +1,7 @@
 import SkillTree, { Skill, SkillPrereq, SkillModule } from '@/components/SkillTree';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, BookOpen, CheckCircle, X, Sparkles, Lock, Trophy, Target } from 'lucide-react';
 import { addXp } from '@/lib/gamification';
@@ -38,7 +38,7 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
     const navigate = useNavigate();
-    
+
     // référence temporelle pour éviter les multiples appels réseau (debouncing disk io)
     const lastFetchTimeRef = useRef(0);
 
@@ -51,7 +51,7 @@ export default function Dashboard() {
             if (!user) return;
             const now = Date.now();
             if (now - lastFetchTimeRef.current < 2000) return;
-            
+
             lastFetchTimeRef.current = now;
             setIsLoading(true);
             try {
@@ -96,49 +96,62 @@ export default function Dashboard() {
         }
 
         if (!authLoading && user) fetchData();
-        
+
         // désactivation du scroll global pour une navigation immersive dans l'arbre
         document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = 'unset'; };
     }, [user?.id, authLoading]);
 
     /**
-     * détermine dynamiquement l'état d'un noeud selon les règles métier de progression.
+     * calcule dynamiquement l'état de tous les noeuds selon les règles métier.
+     * centralisé dans un useMemo pour éviter les calculs récursifs lourds à chaque render.
      */
-    const getSkillStatus = (skillId: string, visited = new Set<string>()): 'completed' | 'available' | 'unlocked' | 'unlocked_needs_exam' | 'locked' => {
-        if (completedSkills.has(skillId)) return 'completed';
-        if (visited.has(skillId)) return 'locked';
-        visited.add(skillId);
+    const skillsStatus = useMemo(() => {
+        const statusMap: Record<string, 'completed' | 'available' | 'unlocked' | 'unlocked_needs_exam' | 'locked'> = {};
 
-        // vérification récursive des prérequis directs
-        const skillPrereqs = prereqs.filter(p => p.skill_id === skillId);
-        const prereqsMet = skillPrereqs.every(p => getSkillStatus(p.prerequisite_skill_id, visited) === 'completed');
+        const computeStatus = (skillId: string, visited = new Set<string>()): any => {
+            if (statusMap[skillId]) return statusMap[skillId];
+            if (completedSkills.has(skillId)) return 'completed';
+            if (visited.has(skillId)) return 'locked';
 
-        if (!prereqsMet && skillPrereqs.length > 0) return 'locked';
+            const newVisited = new Set(visited);
+            newVisited.add(skillId);
 
-        // vérification de la complétion de tous les modules associés
-        const requiredModules = skillModules.filter(sm => sm.skill_id === skillId);
-        const modulesCompleted = requiredModules.length > 0 && requiredModules.every(rm => userModules[rm.module_id]);
+            // prérequis directs
+            const skillPrereqs = prereqs.filter(p => p.skill_id === skillId);
+            const prereqsMet = skillPrereqs.every(p => computeStatus(p.prerequisite_skill_id, newVisited) === 'completed');
 
-        const skill = skills.find(s => s.id === skillId);
-        if (skill?.is_locked) return 'locked';
+            if (!prereqsMet && skillPrereqs.length > 0) return 'locked';
 
-        // vérification spécifique aux examens de validation de palier
-        if (skill?.requires_exam && skill.exam_module_id) {
-            if (!passedExams.has(skill.exam_module_id)) return 'unlocked_needs_exam';
-        }
+            // modules associés
+            const requiredModules = skillModules.filter(sm => sm.skill_id === skillId);
+            const modulesCompleted = requiredModules.length > 0 && requiredModules.every(rm => userModules[rm.module_id]);
 
-        if (requiredModules.length > 0 && !modulesCompleted) return 'unlocked';
+            const skill = skills.find(s => s.id === skillId);
+            if (skill?.is_locked) return 'locked';
 
-        return 'available';
-    };
+            if (skill?.requires_exam && skill.exam_module_id) {
+                if (!passedExams.has(skill.exam_module_id)) return 'unlocked_needs_exam';
+            }
+
+            if (requiredModules.length > 0 && !modulesCompleted) return 'unlocked';
+
+            return 'available';
+        };
+
+        skills.forEach(s => {
+            statusMap[s.id] = computeStatus(s.id);
+        });
+
+        return statusMap;
+    }, [skills, prereqs, skillModules, userModules, completedSkills, passedExams]);
 
     /**
      * gère l'interaction utilisateur sur un noeud de l'arbre.
      * déclenche le déblocage de récompenses xp si possible.
      */
     const handleSkillAction = async (skill: Skill) => {
-        const status = getSkillStatus(skill.id);
+        const status = skillsStatus[skill.id];
 
         if (status === 'available' && !completedSkills.has(skill.id)) {
             if (user) {
@@ -171,7 +184,7 @@ export default function Dashboard() {
     return (
         <div className="h-[calc(100vh-73px)] bg-background relative overflow-hidden flex flex-col select-none mesh-gradient font-sans">
             <div className="absolute inset-0 bg-grid-pattern opacity-[0.05] pointer-events-none" />
-            
+
             <SkillTree
                 skills={skills}
                 prereqs={prereqs}
@@ -180,12 +193,13 @@ export default function Dashboard() {
                 userModules={userModules}
                 completedSkills={completedSkills}
                 passedExams={passedExams}
+                skillsStatus={skillsStatus}
                 onSkillClick={handleSkillAction}
             />
 
             {/* panneau latéral d'exploration des détails de compétence */}
             {selectedSkill && (() => {
-                const status = getSkillStatus(selectedSkill.id);
+                const status = skillsStatus[selectedSkill.id];
                 const skillModulesData = skillModules.filter(sm => sm.skill_id === selectedSkill.id);
 
                 return (

@@ -43,7 +43,8 @@ export default function UserManagementTab() {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('id, email, username, role, xp, level, streak, created_at')
-                .order('xp', { ascending: false });
+                .order('xp', { ascending: false })
+                .limit(100);
             if (error) throw error;
             setUsers(data as AdminUser[] || []);
         } catch (err) {
@@ -135,7 +136,10 @@ export default function UserManagementTab() {
                 
                 <div className="flex items-center gap-3 bg-surface/40 px-6 py-3 rounded-full border border-border/40">
                     <Target size={14} className="text-text-muted/40" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/60">{filteredUsers.length} <span className="opacity-40">corrélation{filteredUsers.length !== 1 ? 's' : ''}</span></span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/60">
+                        {filteredUsers.length} <span className="opacity-40">affiché{filteredUsers.length !== 1 ? 's' : ''}</span>
+                        {users.length >= 100 && <span className="text-amber-500/60 ml-2"> (pool limité à 100)</span>}
+                    </span>
                 </div>
             </div>
 

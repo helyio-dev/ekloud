@@ -189,12 +189,6 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                 </button>
             </div>
 
-            <style>{`
-                @keyframes shimmer {
-                    0% { background-position: 250% 0; }
-                    100% { background-position: -250% 0; }
-                }
-            `}</style>
         </form>
     );
 }
