@@ -748,8 +748,9 @@
   animation: title-pulse 3s ease-in-out infinite;
 }
 
-/* transitions de thème optimisées pour la performance */
-*, *::before, *::after {
+/* transitions de thème optimisées pour la performance (restriction aux conteneurs et UI) */
+body, div, section, main, header, footer, article, aside, 
+button, a, input, textarea, select, span, p, h1, h2, h3, h4, h5, h6 {
   transition: 
     background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     color 0.3s cubic-bezier(0.4, 0, 0.2, 1),

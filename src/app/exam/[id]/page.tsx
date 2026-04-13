@@ -14,8 +14,15 @@ type Question = {
     answers: {
         id: string;
         answer_text: string;
-        is_correct: boolean;
     }[];
+};
+
+/**
+ * état d'une réponse après validation unitaire par le serveur.
+ */
+type AnswerState = {
+    selected_id: string;
+    is_correct: boolean;
 };
 
 /**
@@ -33,8 +40,10 @@ export default function ExamPage() {
     const [score, setScore] = useState(0);
     const [earnedXp, setEarnedXp] = useState(0);
     const [showResult, setShowResult] = useState(false);
+    const [answerStates, setAnswerStates] = useState<Record<string, AnswerState>>({});
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isCheckingAnswer, setIsCheckingAnswer] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // protection de la route (authentification requise)
@@ -51,9 +60,11 @@ export default function ExamPage() {
 
             try {
                 // récupération du pool de questions pour l'évaluation finale
+                // récupération du pool de questions pour l'évaluation finale
+                // is_correct est exclu pour éviter l'exposition client (anti-cheat)
                 const { data: qData } = await supabase
                     .from('questions')
-                    .select(`id, question_text, quiz_options (id, option_text, is_correct)`)
+                    .select(`id, question_text, quiz_options (id, option_text)`)
                     .eq('module_id', id)
                     .limit(20);
 
@@ -72,8 +83,7 @@ export default function ExamPage() {
                     question_text: q.question_text,
                     answers: shuffle((q.quiz_options || []).map((o: any) => ({
                         id: o.id,
-                        answer_text: o.option_text,
-                        is_correct: o.is_correct
+                        answer_text: o.option_text
                     })))
                 }));
                 
@@ -92,15 +102,37 @@ export default function ExamPage() {
     /**
      * traite la sélection d'une réponse et incrémente le score si correct.
      */
-    const handleAnswer = (answerId: string) => {
-        if (selectedAnswer) return;
+    const handleAnswer = async (answerId: string) => {
+        if (selectedAnswer || isCheckingAnswer) return;
+        
+        setIsCheckingAnswer(true);
         setSelectedAnswer(answerId);
 
-        const currentQ = questions[currentIndex];
-        const answer = currentQ.answers.find(a => a.id === answerId);
-        if (answer?.is_correct) {
-            setScore(prev => prev + 1);
-            setEarnedXp(prev => prev + 2); // bonus examen : double xp
+        try {
+            const currentQ = questions[currentIndex];
+            // validation via le serveur sans exposition préalable
+            const { data, error } = await supabase.rpc('check_quiz_answer', {
+                p_answer_id: answerId,
+            });
+
+            if (error) throw error;
+
+            setAnswerStates(prev => ({
+                ...prev,
+                [currentQ.id]: {
+                    selected_id: answerId,
+                    is_correct: data.is_correct,
+                },
+            }));
+
+            if (data.is_correct) {
+                setScore(prev => prev + 1);
+                setEarnedXp(prev => prev + 2); // bonus examen : double xp
+            }
+        } catch (err) {
+            console.error('erreur lors de la validation de la réponse:', err);
+        } finally {
+            setIsCheckingAnswer(false);
         }
     };
 
@@ -294,8 +326,9 @@ export default function ExamPage() {
                     <div className="grid gap-5">
                         {currentQ?.answers?.map((answer, idx) => {
                             const isSelected = selectedAnswer === answer.id;
-                            const isCorrect = isSelected && answer.is_correct;
-                            const answered = !!selectedAnswer;
+                            const currentAnswerState = currentQ ? answerStates[currentQ.id] : null;
+                            const isCorrect = isSelected && currentAnswerState?.is_correct;
+                            const answered = !!currentAnswerState;
 
                             let baseStyle = 'bg-surface/30 border-border/80 hover:bg-accent/5 hover:border-accent/40 text-text/80 shadow-sm';
                             if (answered) {
@@ -328,6 +361,9 @@ export default function ExamPage() {
                                             isCorrect 
                                                 ? <CheckCircle className="w-8 h-8 shrink-0 text-emerald-500 animate-in zoom-in duration-500" />
                                                 : <XCircle className="w-8 h-8 shrink-0 text-rose-500 animate-in zoom-in duration-500" />
+                                        )}
+                                        {isCheckingAnswer && isSelected && !answered && (
+                                            <Loader2 className="w-6 h-6 animate-spin text-accent" />
                                         )}
                                     </div>
                                 </button>

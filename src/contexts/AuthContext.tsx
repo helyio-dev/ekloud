@@ -60,7 +60,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
      * récupère les informations de profil depuis la base de données.
      * crée un profil par défaut si l'utilisateur est nouveau.
      */
-    const fetchProfile = async (userId: string, newUser?: any) => {
+    const fetchProfile = React.useCallback(async (userId: string, newUser?: any) => {
+        if (!userId) return;
         if (lastFetchedIdRef.current === userId) return;
         lastFetchedIdRef.current = userId;
         
@@ -117,7 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } catch (err) {
             console.error('erreur inattendue profile_fetch:', err);
         }
-    };
+    }, []);
 
     useEffect(() => {
         /**
@@ -139,15 +140,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
 
         // écoute des changements d'état (login, logout, token refresh)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+            console.log(`Auth event: ${event}`);
             const newUser = currentSession?.user ?? null;
+            
             setSession(currentSession);
             setUser(newUser);
             
             if (newUser) {
-                await fetchProfile(newUser.id, newUser);
+                try {
+                    await fetchProfile(newUser.id, newUser);
+                } catch (err) {
+                    console.error('Erreur durant le cycle onAuthStateChange:', err);
+                }
             } else {
-                // remise à zéro des états d'authentification
+                // remise à zéro complète lors de la déconnexion
                 lastFetchedIdRef.current = null;
                 setIsAdmin(false);
                 setIsContributor(false);

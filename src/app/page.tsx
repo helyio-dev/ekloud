@@ -71,7 +71,7 @@ export default function LandingPage() {
                         <button 
                             onClick={(e) => {
                                 e.preventDefault();
-                                navigator.clipboard.writeText('contact@ekoud.qzz.io');
+                                navigator.clipboard.writeText('contact@ekloud.qzz.io');
                                 setCopied(true);
                                 setTimeout(() => setCopied(false), 2000);
                             }}

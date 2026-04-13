@@ -352,16 +352,6 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                 </button>
             </div>
 
-            <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-                @keyframes shimmer {
-                    0% { background-position: 250% 0; }
-                    100% { background-position: -250% 0; }
-                }
-            `}</style>
         </form>
     );
 }

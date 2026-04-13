@@ -34,6 +34,7 @@ export default function LessonPage() {
     const { user, isLoading: authLoading, xp, streak } = useAuth();
     const [lesson, setLesson] = useState<Lesson | null>(null);
     const [nextLessonId, setNextLessonId] = useState<string | null>(null);
+    const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isCompleting, setIsCompleting] = useState(false);
     const navigate = useNavigate();
@@ -71,6 +72,17 @@ export default function LessonPage() {
                         .limit(1);
 
                     setNextLessonId(nextLesson && nextLesson.length > 0 ? nextLesson[0].id : null);
+
+                    // recherche de la leçon précédente dans le même module
+                    const { data: prevLesson } = await supabase
+                        .from('lessons')
+                        .select('id')
+                        .eq('module_id', currentLesson.module_id)
+                        .lt('order_index', currentLesson.order_index)
+                        .order('order_index', { ascending: false })
+                        .limit(1);
+
+                    setPrevLessonId(prevLesson && prevLesson.length > 0 ? prevLesson[0].id : null);
                 }
             } catch (err) {
                 console.error("erreur de récupération de la leçon:", err);
@@ -244,7 +256,12 @@ export default function LessonPage() {
             {/* barre d'actions fixée en bas de page pour la validation du parcours */}
             <footer className="border-t border-border/60 bg-surface/60 backdrop-blur-[48px] p-8 md:p-10 sticky bottom-0 z-50 shadow-[0_-20px_50px_rgba(0,0,0,0.3)]">
                 <div className="max-w-5xl mx-auto flex justify-between items-center gap-8">
-                    <button disabled className="p-5 rounded-3xl bg-surface-hover/30 text-text-muted opacity-20 cursor-not-allowed border border-border/40 transition-all" aria-label="leçon précédente">
+                    <button 
+                        onClick={() => prevLessonId && navigate(`/lessons/${prevLessonId}`)}
+                        disabled={!prevLessonId} 
+                        className={`p-5 rounded-3xl bg-surface-hover/50 text-text-muted border border-border/40 transition-all ${!prevLessonId ? 'opacity-20 cursor-not-allowed' : 'hover:bg-surface-hover hover:text-text active:scale-90'}`} 
+                        aria-label="leçon précédente"
+                    >
                         <ChevronLeft className="w-8 h-8" />
                     </button>
 

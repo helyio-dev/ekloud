@@ -8,7 +8,7 @@ import { useTheme } from '@/contexts/ThemeContext';
  * affiche une icône lucide ou un logo de marque externe via simple icons.
  * gère les états verrouillé/débloqué visuellement.
  */
-const SkillIcon = ({ name, status, size = 20, className }: { name: string, status: string, isFinal: boolean, size?: number, className?: string }) => {
+const SkillIcon = ({ name, status, isFinal, size = 20, className }: { name: string, status: string, isFinal: boolean, size?: number, className?: string }) => {
     const { mode } = useTheme();
     if (status === 'locked') return <Lock size={size} className={className} />;
     
@@ -59,6 +59,7 @@ type SkillTreeProps = {
     userModules: Record<string, boolean>;
     completedSkills: Set<string>;
     passedExams: Set<string>;
+    skillsStatus: Record<string, 'completed' | 'available' | 'unlocked' | 'unlocked_needs_exam' | 'locked'>;
     onSkillClick?: (skill: Skill) => void;
 };
 
@@ -151,7 +152,10 @@ const ConstellationBackground = () => {
                 for (let j = i + 1; j < particleCount; j++) {
                     const p2 = particles[j];
                     const distX = p.x - p2.x;
+                    if (Math.abs(distX) > 150) continue; // fail-fast horizontal
                     const distY = p.y - p2.y;
+                    if (Math.abs(distY) > 150) continue; // fail-fast vertical
+                    
                     const dist = Math.sqrt(distX * distX + distY * distY);
                     
                     if (dist < 150) {
@@ -256,7 +260,6 @@ const SkillNode = ({ skill, status, active, onClick }: { skill: Skill, status: s
         </div>
     );
 };
-
 export default function SkillTree({
     skills,
     prereqs,
@@ -265,35 +268,13 @@ export default function SkillTree({
     userModules,
     completedSkills,
     passedExams,
+    skillsStatus,
     onSkillClick
 }: SkillTreeProps) {
     const [activeCategoryId, setActiveCategoryId] = useState<string>('intro');
     const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
 
-    // calcul de l'état de chaque compétence
-    const getSkillStatus = (skillId: string, visited = new Set<string>()): 'completed' | 'available' | 'unlocked' | 'unlocked_needs_exam' | 'locked' => {
-        if (completedSkills.has(skillId)) return 'completed';
-        if (visited.has(skillId)) return 'locked';
-        visited.add(skillId);
-
-        const skillPrereqs = prereqs.filter(p => p.skill_id === skillId);
-        const prereqsMet = skillPrereqs.every(p => getSkillStatus(p.prerequisite_skill_id, visited) === 'completed');
-
-        if (!prereqsMet && skillPrereqs.length > 0) return 'locked';
-
-        const requiredModules = skillModules.filter(sm => sm.skill_id === skillId);
-        const modulesCompleted = requiredModules.length > 0 && requiredModules.every(rm => userModules[rm.module_id]);
-
-        const skill = skills.find(s => s.id === skillId);
-        if (skill?.is_locked) return 'locked';
-
-        if (skill?.requires_exam && skill.exam_module_id) {
-            if (!passedExams.has(skill.exam_module_id)) return 'unlocked_needs_exam';
-        }
-
-        if (requiredModules.length > 0 && !modulesCompleted) return 'unlocked';
-        return 'available';
-    };
+    // suppression de getSkillStatus interne (utilisation de skillsStatus passé en prop pour la perf)
 
     // regroupement des compétences par catégorie de module
     const groupedSkills = useMemo(() => {
@@ -400,9 +381,10 @@ export default function SkillTree({
                     {/* rendu des liens de dépendance */}
                     <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                         {graphData.edges.map(edge => {
-                            const isParentCompleted = getSkillStatus(edge.sourceId) === 'completed';
-                            const isTargetLocked = getSkillStatus(edge.targetId) === 'locked';
-                            const theme = getThemeColor(getSkillStatus(edge.sourceId));
+                            const status = skillsStatus[edge.sourceId];
+                            const isParentCompleted = status === 'completed';
+                            const isTargetLocked = skillsStatus[edge.targetId] === 'locked';
+                            const theme = getThemeColor(status);
 
                             return (
                                 <g key={`${edge.sourceId}-${edge.targetId}`}>
@@ -434,9 +416,12 @@ export default function SkillTree({
                             >
                                 <SkillNode 
                                     skill={skill}
-                                    status={getSkillStatus(skill.id)}
+                                    status={skillsStatus[skill.id]}
                                     active={selectedSkillId === skill.id}
-                                    onClick={() => setSelectedSkillId(skill.id)}
+                                    onClick={() => {
+                                        setSelectedSkillId(skill.id);
+                                        onSkillClick?.(skill);
+                                    }}
                                 />
                             </div>
                         );
