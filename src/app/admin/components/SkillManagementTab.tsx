@@ -247,35 +247,42 @@ export default function SkillManagementTab() {
     );
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
+        <div className="space-y-10">
             {/* barre de contrôle supérieure */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-surface/40 backdrop-blur-3xl border border-border/80 p-8 rounded-[2.5rem] shadow-xl">
-                <div className="flex items-center gap-2 bg-background/60 p-1.5 rounded-2xl border border-border/60">
+            <div className="flex items-center justify-between border-b border-border/40 pb-6">
+                <div className="flex items-center gap-2 bg-background p-1 rounded-lg border border-border/60">
                     <button
                         onClick={() => setViewMode('list')}
-                        className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'list' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-text-muted hover:text-text'}`}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'list' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
                     >
-                        <LayoutList className="w-3.5 h-3.5" /> catalogue
+                        Liste
                     </button>
                     <button
                         onClick={() => setViewMode('visual')}
-                        className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'visual' ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'text-text-muted hover:text-text'}`}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'visual' ? 'bg-accent text-white' : 'text-text-muted hover:text-text'}`}
                     >
-                        <Eye className="w-3.5 h-3.5" /> helix grid
+                        Grille
                     </button>
                 </div>
 
-                <button
-                    onClick={() => {
-                        setEditingSkill({ name: '', description: '', icon: 'Book', x_pos: 0, y_pos: 0, is_final: false, requires_exam: false, is_locked: false, level: 'Découverte' } as any);
-                        setSelectedModules([]);
-                        setSelectedPrereqs([]);
-                        setIsFormOpen(true);
-                    }}
-                    className="group flex items-center gap-4 px-8 py-4 bg-accent hover:bg-accent/90 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-accent/20"
-                >
-                    <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" /> nouveau sujet
-                </button>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-accent">
+                        <Database size={14} />
+                        <h1 className="text-sm font-black uppercase tracking-widest text-text">Compétences</h1>
+                    </div>
+                    <div className="h-4 w-px bg-border/40" />
+                    <button
+                        onClick={() => {
+                            setEditingSkill({ name: '', description: '', icon: 'Book', x_pos: 0, y_pos: 0, is_final: false, requires_exam: false, is_locked: false, level: 'Découverte' } as any);
+                            setSelectedModules([]);
+                            setSelectedPrereqs([]);
+                            setIsFormOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all active:scale-95 shadow-lg shadow-accent/20"
+                    >
+                        <Plus className="w-4 h-4" /> Nouveau Sujet
+                    </button>
+                </div>
             </div>
 
             {/* affichage conditionnel : liste vs helix grid */}
@@ -284,41 +291,41 @@ export default function SkillManagementTab() {
                     {skills.map((skill, index) => (
                         <div 
                             key={skill.id} 
-                            className="group bg-surface/40 hover:bg-surface/60 backdrop-blur-xl border border-border/60 hover:border-accent/40 p-8 rounded-[2.5rem] transition-all shadow-xl hover:shadow-2xl hover:shadow-accent/5 animate-in fade-in slide-in-from-bottom-4 fill-mode-both"
+                            className="group bg-surface hover:bg-surface-hover/50 border border-border/60 hover:border-accent/60 p-8 rounded-[2.5rem] transition-all shadow-xl hover:shadow-2xl hover:shadow-accent/5 animate-in fade-in slide-in-from-bottom-4 fill-mode-both"
                             style={{ animationDelay: `${index * 50}ms` }}
                         >
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                                 <div className="flex items-center gap-8">
-                                    <div className={`w-20 h-20 rounded-[1.5rem] bg-background border border-border/80 flex items-center justify-center transition-all duration-500 shadow-inner group-hover:scale-105 group-hover:rotate-3 ${skill.is_final ? 'shadow-[0_0_30px_rgba(234,179,8,0.15)] border-yellow-500/40 ring-1 ring-yellow-500/10' : 'group-hover:border-accent/40'}`}>
+                                    <div className={`w-20 h-20 rounded-[1.5rem] bg-background border border-border/80 flex items-center justify-center transition-all duration-500 shadow-inner group-hover:scale-105 group-hover:rotate-3 ${skill.is_final ? 'shadow-[0_0_30px_rgba(234,179,8,0.2)] border-yellow-500/60 ring-1 ring-yellow-500/20' : 'group-hover:border-accent/60'}`}>
                                         <SkillIcon name={skill.icon} isFinal={skill.is_final} size={32} className={skill.is_final ? 'text-yellow-500 animate-pulse' : 'text-accent'} />
                                     </div>
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-3">
                                             <h3 className="text-2xl font-black text-text uppercase tracking-tight group-hover:text-accent transition-colors">{skill.name || 'sujet non identifié'}</h3>
-                                            <div className="px-3 py-1 bg-accent/5 border border-accent/10 rounded-full text-[9px] font-black text-accent uppercase tracking-widest">{skill.level}</div>
+                                            <div className="px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[9px] font-black text-accent uppercase tracking-widest">{skill.level}</div>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <span className="text-[10px] text-text-muted/40 font-black uppercase tracking-[0.2em] italic">index hiérarchique: {index + 1}</span>
-                                            {skill.requires_exam && <span className="flex items-center gap-1 text-[9px] text-yellow-500/60 font-black uppercase tracking-widest"><Target size={10} /> examen requis</span>}
+                                            <span className="text-[10px] text-text-muted/60 font-black uppercase tracking-[0.2em] italic">index hiérarchique: {index + 1}</span>
+                                            {skill.requires_exam && <span className="flex items-center gap-1 text-[9px] text-yellow-500 font-black uppercase tracking-widest"><Target size={10} /> examen requis</span>}
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div className="flex gap-2 bg-background/40 p-2 rounded-2xl border border-border/40">
+                                <div className="flex gap-2 bg-background p-2 rounded-2xl border border-border/60 shadow-md">
                                     <button onClick={() => handleMove(skill.id, 'up')} className="p-3 hover:bg-surface-hover rounded-xl text-text-muted/40 hover:text-text transition-all active:scale-95" title="monter"><ArrowUp className="w-4 h-4" /></button>
                                     <button onClick={() => handleMove(skill.id, 'down')} className="p-3 hover:bg-surface-hover rounded-xl text-text-muted/40 hover:text-text transition-all active:scale-95" title="descendre"><ArrowDown className="w-4 h-4" /></button>
-                                    <div className="w-px h-8 bg-border/40 mx-1 self-center" />
-                                    <button onClick={() => handleEdit(skill)} className="p-3 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all active:scale-95" title="éditer"><Edit2 className="w-4 h-4" /></button>
-                                    <button onClick={() => handleDelete(skill.id)} className="p-3 hover:bg-rose-500/10 rounded-xl text-text-muted/40 hover:text-rose-500 transition-all active:scale-95" title="supprimer"><Trash2 className="w-4 h-4" /></button>
+                                    <div className="w-px h-8 bg-border/60 mx-1 self-center" />
+                                    <button onClick={() => handleEdit(skill)} className="p-3 hover:bg-accent/10 rounded-xl text-text-muted hover:text-accent transition-all active:scale-95" title="éditer"><Edit2 className="w-4 h-4" /></button>
+                                    <button onClick={() => handleDelete(skill.id)} className="p-3 hover:bg-rose-500/10 rounded-xl text-text-muted hover:text-rose-500 transition-all active:scale-95" title="supprimer"><Trash2 className="w-4 h-4" /></button>
                                 </div>
                             </div>
                             
-                            <div className="mt-8 pt-8 border-t border-border/40 space-y-6">
-                                <p className="text-sm text-text-muted max-w-3xl font-medium leading-relaxed italic opacity-80">{skill.description || 'aucune donnée pédagogique enregistrée pour ce module.'}</p>
+                            <div className="mt-8 pt-8 border-t border-border/60 space-y-6">
+                                <p className="text-sm text-text-muted max-w-3xl font-medium leading-relaxed italic">{skill.description || 'aucune donnée pédagogique enregistrée pour ce module.'}</p>
 
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest ${skill.is_final ? 'bg-yellow-500/5 border-yellow-500/20 text-yellow-500' : 'bg-surface-hover/30 border-border/40 text-text-muted/60'}`}>
+                                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest shadow-sm ${skill.is_final ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500' : 'bg-surface-hover border-border/80 text-text-muted'}`}>
                                             {skill.is_final ? <Trophy size={10} /> : skill.is_locked ? <Lock size={10} /> : <Book size={10} />}
                                             {skill.is_final ? 'nœud de maîtrise' : skill.is_locked ? 'verrouillé' : 'module standard'}
                                         </div>
@@ -344,21 +351,21 @@ export default function SkillManagementTab() {
 
             {/* modal de configuration du nœud */}
             {isFormOpen && editingSkill && (
-                <div className="fixed inset-0 bg-[#020203]/90 backdrop-blur-[20px] z-[100] flex items-center justify-center p-6 md:p-12 animate-in fade-in duration-500">
-                    <div className="bg-surface/60 backdrop-blur-3xl border border-border/80 p-8 md:p-16 rounded-[4rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto space-y-12 shadow-2xl relative custom-scrollbar">
+                <div className="fixed inset-0 bg-background/95 z-[100] flex items-center justify-center p-6 md:p-12 animate-in fade-in duration-500">
+                    <div className="bg-surface border border-border/80 p-8 md:p-16 rounded-[4rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto space-y-12 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative custom-scrollbar">
                         <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
                             <Settings2 size={300} />
                         </div>
 
                         <div className="flex justify-between items-start relative z-10">
                             <div className="space-y-4">
-                                <div className="flex items-center gap-3 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full w-fit">
+                                <div className="flex items-center gap-3 px-4 py-1.5 bg-accent/20 border border-accent/20 rounded-full w-fit">
                                     <Sparkles className="w-3.5 h-3.5 text-accent" />
                                     <span className="text-[10px] font-black text-accent uppercase tracking-[0.3em]">{editingSkill.id ? 'édition nucléaire' : 'injection de donnée'}</span>
                                 </div>
                                 <h2 className="text-4xl md:text-5xl font-black text-text uppercase tracking-tighter font-equinox">{editingSkill.id ? 'config helix' : 'nouveau nœud'}</h2>
                             </div>
-                            <button onClick={() => setIsFormOpen(false)} className="p-4 hover:bg-surface-hover rounded-full transition-all hover:rotate-90 group">
+                            <button onClick={() => setIsFormOpen(false)} className="p-4 bg-background border border-border/60 hover:bg-surface-hover rounded-full transition-all hover:rotate-90 group shadow-md">
                                 <X className="w-10 h-10 text-text group-hover:text-accent transition-colors" />
                             </button>
                         </div>
@@ -372,7 +379,7 @@ export default function SkillManagementTab() {
                                         type="text"
                                         value={editingSkill.name}
                                         onChange={e => setEditingSkill({ ...editingSkill, name: e.target.value })}
-                                        className="w-full px-8 py-6 bg-background/40 border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:bg-background transition-all text-text font-black uppercase tracking-tight text-xl"
+                                        className="w-full px-8 py-6 bg-background border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all text-text font-black uppercase tracking-tight text-xl shadow-sm"
                                         placeholder="EX: CLOUD ARCHITECTURE"
                                     />
                                 </div>
@@ -382,19 +389,19 @@ export default function SkillManagementTab() {
                                         type="text"
                                         value={editingSkill.icon}
                                         onChange={e => setEditingSkill({ ...editingSkill, icon: e.target.value })}
-                                        className="w-full px-8 py-6 bg-background/40 border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:bg-background transition-all text-text font-bold italic"
+                                        className="w-full px-8 py-6 bg-background border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all text-text font-bold italic shadow-sm"
                                         placeholder="Book, Database, React..."
                                     />
                                 </div>
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-1">niveau d'accréditation</label>
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-2 gap-3">
                                         {(['Découverte', 'Fondamentaux', 'Avancé', 'Expert'] as const).map(lvl => (
                                             <button
                                                 key={lvl}
                                                 type="button"
                                                 onClick={() => setEditingSkill({ ...editingSkill, level: lvl })}
-                                                className={`px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${editingSkill.level === lvl ? 'bg-accent border-accent text-white shadow-lg shadow-accent/20' : 'bg-background/20 border-border/40 text-text-muted hover:border-border'}`}
+                                                className={`px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${editingSkill.level === lvl ? 'bg-accent border-accent text-white shadow-xl shadow-accent/40' : 'bg-background border-border/60 text-text-muted hover:border-accent/40 hover:text-text shadow-sm'}`}
                                             >
                                                 {lvl}
                                             </button>
@@ -408,7 +415,7 @@ export default function SkillManagementTab() {
                                 <textarea
                                     value={editingSkill.description}
                                     onChange={e => setEditingSkill({ ...editingSkill, description: e.target.value })}
-                                    className="w-full px-8 py-6 bg-background/40 border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:bg-background transition-all text-text h-40 resize-none font-medium leading-relaxed italic"
+                                    className="w-full px-8 py-6 bg-background border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all text-text h-40 resize-none font-medium leading-relaxed italic shadow-sm"
                                     placeholder="décrivez l'objectif terminal de ce nœud de compétence..."
                                 />
                             </div>
@@ -416,8 +423,8 @@ export default function SkillManagementTab() {
                             <div className="space-y-8">
                                 <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-1">attributs de progression</label>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <label className="flex items-center gap-6 cursor-pointer p-6 bg-background/30 border border-border/60 rounded-[2rem] hover:border-accent/40 transition-all select-none group">
-                                        <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${editingSkill.is_final ? 'bg-yellow-500 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'border-border/40 group-hover:border-accent/40'}`}>
+                                    <label className="flex items-center gap-6 cursor-pointer p-6 bg-background border border-border/60 rounded-[2rem] hover:border-accent/60 transition-all select-none group shadow-md">
+                                        <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${editingSkill.is_final ? 'bg-yellow-500 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.4)]' : 'border-border/60 group-hover:border-accent/40'}`}>
                                             {editingSkill.is_final && <Trophy size={16} className="text-black" />}
                                         </div>
                                         <input
@@ -428,12 +435,12 @@ export default function SkillManagementTab() {
                                         />
                                         <div className="flex flex-col">
                                             <span className="text-xs font-black text-text uppercase tracking-widest">nœud final</span>
-                                            <span className="text-[9px] text-text-muted/40 font-bold uppercase">objectif terminal</span>
+                                            <span className="text-[9px] text-text-muted font-bold uppercase">objectif terminal</span>
                                         </div>
                                     </label>
 
-                                    <label className="flex items-center gap-6 cursor-pointer p-6 bg-background/30 border border-border/60 rounded-[2rem] hover:border-rose-500/40 transition-all select-none group">
-                                        <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${editingSkill.is_locked ? 'bg-rose-500 border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]' : 'border-border/40 group-hover:border-rose-500/40'}`}>
+                                    <label className="flex items-center gap-6 cursor-pointer p-6 bg-background border border-border/60 rounded-[2rem] hover:border-rose-500/60 transition-all select-none group shadow-md">
+                                        <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${editingSkill.is_locked ? 'bg-rose-500 border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)]' : 'border-border/60 group-hover:border-rose-500/40'}`}>
                                             {editingSkill.is_locked && <Lock size={16} className="text-black" />}
                                         </div>
                                         <input
@@ -444,12 +451,12 @@ export default function SkillManagementTab() {
                                         />
                                         <div className="flex flex-col">
                                             <span className="text-xs font-black text-text uppercase tracking-widest">en développement</span>
-                                            <span className="text-[9px] text-rose-500/40 font-bold uppercase tracking-tighter">accès restreint</span>
+                                            <span className="text-[9px] text-rose-500 font-bold uppercase tracking-tighter">accès restreint</span>
                                         </div>
                                     </label>
 
-                                    <label className="flex items-center gap-6 cursor-pointer p-6 bg-background/30 border border-border/60 rounded-[2rem] hover:border-accent/40 transition-all select-none group">
-                                        <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${editingSkill.requires_exam ? 'bg-accent border-accent shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'border-border/40 group-hover:border-accent/40'}`}>
+                                    <label className="flex items-center gap-6 cursor-pointer p-6 bg-background border border-border/60 rounded-[2rem] hover:border-accent/60 transition-all select-none group shadow-md">
+                                        <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all ${editingSkill.requires_exam ? 'bg-accent border-accent shadow-[0_0_15px_rgba(99,102,241,0.4)]' : 'border-border/60 group-hover:border-accent/40'}`}>
                                             {editingSkill.requires_exam && <Rocket size={16} className="text-white" />}
                                         </div>
                                         <input
@@ -460,7 +467,7 @@ export default function SkillManagementTab() {
                                         />
                                         <div className="flex flex-col">
                                             <span className="text-xs font-black text-text uppercase tracking-widest">examen d'accès</span>
-                                            <span className="text-[9px] text-accent/40 font-bold uppercase tracking-tighter">pass obligatoire</span>
+                                            <span className="text-[9px] text-accent font-bold uppercase tracking-tighter">pass obligatoire</span>
                                         </div>
                                     </label>
                                 </div>
@@ -473,7 +480,7 @@ export default function SkillManagementTab() {
                                         <select
                                             value={editingSkill.exam_module_id || ''}
                                             onChange={e => setEditingSkill({ ...editingSkill, exam_module_id: e.target.value })}
-                                            className="w-full px-8 py-6 bg-background/40 border border-accent/20 rounded-[2rem] outline-none focus:border-accent transition-all text-text font-black uppercase tracking-widest text-xs appearance-none"
+                                            className="w-full px-8 py-6 bg-background border border-accent/30 rounded-[2rem] outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all text-text font-black uppercase tracking-widest text-xs appearance-none shadow-sm"
                                         >
                                             <option value="" disabled>sélectionner un module d'examen</option>
                                             {modules.map(mod => (
@@ -489,11 +496,11 @@ export default function SkillManagementTab() {
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-1 flex items-center gap-2">
                                         <Book className="w-4 h-4 text-accent" /> modules ekloud liés ({selectedModules.length})
                                     </label>
-                                    <div className="bg-background/40 border border-border/60 rounded-[2.5rem] p-6 h-80 overflow-y-auto space-y-2 custom-scrollbar">
+                                    <div className="bg-background border border-border/60 rounded-[2.5rem] p-6 h-80 overflow-y-auto space-y-2 custom-scrollbar shadow-inner">
                                         {modules.map(mod => (
-                                            <label key={mod.id} className="flex items-center justify-between cursor-pointer hover:bg-surface/60 p-4 rounded-2xl transition-all group">
+                                            <label key={mod.id} className="flex items-center justify-between cursor-pointer hover:bg-surface p-4 rounded-2xl transition-all group">
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedModules.includes(mod.id) ? 'bg-accent border-accent text-white' : 'border-border/40 group-hover:border-accent/40'}`}>
+                                                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedModules.includes(mod.id) ? 'bg-accent border-accent text-white' : 'border-border/60 group-hover:border-accent/40'}`}>
                                                         {selectedModules.includes(mod.id) && <Plus size={14} className="rotate-45" />}
                                                     </div>
                                                     <input
@@ -505,22 +512,22 @@ export default function SkillManagementTab() {
                                                             else setSelectedModules(selectedModules.filter(id => id !== mod.id));
                                                         }}
                                                     />
-                                                    <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${selectedModules.includes(mod.id) ? 'text-text' : 'text-text-muted/40 group-hover:text-text-muted'}`}>{mod.title}</span>
+                                                    <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${selectedModules.includes(mod.id) ? 'text-text' : 'text-text-muted group-hover:text-text-muted'}`}>{mod.title}</span>
                                                 </div>
-                                                <ChevronRight className={`w-4 h-4 transition-all opacity-0 group-hover:opacity-100 ${selectedModules.includes(mod.id) ? 'text-accent' : 'text-text-muted/20'}`} />
+                                                <ChevronRight className={`w-4 h-4 transition-all opacity-0 group-hover:opacity-100 ${selectedModules.includes(mod.id) ? 'text-accent' : 'text-text-muted/40'}`} />
                                             </label>
                                         ))}
                                     </div>
                                 </div>
                                 <div className="space-y-6">
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted/60 ml-1 flex items-center gap-2">
-                                        <Database className="w-4 h-4 text-purple-400" /> dépendances amont ({selectedPrereqs.length})
+                                        <Database className="w-4 h-4 text-purple-500" /> dépendances amont ({selectedPrereqs.length})
                                     </label>
-                                    <div className="bg-background/40 border border-border/60 rounded-[2.5rem] p-6 h-80 overflow-y-auto space-y-2 custom-scrollbar">
+                                    <div className="bg-background border border-border/60 rounded-[2.5rem] p-6 h-80 overflow-y-auto space-y-2 custom-scrollbar shadow-inner">
                                         {skills.filter(s => s.id !== editingSkill.id).map(skill => (
-                                            <label key={skill.id} className="flex items-center justify-between cursor-pointer hover:bg-surface/60 p-4 rounded-2xl transition-all group">
+                                            <label key={skill.id} className="flex items-center justify-between cursor-pointer hover:bg-surface p-4 rounded-2xl transition-all group">
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedPrereqs.includes(skill.id) ? 'bg-purple-500 border-purple-500 text-white' : 'border-border/40 group-hover:border-purple-500/40'}`}>
+                                                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedPrereqs.includes(skill.id) ? 'bg-purple-600 border-purple-600 text-white' : 'border-border/60 group-hover:border-purple-500/40'}`}>
                                                         {selectedPrereqs.includes(skill.id) && <Zap size={10} />}
                                                     </div>
                                                     <input
@@ -532,9 +539,9 @@ export default function SkillManagementTab() {
                                                             else setSelectedPrereqs(selectedPrereqs.filter(id => id !== skill.id));
                                                         }}
                                                     />
-                                                    <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${selectedPrereqs.includes(skill.id) ? 'text-text' : 'text-text-muted/40 group-hover:text-text-muted'}`}>{skill.name}</span>
+                                                    <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${selectedPrereqs.includes(skill.id) ? 'text-text' : 'text-text-muted group-hover:text-text-muted'}`}>{skill.name}</span>
                                                 </div>
-                                                <ChevronRight className={`w-4 h-4 transition-all opacity-0 group-hover:opacity-100 ${selectedPrereqs.includes(skill.id) ? 'text-purple-400' : 'text-text-muted/20'}`} />
+                                                <ChevronRight className={`w-4 h-4 transition-all opacity-0 group-hover:opacity-100 ${selectedPrereqs.includes(skill.id) ? 'text-purple-500' : 'text-text-muted/40'}`} />
                                             </label>
                                         ))}
                                     </div>
@@ -614,14 +621,14 @@ function ChapterPreview({ skills, prereqs, skillModules, modules, onEdit }: Chap
     }, [activeModuleId]);
 
     return (
-        <div className="bg-surface/20 backdrop-blur-3xl border border-border/80 rounded-[4rem] overflow-hidden flex flex-col h-[800px] relative font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-1000">
+        <div className="bg-surface border border-border/80 rounded-[4rem] overflow-hidden flex flex-col h-[800px] relative font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-1000">
             {/* navigation contextuelle supérieure */}
-            <nav className="relative z-20 flex items-center gap-8 px-12 py-6 bg-surface/40 border-b border-border/60 backdrop-blur-3xl overflow-x-auto no-scrollbar scroll-smooth">
+            <nav className="relative z-20 flex items-center gap-8 px-12 py-6 bg-surface border-b border-border/80 overflow-x-auto no-scrollbar scroll-smooth shadow-sm">
                 {grouped['intro'] && (
                     <button 
                         onClick={() => setActiveModuleId('intro')}
-                        className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all whitespace-nowrap py-2 px-4 rounded-lg
-                            ${activeModuleId === 'intro' ? 'text-accent bg-accent/5' : 'text-text-muted hover:text-text'}`}
+                        className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all whitespace-nowrap py-2.5 px-6 rounded-xl
+                            ${activeModuleId === 'intro' ? 'text-accent bg-accent/10 shadow-sm' : 'text-text-muted hover:text-text hover:bg-surface-hover'}`}
                     >
                         architecture
                     </button>
@@ -630,8 +637,8 @@ function ChapterPreview({ skills, prereqs, skillModules, modules, onEdit }: Chap
                     <button 
                         key={category}
                         onClick={() => setActiveModuleId(category)}
-                        className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all whitespace-nowrap py-2 px-4 rounded-lg
-                            ${activeModuleId === category ? 'text-accent bg-accent/5' : 'text-text-muted hover:text-text'}`}
+                        className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all whitespace-nowrap py-2.5 px-6 rounded-xl
+                            ${activeModuleId === category ? 'text-accent bg-accent/10 shadow-sm' : 'text-text-muted hover:text-text hover:bg-surface-hover'}`}
                     >
                         {category}
                     </button>
@@ -640,18 +647,18 @@ function ChapterPreview({ skills, prereqs, skillModules, modules, onEdit }: Chap
 
             <div className="flex-1 flex overflow-hidden">
                 {/* section gauche : grille helix nodes */}
-                <div className="flex-1 overflow-y-auto no-scrollbar p-16 custom-scrollbar bg-surface/5 relative">
-                    <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)]" />
+                <div className="flex-1 overflow-y-auto no-scrollbar p-16 custom-scrollbar bg-background/5 relative shadow-inner">
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)]" />
                     
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 relative z-10">
                         {activeSkills.map((skill, idx) => (
                             <div 
                                 key={skill.id}
                                 onClick={() => setSelectedSkillId(skill.id)}
-                                className={`group relative aspect-square rounded-[2rem] flex flex-col items-center justify-center transition-all duration-500 cursor-pointer border-2 animate-in fade-in slide-in-from-bottom-4 fill-mode-both
+                                className={`group relative aspect-square rounded-[2rem] flex flex-col items-center justify-center transition-all duration-500 cursor-pointer border-2 animate-in fade-in slide-in-from-bottom-4 fill-mode-both shadow-md
                                     ${selectedSkillId === skill.id 
-                                        ? 'bg-accent/10 border-accent shadow-[0_0_40px_rgba(99,102,241,0.2)] ring-1 ring-accent/20 scale-105' 
-                                        : 'bg-surface/40 border-border/40 opacity-60 hover:opacity-100 hover:border-accent/40 hover:bg-surface/60 hover:scale-[1.02]'}`}
+                                        ? 'bg-accent/10 border-accent shadow-[0_0_40px_rgba(99,102,241,0.25)] scale-105' 
+                                        : 'bg-surface border-border/80 opacity-70 hover:opacity-100 hover:border-accent/60 hover:scale-[1.02]'}`}
                                 style={{ animationDelay: `${idx * 40}ms` }}
                             >
                                 <div className={`transition-all duration-700 ${selectedSkillId === skill.id ? 'scale-125 text-accent rotate-12' : 'text-text-muted group-hover:rotate-6'}`}>
@@ -659,7 +666,7 @@ function ChapterPreview({ skills, prereqs, skillModules, modules, onEdit }: Chap
                                 </div>
                                 
                                 {selectedSkillId === skill.id && (
-                                    <div className="absolute inset-0 rounded-[2rem] border border-dashed border-accent/40 animate-[spin_60s_linear_infinite] pointer-events-none" />
+                                    <div className="absolute inset-0 rounded-[2rem] border-2 border-dashed border-accent/40 animate-[spin_60s_linear_infinite] pointer-events-none" />
                                 )}
                             </div>
                         ))}
@@ -667,22 +674,22 @@ function ChapterPreview({ skills, prereqs, skillModules, modules, onEdit }: Chap
 
                     {activeSkills.length === 0 && (
                         <div className="h-full flex items-center justify-center">
-                            <p className="text-[10px] font-black text-text-muted/20 uppercase tracking-[0.5em] italic">configuration helix vide</p>
+                            <p className="text-[10px] font-black text-text-muted/30 uppercase tracking-[0.5em] italic">configuration helix vide</p>
                         </div>
                     )}
                 </div>
 
                 {/* section droite : terminal d'inspection détaillée */}
-                <div className="w-[400px] bg-surface/40 backdrop-blur-3xl border-l border-border/80 p-12 flex flex-col justify-between relative overflow-hidden">
-                    <div className="absolute -bottom-20 -right-20 opacity-[0.02] pointer-events-none">
+                <div className="w-[400px] bg-surface border-l border-border/80 p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+                    <div className="absolute -bottom-20 -right-20 opacity-[0.03] pointer-events-none">
                         <Zap size={300} />
                     </div>
 
-                    {selectedSkill ? (
+                    {selectedSkill && (
                         <div className="animate-in fade-in slide-in-from-right-8 duration-700 fill-mode-both flex flex-col h-full gap-10">
                             <div className="space-y-12">
                                 <div className="space-y-6">
-                                    <div className="w-20 h-20 rounded-[1.5rem] bg-accent/5 border-2 border-accent/40 flex items-center justify-center text-accent shadow-lg shadow-accent/10">
+                                    <div className="w-20 h-20 rounded-[1.5rem] bg-background border-2 border-accent/40 flex items-center justify-center text-accent shadow-xl shadow-accent/10">
                                         <SkillIcon name={selectedSkill.icon} isFinal={selectedSkill.is_final} size={36} />
                                     </div>
                                     <div className="space-y-2">
@@ -693,30 +700,25 @@ function ChapterPreview({ skills, prereqs, skillModules, modules, onEdit }: Chap
                                         <h4 className="text-3xl font-black text-text uppercase tracking-tighter leading-[0.9] font-equinox">{selectedSkill.name}</h4>
                                     </div>
                                     <div className="flex flex-wrap gap-2 pt-2">
-                                        <span className="px-3 py-1 bg-surface-hover border border-border/60 rounded-full text-[9px] font-black uppercase text-text-muted/60">{selectedSkill.level}</span>
-                                        {selectedSkill.is_final && <span className="px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-[9px] font-black uppercase text-yellow-500">nœud maître</span>}
+                                        <span className="px-4 py-1.5 bg-surface-hover border border-border/80 rounded-full text-[9px] font-black uppercase text-text-muted">{selectedSkill.level}</span>
+                                        {selectedSkill.is_final && <span className="px-4 py-1.5 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-[9px] font-black uppercase text-yellow-500">nœud maître</span>}
                                     </div>
                                 </div>
                                 
                                 <div className="space-y-4">
-                                    <span className="text-[10px] font-black text-text-muted/40 uppercase tracking-widest border-b border-border/40 pb-2 flex items-center gap-2">
+                                    <span className="text-[10px] font-black text-text-muted/60 uppercase tracking-widest border-b border-border/60 pb-2 flex items-center gap-2">
                                         <Settings2 size={12} /> détails de l'implémentation
                                     </span>
-                                    <p className="text-sm text-text-muted font-medium italic leading-relaxed opacity-80">{selectedSkill.description || 'aucune instruction pédagogique fournie.'}</p>
+                                    <p className="text-sm text-text-muted font-medium italic leading-relaxed opacity-90">{selectedSkill.description || 'aucune instruction pédagogique fournie.'}</p>
                                 </div>
                             </div>
 
                             <button 
                                 onClick={() => onEdit(selectedSkill)}
-                                className="group w-full h-16 bg-accent rounded-2xl text-white font-black uppercase text-[11px] tracking-[0.2em] flex items-center justify-center gap-4 transition-all hover:scale-[1.05] active:scale-95 shadow-xl shadow-accent/20 mt-auto"
+                                className="group w-full h-16 bg-accent rounded-2xl text-white font-black uppercase text-[11px] tracking-[0.3em] flex items-center justify-center gap-4 transition-all hover:scale-[1.05] active:scale-95 shadow-2xl shadow-accent/40 mt-auto"
                             >
                                 <Edit2 className="w-4 h-4 group-hover:rotate-12 transition-transform" /> éditer succès
                             </button>
-                        </div>
-                    ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-text-muted/10 text-center gap-6">
-                            <Target size={80} className="opacity-20 animate-pulse" />
-                            <span className="text-[11px] font-black uppercase tracking-[0.5em] leading-relaxed">terminal en attente de sélection...</span>
                         </div>
                     )}
                 </div>

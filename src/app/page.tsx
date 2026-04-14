@@ -91,11 +91,11 @@ export default function LandingPage() {
  */
 function ConceptItem({ icon, num, title, desc }: { icon: React.ReactNode; num: string; title: string; desc: string }) {
     return (
-        <article className="group relative flex flex-col md:flex-row gap-8 md:gap-16 items-center md:items-start p-10 md:p-16 rounded-[4rem] transition-all duration-700 hover:bg-accent/[0.02] border border-border/40 hover:border-accent/20 glass-morphism backdrop-blur-3xl overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-accent/[0.01] rounded-full blur-[128px] -z-10 group-hover:bg-accent/[0.04] transition-colors duration-1000" />
+        <article className="group relative flex flex-col md:flex-row gap-8 md:gap-16 items-center md:items-start p-10 md:p-20 rounded-[4rem] transition-all duration-700 hover:bg-surface border-2 border-border/60 hover:border-accent/40 bg-surface shadow-2xl overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-accent/[0.01] rounded-full blur-[128px] -z-10 group-hover:bg-accent/[0.05] transition-colors duration-1000" />
 
             {/* indicateur numérique et icône au survol */}
-            <div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] bg-surface-hover/30 border border-border/60 flex items-center justify-center font-black text-text text-4xl md:text-6xl shadow-inner group-hover:bg-accent group-hover:border-accent/40 group-hover:text-white group-hover:shadow-[0_0_60px_rgba(99,102,241,0.25)] transition-all duration-1000 relative overflow-hidden">
+            <div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] bg-background border border-border/80 flex items-center justify-center font-black text-text text-4xl md:text-6xl shadow-inner group-hover:bg-accent group-hover:border-accent/40 group-hover:text-white group-hover:shadow-[0_0_80px_rgba(99,102,241,0.3)] transition-all duration-1000 relative overflow-hidden">
                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="relative z-10 group-hover:scale-0 transition-transform duration-500">{num}</span>
                 <div className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-110 transition-all duration-700 delay-100 z-10">
@@ -106,11 +106,11 @@ function ConceptItem({ icon, num, title, desc }: { icon: React.ReactNode; num: s
             {/* contenu textuel descriptif */}
             <div className="md:pt-4 text-center md:text-left space-y-6 max-w-2xl">
                 <div className="flex items-center gap-6 justify-center md:justify-start overflow-hidden">
-                    <div className="h-[2px] w-12 bg-accent/20 group-hover:w-20 transition-all duration-700" />
+                    <div className="h-[2px] w-12 bg-accent/30 group-hover:w-20 transition-all duration-700" />
                     <span className="text-accent font-black text-[10px] tracking-[0.5em] uppercase whitespace-nowrap">phase {num}</span>
                 </div>
                 <h3 className="text-3xl md:text-5xl font-black tracking-tight text-text group-hover:text-accent transition-colors duration-500 font-equinox uppercase leading-none">{title}</h3>
-                <p className="text-text-muted text-lg md:text-2xl leading-relaxed font-medium group-hover:text-text transition-colors duration-500 opacity-80 group-hover:opacity-100">{desc}</p>
+                <p className="text-text-muted text-lg md:text-2xl leading-relaxed font-medium group-hover:text-text transition-colors duration-500 opacity-80 group-hover:opacity-100 italic">{desc}</p>
             </div>
         </article>
     );

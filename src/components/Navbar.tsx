@@ -31,7 +31,7 @@ export default function Navbar() {
     const { progress, currentLevelXp, requiredXpForNext, level: currentLevel } = calculateLevelProgress(xp || 0);
 
     return (
-        <nav className="border-b border-border bg-surface/50 backdrop-blur-md sticky top-0 z-50 px-4 md:px-6 py-4 font-sans">
+        <nav className="border-b border-border bg-surface sticky top-0 z-50 px-4 md:px-6 py-5 font-sans shadow-lg">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 
                 {/* identité visuelle et logo ekloud */}
@@ -50,12 +50,12 @@ export default function Navbar() {
                 <div className="flex items-center gap-6">
                     {/* affichage des paliers de progression (desktop) */}
                     {user && (
-                        <div className="hidden lg:flex items-center gap-5 bg-background border border-border/40 pl-5 pr-3 py-2 rounded-2xl shadow-inner group/stats hover:border-accent/30 transition-colors">
+                        <div className="hidden lg:flex items-center gap-5 bg-background border border-border/60 pl-5 pr-3 py-2.5 rounded-2xl shadow-inner group/stats hover:border-accent/40 transition-colors">
                             <div title={`${streak} jours de série consécutive`} className="flex items-center gap-2 text-orange-500 font-black text-xs tracking-tight">
                                 <Flame className="w-4 h-4 fill-orange-500/20 group-hover/stats:scale-110 transition-transform" />
                                 {streak}
                             </div>
-                            <div className="w-[1px] h-6 bg-border/50" />
+                            <div className="w-[1px] h-6 bg-border/40" />
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent/10 border border-accent/20 text-accent font-black text-xs shadow-sm">
                                     {currentLevel}
@@ -65,7 +65,7 @@ export default function Navbar() {
                                         <span>expérience</span>
                                         <span>{formatXP(currentLevelXp)} / {formatXP(requiredXpForNext)}</span>
                                     </div>
-                                    <div className="h-1.5 w-full bg-surface rounded-full overflow-hidden p-[2px] border border-border/20">
+                                    <div className="h-1.5 w-full bg-surface-hover/30 rounded-full overflow-hidden p-[2px] border border-border/40">
                                         <div className="h-full bg-accent rounded-full relative transition-all duration-1000 shadow-[0_0_10px_var(--accent-glow)]" style={{ width: `${progress}%` }}>
                                             <div className="absolute inset-0 bg-white/20 animate-pulse" />
                                         </div>
@@ -91,7 +91,7 @@ export default function Navbar() {
                         {/* sélecteur de mode visuel (sombre/clair) */}
                         <button
                             onClick={toggleMode}
-                            className="p-3 rounded-xl bg-surface hover:bg-surface/80 border border-border text-text-muted hover:text-text transition-all duration-300 shadow-sm active:scale-90"
+                            className="p-3 rounded-xl bg-background hover:bg-surface-hover border border-border text-text-muted hover:text-text transition-all duration-300 shadow-sm active:scale-90"
                             aria-label="changer de thème"
                         >
                             {mode === 'light' ? <Moon size={18} /> : <Sun size={18} />}
@@ -102,14 +102,14 @@ export default function Navbar() {
                             <div className="relative" ref={menuRef}>
                                 <button 
                                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                    className={`flex items-center gap-3 border px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 ${isMenuOpen ? 'bg-accent border-accent text-white' : 'bg-surface hover:bg-surface/80 border-border text-text hover:border-accent/40'}`}
+                                    className={`flex items-center gap-3 border px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 ${isMenuOpen ? 'bg-accent border-accent text-white shadow-accent/20' : 'bg-background hover:bg-surface-hover border-border text-text hover:border-accent/40'}`}
                                 >
                                     menu
                                     <Menu size={14} className={isMenuOpen ? 'rotate-90 transition-transform' : ''} />
                                 </button>
 
                                 {/* menu déroulant enrichi */}
-                                <div className={`fixed inset-x-4 top-[80px] md:absolute md:inset-auto md:right-0 md:top-full md:mt-4 md:w-80 bg-surface/90 backdrop-blur-3xl border border-border rounded-[2.5rem] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 transform z-50 overflow-hidden ${isMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-8 md:translate-y-4'}`}>
+                                <div className={`fixed inset-x-4 top-[85px] md:absolute md:inset-auto md:right-0 md:top-full md:mt-4 md:w-80 bg-surface border border-border/80 rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] transition-all duration-500 transform z-50 overflow-hidden ${isMenuOpen ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible translate-y-4 scale-95 md:translate-y-2'}`}>
                                     <div className="p-5 flex flex-col gap-6">
                                         
                                         {/* navigation par tuiles interactives */}

@@ -197,124 +197,136 @@ export default function Dashboard() {
                 onSkillClick={handleSkillAction}
             />
 
-            {/* panneau latéral d'exploration des détails de compétence */}
+            {/* Panneau de détail industriel */}
             {selectedSkill && (() => {
                 const status = skillsStatus[selectedSkill.id];
                 const skillModulesData = skillModules.filter(sm => sm.skill_id === selectedSkill.id);
 
                 return (
-                    <article className="fixed inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:-translate-y-1/2 md:right-8 w-full md:w-[600px] max-h-[85vh] md:max-h-[90vh] bg-surface/50 backdrop-blur-[64px] border border-border z-[999] rounded-t-[4rem] md:rounded-[4rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] animate-in slide-in-from-bottom-32 md:slide-in-from-right-32 duration-700 overflow-hidden flex flex-col">
-                        <div className="relative z-10 p-10 md:p-14 space-y-10 flex flex-col h-full overflow-y-auto no-scrollbar">
-                            <header className="flex justify-between items-start gap-6">
-                                <div className="space-y-6">
-                                    <div className="flex flex-wrap items-center gap-4">
-                                        {status === 'completed' ? (
-                                            <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 shadow-sm">
-                                                <CheckCircle size={14} /> maîtrisé
-                                            </div>
-                                        ) : status === 'available' ? (
-                                            <div className="flex items-center gap-2 px-4 py-1.5 bg-accent/20 border border-accent/40 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-accent animate-pulse shadow-sm">
-                                                <Sparkles size={14} /> disponible
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-2 px-4 py-1.5 bg-surface-hover/50 border border-border rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">
-                                                <Lock size={14} /> {status === 'locked' ? 'verrouillé' : 'évolution en cours'}
-                                            </div>
-                                        )}
-                                        {selectedSkill.is_final && <div className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/40 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-amber-500 shadow-sm flex items-center gap-2"><Trophy size={14} /> palier majeur</div>}
+                    <div className="fixed inset-y-0 right-0 w-full md:w-[480px] bg-surface border-l border-border z-[1000] flex flex-col shadow-2xl animate-in slide-in-from-right duration-500 overflow-hidden selection:bg-accent/30">
+                        {/* Header Minimal */}
+                        <header className="h-20 px-8 border-b border-border/60 flex items-center justify-between shrink-0 bg-background/20">
+                            <div className="flex items-center gap-4">
+                                <div className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all ${
+                                    status === 'completed' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' :
+                                    status === 'available' ? 'bg-accent/10 border-accent/30 text-accent animate-pulse' :
+                                    'bg-background border-border/80 text-text-muted opacity-40'
+                                } shadow-sm`}>
+                                    {status === 'completed' ? <CheckCircle size={20} /> : <Sparkles size={20} />}
+                                </div>
+                                <div className="space-y-0.5">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-text-muted/60 leading-none">Status Code</p>
+                                    <p className={`text-[11px] font-black uppercase tracking-widest leading-none ${
+                                        status === 'completed' ? 'text-emerald-500' : 
+                                        status === 'available' ? 'text-accent' : 
+                                        'text-text-muted'
+                                    }`}>
+                                        {status.replace(/_/g, ' ')}
+                                    </p>
+                                </div>
+                            </div>
+                            <button onClick={() => setSelectedSkill(null)} className="p-2.5 hover:bg-background border border-border/60 rounded-lg transition-all active:scale-90 text-text-muted hover:text-text">
+                                <X size={18} />
+                            </button>
+                        </header>
+
+                        <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-10">
+                            {/* Identité */}
+                            <section className="space-y-3">
+                                <h2 className="text-3xl font-black tracking-tight text-text uppercase leading-none">
+                                    {selectedSkill.name}
+                                </h2>
+                                <p className="text-sm text-text-muted leading-relaxed font-medium italic opacity-70">
+                                    {selectedSkill.description || "Instruction pédagogique non définie."}
+                                </p>
+                            </section>
+
+                            {/* Récompense */}
+                            <div className="flex items-center justify-between p-5 bg-background border border-border/60 rounded-xl group overflow-hidden">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-accent/5 border border-accent/20 rounded-lg flex items-center justify-center text-accent">
+                                        <Trophy size={18} />
                                     </div>
-                                    <h2 className="text-4xl md:text-7xl font-black tracking-tighter leading-none text-text uppercase font-equinox drop-shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
-                                        {selectedSkill.name}
-                                    </h2>
+                                    <div className="space-y-0.5">
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-text-muted/60">Achievement Reward</p>
+                                        <p className="text-sm font-black uppercase tracking-tight">+{selectedSkill.is_final ? '100' : '25'} XP</p>
+                                    </div>
                                 </div>
-                                <button onClick={() => setSelectedSkill(null)} className="p-4 bg-surface-hover/40 hover:bg-surface-hover rounded-full transition-all group active:scale-90" aria-label="fermer les détails">
-                                    <X className="w-8 h-8 text-text-muted group-hover:text-text group-hover:rotate-90 transition-all duration-500" />
-                                </button>
-                            </header>
+                                {status === 'completed' && <CheckCircle size={16} className="text-emerald-500 opacity-40" />}
+                            </div>
 
-                            <p className="text-xl md:text-2xl text-text-muted/80 leading-relaxed font-medium max-w-lg">
-                                {selectedSkill.description || "maîtrisez cette compétence pour débloquer de nouveaux horizons technologiques."}
-                            </p>
-
-                            <aside className="flex items-center gap-8 p-8 bg-surface-hover/30 border border-border/60 rounded-[3rem] shadow-inner">
-                                <div className="w-16 h-16 shrink-0 bg-accent/15 rounded-[1.5rem] flex items-center justify-center shadow-lg border border-accent/20">
-                                    <Sparkles className="w-8 h-8 text-accent" />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted opacity-60">récompense de succès</p>
-                                    <p className="text-3xl font-black text-text tracking-tight">+{selectedSkill.is_final ? '100' : '25'} XP <span className="text-accent underline decoration-accent/20">collectables</span></p>
-                                </div>
-                            </aside>
-
+                            {/* Objectifs */}
                             {skillModulesData.length > 0 && (
-                                <section className="space-y-8">
-                                    <header className="flex justify-between items-end px-4">
-                                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.5em] flex items-center gap-3">
-                                            <Target size={12} className="text-accent" /> objectifs à atteindre
+                                <section className="space-y-6">
+                                    <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-widest flex items-center gap-2">
+                                            <Target size={12} /> Objectifs Requis
                                         </h3>
-                                        <span className="text-[10px] font-black text-text-muted opacity-40 bg-surface-hover/50 px-2 py-1 rounded">
-                                            {skillModulesData.filter(sm => userModules[sm.module_id]).length} / {skillModulesData.length} complétés
+                                        <span className="text-[9px] font-black text-text-muted/40 uppercase">
+                                            {skillModulesData.filter(sm => userModules[sm.module_id]).length} / {skillModulesData.length}
                                         </span>
-                                    </header>
+                                    </div>
 
-                                    <div className="flex gap-6 overflow-x-auto pb-8 px-4 snap-x no-scrollbar">
+                                    <div className="grid grid-cols-1 gap-3">
                                         {skillModulesData.map((sm) => {
                                             const mod = modules.find(m => m.id === sm.module_id);
                                             const completed = userModules[sm.module_id];
                                             return (
-                                                <article
+                                                <button
                                                     key={sm.module_id}
                                                     onClick={() => navigate(`/modules/${sm.module_id}`)}
-                                                    className="group shrink-0 w-48 snap-start cursor-pointer group"
+                                                    className={`w-full flex items-center justify-between p-4 border rounded-xl transition-all text-left group ${
+                                                        completed 
+                                                        ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500/80 hover:bg-emerald-500/10' 
+                                                        : 'bg-background border-border/60 text-text-muted hover:border-accent/40 hover:bg-surface'
+                                                    }`}
                                                 >
-                                                    <div className={`aspect-[4/5] rounded-[3rem] border transition-all duration-700 group-hover:scale-105 group-hover:-translate-y-2 flex flex-col p-8 justify-between shadow-2xl relative overflow-hidden ${completed ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/60 bg-surface-hover/30 group-hover:border-accent/40'}`}>
-                                                        <div className={`absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000`} />
-                                                        <div className={`w-12 h-12 rounded-[1.25rem] flex items-center justify-center transition-all duration-700 relative z-10 ${completed ? 'bg-emerald-500/20 text-emerald-500' : 'bg-surface-hover text-text-muted group-hover:bg-accent/20 group-hover:text-accent'}`}>
-                                                            {completed ? <CheckCircle size={24} /> : <BookOpen size={24} />}
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`p-2 rounded-lg border ${completed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-surface border-border/80 group-hover:border-accent/40'} transition-all`}>
+                                                            {completed ? <CheckCircle size={14} /> : <BookOpen size={14} />}
                                                         </div>
-                                                        <div className="space-y-2 relative z-10">
-                                                            <h4 className="text-base font-black leading-tight block uppercase tracking-tight group-hover:text-text transition-colors">{mod?.title || 'objectif orbital'}</h4>
-                                                            <span className="text-[9px] font-black uppercase tracking-widest text-text-muted opacity-50 group-hover:opacity-100 transition-opacity">{completed ? 'terminé' : 'en cours'}</span>
-                                                        </div>
+                                                        <span className="text-[11px] font-black uppercase tracking-tight">{mod?.title || 'Unknown Object'}</span>
                                                     </div>
-                                                </article>
+                                                    <ChevronRight size={12} className="opacity-20 group-hover:opacity-60 transition-all" />
+                                                </button>
                                             );
                                         })}
                                     </div>
                                 </section>
                             )}
-
-                            <footer className="mt-auto pt-8">
-                                {status === 'available' ? (
-                                    <button
-                                        onClick={() => handleSkillAction(selectedSkill)}
-                                        className="group w-full rounded-[3rem] bg-accent py-10 flex items-center justify-center gap-5 shadow-[0_20px_50px_rgba(99,102,241,0.3)] active:scale-95 transition-all hover:shadow-[0_25px_60px_rgba(99,102,241,0.4)]"
-                                    >
-                                        <Sparkles className="w-8 h-8 text-white animate-pulse" />
-                                        <span className="text-2xl font-black text-white uppercase tracking-[0.4em]">collecter succès</span>
-                                    </button>
-                                ) : (selectedSkill.is_locked) ? (
-                                    <div className="w-full py-10 bg-red-500/5 border border-red-500/20 rounded-[3rem] flex items-center justify-center gap-5 text-red-500/60 transition-opacity">
-                                        <Lock size={28} /> <span className="text-2xl font-black uppercase tracking-[0.3em]">indisponible</span>
-                                    </div>
-                                ) : (skillModulesData.length > 0) ? (
-                                    <button
-                                        onClick={() => {
-                                            const targetId = (status === 'unlocked_needs_exam' && selectedSkill.exam_module_id) ? selectedSkill.exam_module_id : (skillModulesData.find(sm => !userModules[sm.module_id])?.module_id || skillModulesData[0].module_id);
-                                            navigate(`/modules/${targetId}`);
-                                        }}
-                                        disabled={status === 'locked'}
-                                        className={`group w-full rounded-[3rem] py-10 flex items-center justify-center gap-5 border border-border/80 bg-surface-hover/50 backdrop-blur-xl transition-all shadow-xl font-sans ${status === 'locked' ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 active:scale-95 hover:border-accent/40 hover:bg-accent/5'}`}
-                                    >
-                                        <span className="text-2xl font-black uppercase tracking-[0.3em] group-hover:text-accent transition-colors">
-                                            {status === 'completed' ? 'revoir objectifs' : status === 'unlocked_needs_exam' ? 'passer l\'examen' : 'lancer l\'objectif'}
-                                        </span>
-                                        <ChevronRight className="w-8 h-8 group-hover:translate-x-3 transition-transform duration-500 text-accent" />
-                                    </button>
-                                ) : null}
-                            </footer>
                         </div>
-                    </article>
+
+                        {/* Action Bar */}
+                        <footer className="p-8 border-t border-border/60 bg-background/20">
+                            {status === 'available' ? (
+                                <button
+                                    onClick={() => handleSkillAction(selectedSkill)}
+                                    className="w-full h-16 bg-accent text-white rounded-xl flex items-center justify-center gap-4 shadow-lg shadow-accent/20 hover:brightness-110 active:scale-95 transition-all text-[11px] font-black uppercase tracking-[0.3em]"
+                                >
+                                    <Sparkles size={16} /> Collecter Succès
+                                </button>
+                            ) : status === 'locked' || selectedSkill.is_locked ? (
+                                <div className="w-full h-16 bg-background border border-border/60 rounded-xl flex items-center justify-center gap-3 text-text-muted/40 text-[11px] font-black uppercase tracking-widest cursor-not-allowed">
+                                    <Lock size={16} /> Verrouillé
+                                </div>
+                            ) : status === 'completed' ? (
+                                <div className="w-full h-16 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex items-center justify-center gap-3 text-emerald-500/60 text-[11px] font-black uppercase tracking-widest shadow-inner">
+                                    <CheckCircle size={16} /> Succès Maîtrisé
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        const targetId = (status === 'unlocked_needs_exam' && selectedSkill.exam_module_id) ? selectedSkill.exam_module_id : (skillModulesData.find(sm => !userModules[sm.module_id])?.module_id || skillModulesData[0].module_id);
+                                        navigate(`/modules/${targetId}`);
+                                    }}
+                                    className="w-full h-16 bg-surface border border-border/60 hover:bg-background hover:border-accent/40 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-95 text-[11px] font-black uppercase tracking-widest text-text-muted hover:text-accent"
+                                >
+                                    {status === 'unlocked_needs_exam' ? 'Passer l\'examen' : 'Lancer l\'objectif'}
+                                    <ChevronRight size={14} className="opacity-40" />
+                                </button>
+                            )}
+                        </footer>
+                    </div>
                 );
             })()}
         </div>

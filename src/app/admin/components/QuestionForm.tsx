@@ -153,7 +153,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
 
     return (
         <form onSubmit={handleSubmit} className="space-y-12 animate-in fade-in duration-700">
-            <div className="bg-surface/40 backdrop-blur-3xl border border-border/80 p-8 md:p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden group">
+            <div className="bg-surface border border-border/80 p-8 md:p-12 rounded-[3.5rem] shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none group-hover:scale-110 transition-transform duration-[2s]">
                     <HelpCircle size={400} />
                 </div>
@@ -168,7 +168,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                                 required
                                 value={context === 'module' ? moduleId : skillId}
                                 onChange={(e) => context === 'module' ? setModuleId(e.target.value) : setSkillId(e.target.value)}
-                                className="w-full px-8 py-5 bg-background/40 border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px]"
+                                className="w-full px-8 py-5 bg-background border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px] shadow-sm"
                             >
                                 <option value="" disabled>choisir l'origine...</option>
                                 {context === 'module' ? (
@@ -177,7 +177,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                                     skills.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
                                 )}
                             </select>
-                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-hover:translate-x-1 transition-transform">
                                 <ChevronRight size={14} />
                             </div>
                         </div>
@@ -191,12 +191,12 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                             <select
                                 value={type}
                                 onChange={(e) => setType(e.target.value)}
-                                className="w-full px-8 py-5 bg-background/40 border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px]"
+                                className="w-full px-8 py-5 bg-background border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px] shadow-sm"
                             >
                                 <option value="multiple_choice">qcm standard</option>
                                 <option value="true_false">binaire (vrai/faux)</option>
                             </select>
-                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-hover:translate-x-1 transition-transform">
                                 <ChevronRight size={14} />
                             </div>
                         </div>
@@ -210,7 +210,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                             <label className="text-[10px] font-black tracking-[0.3em] text-text-muted/60 uppercase">énoncé dynamique (markdown)</label>
                         </div>
                         
-                        <div className="flex bg-background/60 border border-border/60 p-1.5 rounded-2xl">
+                        <div className="flex bg-background border border-border/60 p-1.5 rounded-2xl shadow-md">
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('edit')}
@@ -231,34 +231,34 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                     {activeTab === 'edit' ? (
                         <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-300">
                             {/* barre d'outils héritée */}
-                            <div className="flex flex-wrap items-center gap-1.5 p-3 bg-surface/40 backdrop-blur-md border border-border/60 rounded-[1.8rem] overflow-x-auto no-scrollbar">
-                                <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Bold size={18} /></button>
-                                <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Italic size={18} /></button>
-                                <div className="w-px h-6 bg-border/40 mx-2" />
-                                <button type="button" onClick={() => insertBlock('# ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Heading1 size={18} /></button>
-                                <button type="button" onClick={() => insertBlock('## ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Heading2 size={18} /></button>
-                                <button type="button" onClick={() => insertBlock('### ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Heading3 size={18} /></button>
-                                <div className="w-px h-6 bg-border/40 mx-2" />
-                                <button type="button" onClick={() => insertBlock('- ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><List size={18} /></button>
-                                <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><ListTodo size={18} /></button>
-                                <div className="w-px h-6 bg-border/40 mx-2" />
-                                <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Code size={18} /></button>
-                                <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Settings2 size={18} /></button>
-                                <div className="w-px h-6 bg-border/40 mx-2" />
-                                <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Link size={18} /></button>
-                                <button type="button" onClick={() => insertBlock('> ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/40 hover:text-accent transition-all"><Quote size={18} /></button>
+                            <div className="flex flex-wrap items-center gap-1.5 p-3 bg-surface border border-border/60 rounded-[1.8rem] overflow-x-auto no-scrollbar shadow-lg">
+                                <button type="button" onClick={() => insertFormatting('**', '**')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Bold size={20} /></button>
+                                <button type="button" onClick={() => insertFormatting('*', '*')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Italic size={20} /></button>
+                                <div className="w-px h-8 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertBlock('# ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Heading1 size={20} /></button>
+                                <button type="button" onClick={() => insertBlock('## ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Heading2 size={20} /></button>
+                                <button type="button" onClick={() => insertBlock('### ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Heading3 size={20} /></button>
+                                <div className="w-px h-8 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertBlock('- ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><List size={20} /></button>
+                                <button type="button" onClick={() => insertBlock('- [ ] ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><ListTodo size={20} /></button>
+                                <div className="w-px h-8 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertFormatting('`', '`')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Code size={20} /></button>
+                                <button type="button" onClick={() => insertBlock('```\n', '\n```')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Settings2 size={20} /></button>
+                                <div className="w-px h-8 bg-border/40 mx-2" />
+                                <button type="button" onClick={() => insertFormatting('[', '](url)')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Link size={20} /></button>
+                                <button type="button" onClick={() => insertBlock('> ')} className="p-2.5 hover:bg-accent/10 rounded-xl text-text-muted/60 hover:text-accent transition-all"><Quote size={20} /></button>
                             </div>
                             <textarea
                                 id="question-text"
                                 required
                                 value={questionText}
                                 onChange={(e) => setQuestionText(e.target.value)}
-                                className="w-full px-8 py-6 bg-background/40 border border-border/60 rounded-[2.5rem] outline-none focus:border-accent/40 focus:bg-background transition-all text-text font-medium min-h-[200px] leading-relaxed italic shadow-inner custom-scrollbar"
+                                className="w-full px-8 py-6 bg-background border border-border/60 rounded-[2.5rem] outline-none focus:border-accent/40 focus:bg-background focus:ring-4 focus:ring-accent/5 transition-all text-text font-medium min-h-[220px] leading-relaxed italic shadow-inner custom-scrollbar"
                                 placeholder="écrivez l'énoncé de la question ici..."
                             />
                         </div>
                     ) : (
-                        <div className="min-h-[200px] p-10 bg-background/40 border border-border/60 rounded-[2.5rem] overflow-y-auto animate-in fade-in duration-500">
+                        <div className="min-h-[220px] p-10 bg-background border border-border/60 rounded-[2.5rem] overflow-y-auto animate-in fade-in duration-500 shadow-inner">
                             <div className="prose prose-invert prose-indigo max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-a:text-accent prose-code:text-accent prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-img:rounded-3xl italic opacity-80">
                                 <ReactMarkdown 
                                     remarkPlugins={[remarkGfm, remarkBreaks]}
@@ -272,7 +272,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                 </div>
             </div>
 
-            <div className="space-y-10 bg-surface/20 backdrop-blur-3xl border border-border/60 p-10 md:p-14 rounded-[3.5rem] shadow-xl">
+            <div className="space-y-10 bg-surface border border-border/60 p-10 md:p-14 rounded-[3.5rem] shadow-xl">
                 <div className="flex justify-between items-center relative z-10 border-b border-border/40 pb-8">
                     <div className="space-y-2">
                         <div className="flex items-center gap-3">
@@ -285,7 +285,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                         <button
                             type="button"
                             onClick={handleAddAnswer}
-                            className="group flex items-center gap-3 px-6 py-3 bg-background/60 hover:bg-accent border border-border/60 hover:border-accent rounded-2xl text-[10px] font-black transition-all text-text-muted hover:text-white uppercase tracking-widest"
+                            className="group flex items-center gap-3 px-6 py-3 bg-background hover:bg-accent border border-border/60 hover:border-accent rounded-2xl text-[10px] font-black transition-all text-text-muted hover:text-white uppercase tracking-widest shadow-sm"
                         >
                             <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" /> proposition
                         </button>
@@ -296,7 +296,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                     {answers.map((answer, index) => (
                         <div
                             key={index}
-                            className={`flex flex-col md:flex-row items-start md:items-center gap-6 p-8 rounded-[2.5rem] border transition-all duration-500 ease-out animate-in slide-in-from-right-4 fill-mode-both ${answer.isCorrect ? 'border-accent/40 bg-accent/5 shadow-2xl shadow-accent/10' : 'border-border/40 bg-background/40 hover:border-accent/20'}`}
+                            className={`flex flex-col md:flex-row items-start md:items-center gap-6 p-8 rounded-[2.5rem] border transition-all duration-500 ease-out animate-in slide-in-from-right-4 fill-mode-both ${answer.isCorrect ? 'border-accent bg-accent/5 shadow-2xl shadow-accent/10 scale-[1.01]' : 'border-border/60 bg-background hover:border-accent/40 shadow-sm'}`}
                             style={{ animationDelay: `${index * 100}ms` }}
                         >
                             <div className="shrink-0 flex items-center gap-4">
@@ -308,11 +308,11 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                                         onChange={() => handleAnswerChange(index, 'isCorrect', true)}
                                         className="hidden"
                                     />
-                                    <div className={`w-12 h-12 rounded-[1.2rem] border-2 flex items-center justify-center transition-all duration-300 ${answer.isCorrect ? 'bg-accent border-accent shadow-lg shadow-accent/40 scale-110' : 'border-border/60 group-hover/radio:border-accent/40 bg-background/60'}`}>
+                                    <div className={`w-12 h-12 rounded-[1.2rem] border-2 flex items-center justify-center transition-all duration-300 ${answer.isCorrect ? 'bg-accent border-accent shadow-lg shadow-accent/40 scale-110' : 'border-border/80 group-hover/radio:border-accent/40 bg-background'}`}>
                                         {answer.isCorrect && <CheckCircle2 className="w-6 h-6 text-white" />}
                                     </div>
                                 </label>
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${answer.isCorrect ? 'text-accent' : 'text-text-muted/20'}`}>id: 0{index + 1}</span>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${answer.isCorrect ? 'text-accent' : 'text-text-muted/40'}`}>id: 0{index + 1}</span>
                             </div>
 
                             <div className="flex-1 w-full">
@@ -321,7 +321,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                                     required
                                     value={answer.text}
                                     onChange={(e) => handleAnswerChange(index, 'text', e.target.value)}
-                                    className={`w-full bg-transparent outline-none text-xl font-black uppercase tracking-tight transition-colors ${answer.isCorrect ? 'text-text placeholder:text-accent/20' : 'text-text-muted/40 focus:text-text'}`}
+                                    className={`w-full bg-transparent outline-none text-xl font-black uppercase tracking-tight transition-colors ${answer.isCorrect ? 'text-text placeholder:text-accent/20' : 'text-text-muted/60 focus:text-text'}`}
                                     placeholder={`RÉPONSE ${index + 1}`}
                                 />
                             </div>
@@ -330,7 +330,7 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveAnswer(index)}
-                                    className="p-4 text-text-muted/20 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all active:scale-90"
+                                    className="p-4 text-text-muted/40 hover:text-rose-500 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 rounded-2xl transition-all active:scale-90"
                                 >
                                     <Trash2 className="w-5 h-5" />
                                 </button>
@@ -351,7 +351,6 @@ export default function QuestionForm({ initialData, onSubmit, isSubmitting, butt
                     {buttonText.toUpperCase()}
                 </button>
             </div>
-
         </form>
     );
 }

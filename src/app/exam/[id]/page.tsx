@@ -249,7 +249,7 @@ export default function ExamPage() {
                     </div>
                     
                     <div className="mt-8 space-y-4">
-                        <h1 className="text-5xl font-black uppercase tracking-tighter font-equinox">{passed ? 'examen validé' : 'accès refusé'}</h1>
+                        <h1 className="text-5xl font-black uppercase tracking-tighter">{passed ? 'examen validé' : 'accès refusé'}</h1>
                         <p className="text-text-muted/70 font-medium text-lg italic">délibération finale sur vos compétences cloud.</p>
                     </div>
 
@@ -319,7 +319,7 @@ export default function ExamPage() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full aspect-square bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
                 
                 <div className="relative z-20 space-y-20">
-                    <h2 className="text-3xl md:text-5xl font-black text-center leading-[1.1] uppercase font-equinox tracking-tighter animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <h2 className="text-3xl md:text-5xl font-black text-center leading-[1.1] uppercase tracking-tighter animate-in fade-in slide-in-from-bottom-8 duration-700">
                         {currentQ?.question_text}
                     </h2>
 
