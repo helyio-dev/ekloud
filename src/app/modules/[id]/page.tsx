@@ -116,7 +116,7 @@ export default function ModulePage() {
             
             <main className="max-w-4xl mx-auto px-6 py-20 relative z-10">
                 <header className="mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both">
-                    <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter uppercase font-equinox leading-tight">{module.title}</h2>
+                    <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tighter uppercase leading-tight">{module.title}</h2>
                     <p className="text-xl md:text-2xl text-text-muted/70 leading-relaxed font-medium max-w-3xl">{module.description}</p>
                 </header>
 
@@ -166,7 +166,7 @@ export default function ModulePage() {
                                             <HelpCircle className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="font-black text-2xl block uppercase tracking-tighter group-hover:text-accent transition-colors">quiz tactique</span>
+                                            <span className="font-black text-2xl block uppercase tracking-tighter group-hover:text-accent transition-colors">quiz de révision</span>
                                             <span className="text-xs font-bold text-text-muted/70 uppercase tracking-widest">10 questions • {quizPassed ? 'validé avec succès' : 'disponible pour évaluation'}</span>
                                         </div>
                                     </div>
@@ -183,7 +183,7 @@ export default function ModulePage() {
                                             <HelpCircle className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="font-black text-2xl block uppercase tracking-tighter">quiz tactique</span>
+                                            <span className="font-black text-2xl block uppercase tracking-tighter">quiz de révision</span>
                                             <span className="text-xs font-bold text-text-muted uppercase tracking-widest">complétez toutes les leçons pour déverrouiller</span>
                                         </div>
                                     </div>
@@ -203,7 +203,7 @@ export default function ModulePage() {
                                             <Shield className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="font-black text-2xl block uppercase tracking-tighter group-hover:text-amber-500 transition-colors">examen de palier</span>
+                                            <span className="font-black text-2xl block uppercase tracking-tighter group-hover:text-amber-500 transition-colors">examen de module</span>
                                             <span className="text-xs font-bold text-text-muted/70 uppercase tracking-widest">20 questions • {examPassed ? 'accès sécurisé' : 'prêt pour le titre'}</span>
                                         </div>
                                     </div>
@@ -220,7 +220,7 @@ export default function ModulePage() {
                                             <Shield className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="font-black text-2xl block uppercase tracking-tighter">examen de palier</span>
+                                            <span className="font-black text-2xl block uppercase tracking-tighter">examen de module</span>
                                             <span className="text-xs font-bold text-text-muted uppercase tracking-widest">validez le quiz pour déverrouiller</span>
                                         </div>
                                     </div>

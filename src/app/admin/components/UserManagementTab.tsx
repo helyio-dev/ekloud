@@ -106,7 +106,7 @@ export default function UserManagementTab() {
     }
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
+        <div className="space-y-12 animate-in fade-in duration-700">
             {selectedUser && (
                 <UserDetailModal
                     user={selectedUser}
@@ -122,98 +122,83 @@ export default function UserManagementTab() {
                 />
             )}
 
-            <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
-                <div className="relative w-full max-w-xl group">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/40 group-focus-within:text-accent transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="rechercher une identité (username / email)..."
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        className="w-full pl-14 pr-6 py-5 bg-background border border-border/60 rounded-[1.5rem] text-sm font-medium text-text placeholder-text-muted/40 focus:outline-none focus:border-accent/40 focus:bg-surface/30 transition-all shadow-sm"
-                    />
+            <div className="flex items-center justify-between border-b border-border/40 pb-6">
+                <div className="flex items-center gap-2 text-accent">
+                    <Users size={14} />
+                    <h1 className="text-sm font-black uppercase tracking-widest text-text">Utilisateurs</h1>
                 </div>
-                
-                <div className="flex items-center gap-3 bg-surface/40 px-6 py-3 rounded-full border border-border/40">
-                    <Target size={14} className="text-text-muted/40" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/60">
-                        {filteredUsers.length} <span className="opacity-40">affiché{filteredUsers.length !== 1 ? 's' : ''}</span>
-                        {users.length >= 100 && <span className="text-amber-500/60 ml-2"> (pool limité à 100)</span>}
-                    </span>
+                <div className="bg-surface px-4 py-1.5 rounded-lg border border-border/60 text-[10px] font-black uppercase tracking-widest text-text">
+                    {filteredUsers.length} <span className="opacity-40">Objets</span>
                 </div>
             </div>
 
-            <div className="overflow-hidden rounded-[2.5rem] border border-border/80 bg-surface/20 backdrop-blur-3xl shadow-xl">
+            <div className="pb-2">
+                <input
+                    type="text"
+                    placeholder="Filtrer par nom ou email..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="w-full bg-surface border border-border/60 px-4 py-2.5 rounded-lg text-xs font-black text-text placeholder-text-muted/30 focus:outline-none focus:border-accent/40 transition-all uppercase tracking-widest"
+                />
+            </div>
+
+            <div className="bg-surface rounded-xl border border-border/60 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-border/80 bg-surface/60 text-text-muted/40 text-[9px] font-black uppercase tracking-[0.3em]">
-                                <th className="p-8">utilisateur</th>
-                                <th className="p-8">statut</th>
-                                <th className="p-8 cursor-pointer hover:text-accent transition-colors group" onClick={() => toggleSort('xp')}>
-                                    <div className="flex items-center gap-2">capital xp <SortIcon col="xp" /></div>
+                            <tr className="border-b border-border/60 bg-background/30 text-text text-[9px] font-black uppercase tracking-widest">
+                                <th className="px-6 py-4">Identité</th>
+                                <th className="px-6 py-4">Accès</th>
+                                <th className="px-6 py-4 cursor-pointer hover:text-accent transition-colors" onClick={() => toggleSort('xp')}>
+                                    <div className="flex items-center gap-2">XP <SortIcon col="xp" /></div>
                                 </th>
-                                <th className="p-8 cursor-pointer hover:text-accent transition-colors group" onClick={() => toggleSort('level')}>
-                                    <div className="flex items-center gap-2">niveau <SortIcon col="level" /></div>
+                                <th className="px-6 py-4 cursor-pointer hover:text-accent transition-colors" onClick={() => toggleSort('level')}>
+                                    <div className="flex items-center gap-2">LVL <SortIcon col="level" /></div>
                                 </th>
-                                <th className="p-8 cursor-pointer hover:text-accent transition-colors group" onClick={() => toggleSort('streak')}>
-                                    <div className="flex items-center gap-2">série <SortIcon col="streak" /></div>
+                                <th className="px-6 py-4 cursor-pointer hover:text-accent transition-colors" onClick={() => toggleSort('streak')}>
+                                    <div className="flex items-center gap-2">Str <SortIcon col="streak" /></div>
                                 </th>
-                                <th className="p-8 cursor-pointer hover:text-accent transition-colors group" onClick={() => toggleSort('created_at')}>
-                                    <div className="flex items-center gap-2">inscription <SortIcon col="created_at" /></div>
-                                </th>
-                                <th className="p-8 text-right">opérations</th>
+                                <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-border/40 font-sans italic">
+                        <tbody className="divide-y divide-border/20">
                             {filteredUsers.map((u, idx) => (
-                                <tr key={u.id} className="hover:bg-accent/5 transition-all group animate-in fade-in slide-in-from-bottom-2 fill-mode-both" style={{ animationDelay: `${idx * 50}ms` }}>
-                                    <td className="p-8">
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent/20 to-purple-500/20 border border-accent/20 flex items-center justify-center text-accent font-black text-sm shrink-0 shadow-lg group-hover:scale-110 transition-transform">
+                                <tr key={idx} className="hover:bg-accent/[0.02] transition-colors group">
+                                    <td className="px-6 py-3">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-lg bg-background border border-border flex items-center justify-center text-accent font-black text-sm shrink-0">
                                                 {(u.username ?? u.email ?? '?').charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="font-black text-base text-text uppercase tracking-tight group-hover:text-accent transition-colors">{u.username ?? <span className="opacity-20 italic">anonyme</span>}</span>
-                                                <span className="text-[10px] font-bold text-text-muted/40 lowercase tracking-widest">{u.email}</span>
+                                                <span className="font-black text-text uppercase tracking-tight text-xs">{u.username ?? 'Anonyme'}</span>
+                                                <span className="text-[8px] font-bold text-text-muted lowercase opacity-40 leading-none">{u.email}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-8">
+                                    <td className="px-6 py-3">
                                         {u.role === 'admin' ? (
-                                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 text-amber-500 rounded-full text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
-                                                <Shield className="w-3 h-3" /> admin
-                                            </div>
+                                            <span className="px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded text-[8px] font-black uppercase border border-amber-500/20">Admin</span>
                                         ) : u.role === 'contributor' ? (
-                                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 text-emerald-500 rounded-full text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
-                                                <BookOpen className="w-3 h-3" /> contributeur
-                                            </div>
+                                            <span className="px-2 py-0.5 bg-purple-500/10 text-purple-500 rounded text-[8px] font-black uppercase border border-purple-500/20">Contrib</span>
                                         ) : (
-                                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-hover/30 text-text-muted/60 rounded-full text-[9px] font-black uppercase tracking-widest border border-border/40">
-                                                <GraduationCap className="w-3 h-3" /> étudiant
-                                            </div>
+                                            <span className="px-2 py-0.5 bg-background border border-border text-text-muted rounded text-[8px] font-black uppercase">User</span>
                                         )}
                                     </td>
-                                    <td className="p-8">
-                                        <div className="flex flex-col">
-                                            <span className="font-black text-lg text-text whitespace-nowrap">{u.xp.toLocaleString()} <span className="text-[10px] opacity-20">u</span></span>
+                                    <td className="px-6 py-3">
+                                        <span className="font-black text-xs text-text">{u.xp.toLocaleString()}</span>
+                                    </td>
+                                    <td className="px-6 py-3 font-black text-text/80 text-xs">{u.level}</td>
+                                    <td className="px-6 py-3">
+                                        <div className="flex items-center gap-1.5 text-rose-500 font-black text-xs">
+                                            {u.streak} <Flame size={12} className={u.streak > 0 ? 'text-rose-500' : 'opacity-20'} />
                                         </div>
                                     </td>
-                                    <td className="p-8 font-black text-text-muted/60 text-lg">{u.level}</td>
-                                    <td className="p-8">
-                                        <div className="flex items-center gap-2 text-rose-500 font-black text-lg">
-                                            {u.streak} <Flame className={`w-4 h-4 ${u.streak > 0 ? 'animate-pulse' : 'opacity-20'}`} />
-                                        </div>
-                                    </td>
-                                    <td className="p-8 text-[11px] font-bold text-text-muted/40 uppercase tracking-widest">
-                                        {new Date(u.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                    </td>
-                                    <td className="p-8 text-right">
+                                    <td className="px-6 py-3 text-right">
                                         <button
                                             onClick={() => setSelectedUser(u)}
-                                            className="px-6 py-3 bg-surface-hover/50 hover:bg-accent text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-white rounded-[1rem] transition-all border border-border/40 hover:border-accent hover:shadow-lg hover:shadow-accent/20 active:scale-95 flex items-center gap-2 ml-auto"
+                                            className="px-4 py-1.5 bg-background hover:bg-accent text-[8px] font-black uppercase tracking-widest text-text-muted hover:text-white rounded-lg transition-all border border-border hover:border-accent inline-flex items-center gap-2"
                                         >
-                                            <Settings2 size={12} /> gérer
+                                            Gérer
                                         </button>
                                     </td>
                                 </tr>
@@ -223,12 +208,8 @@ export default function UserManagementTab() {
                 </div>
 
                 {filteredUsers.length === 0 && (
-                    <div className="bg-background/20 py-24 flex flex-col items-center gap-6 justify-center text-center">
-                        <Sparkles className="w-12 h-12 text-text-muted/20 animate-pulse" />
-                        <div className="space-y-1">
-                            <p className="text-[10px] font-black text-text-muted/40 uppercase tracking-[0.4em]">aucun utilisateur détecté</p>
-                            <p className="text-xs text-text-muted/20 font-medium italic">ajustez vos paramètres de recherche</p>
-                        </div>
+                    <div className="py-20 text-center">
+                        <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Aucun utilisateur détecté</p>
                     </div>
                 )}
             </div>

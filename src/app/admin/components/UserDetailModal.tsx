@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { 
     X, Shield, User, Trash2, RefreshCw, Mail, Loader2, BookOpen, 
     FileText, Target, AlertTriangle, Fingerprint, Activity, Zap, 
-    ChevronRight, Key, Trash, History, ExternalLink, UserCircle
+    ChevronRight, Key, Trash, History, ExternalLink, UserCircle, Sparkles, Flame
 } from 'lucide-react';
 import type { AdminUser } from './UserManagementTab';
 
@@ -156,126 +156,79 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-end overflow-hidden">
-            <div className="absolute inset-0 bg-background/20 backdrop-blur-md animate-in fade-in duration-500" onClick={onClose} />
+            <div className="absolute inset-0 bg-background/80" onClick={onClose} />
 
-            <div className="relative w-full max-w-xl h-full bg-surface/40 backdrop-blur-3xl border-l border-border/60 shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
-                {/* en-tête immersif */}
-                <header className="p-10 pb-12 relative overflow-hidden shrink-0">
-                    <div className="absolute top-0 right-0 p-20 opacity-[0.02] pointer-events-none rotate-12">
-                        <Activity size={300} />
-                    </div>
-                    
-                    <div className="flex items-start justify-between relative z-10">
-                        <div className="flex items-center gap-10">
-                            <div className="relative group">
-                                <div className="absolute -inset-4 bg-gradient-to-tr from-accent to-purple-600 rounded-full opacity-20 group-hover:opacity-40 transition-opacity blur-xl"></div>
-                                <div className="w-24 h-24 rounded-full border-2 border-accent/20 bg-background flex items-center justify-center text-accent relative z-10 overflow-hidden">
-                                    <span className="text-3xl font-black">{ (user.username ?? user.email ?? '?').charAt(0).toUpperCase() }</span>
-                                    <div className="absolute bottom-0 inset-x-0 h-1/3 bg-accent/10 backdrop-blur-md flex items-center justify-center">
-                                        <UserCircle size={12} className="opacity-40" />
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="space-y-2">
-                                <h2 className="text-3xl font-black text-text uppercase tracking-tighter">{ user.username ?? 'anonyme' }</h2>
-                                <div className="flex items-center gap-2 group/email cursor-pointer">
-                                    <Mail size={12} className="text-text-muted/40 group-hover/email:text-accent transition-colors" />
-                                    <p className="text-xs text-text-muted font-bold group-hover/email:text-text transition-colors italic">{ user.email }</p>
-                                </div>
-                            </div>
+            <div className="relative w-full max-w-xl h-full bg-surface border-l border-border flex flex-col shadow-2xl animate-in slide-in-from-right duration-500">
+                {/* Slim Header */}
+                <header className="p-8 border-b border-border/60 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-6">
+                        <div className="w-14 h-14 rounded-xl bg-background border border-border flex items-center justify-center text-accent font-black text-xl shadow-inner">
+                            { (user.username ?? user.email ?? '?').charAt(0).toUpperCase() }
                         </div>
-                        
-                        <button onClick={onClose} className="p-4 bg-background/40 hover:bg-rose-500/10 rounded-2xl transition-all text-text-muted hover:text-rose-500 border border-border/40 active:scale-90">
-                            <X size={20} />
-                        </button>
+                        <div>
+                            <h2 className="text-xl font-black uppercase tracking-tight leading-none mb-1">{ user.username ?? 'Anonyme' }</h2>
+                            <p className="text-[10px] text-text-muted font-bold tracking-widest uppercase opacity-60">{ user.email }</p>
+                        </div>
                     </div>
+                    <button onClick={onClose} className="p-3 hover:bg-background border border-border rounded-lg transition-colors">
+                        <X size={18} />
+                    </button>
                 </header>
 
-                <div className="flex-1 overflow-y-auto px-10 pb-20 custom-scrollbar space-y-12">
+                <div className="flex-1 overflow-y-auto p-10 space-y-12">
                     {feedback && (
-                        <div className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest animate-in slide-in-from-top-4 ${feedback.type === 'success' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'}`}>
+                        <div className={`px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest border ${feedback.type === 'success' ? 'bg-accent/5 text-accent border-accent/20' : 'bg-rose-500/5 text-rose-500 border-rose-500/20'}`}>
                             {feedback.msg}
                         </div>
                     )}
 
-                    <section className="space-y-6">
-                        <div className="flex items-center gap-3 ml-1">
-                            <Zap size={14} className="text-accent" />
-                            <h3 className="text-[10px] font-black text-text-muted/60 uppercase tracking-[0.3em]">index de performance</h3>
-                        </div>
-                        
+                    {/* Performance Stats */}
+                    <div className="space-y-6">
+                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] flex items-center gap-3">
+                            <Zap size={14} className="text-accent" /> Statistiques Générales
+                        </h3>
                         <div className="grid grid-cols-3 gap-4">
-                            <StatCard label="score xp" value={user.xp.toLocaleString()} icon={<Fingerprint className="text-accent" />} />
-                            <StatCard label="grade" value={`v${user.level}`} icon={<Activity className="text-purple-400" />} />
-                            <StatCard label="fusion" value={`${user.streak} j`} icon={<History className="text-orange-400" />} />
+                            <StatCard label="XP" value={user.xp.toLocaleString()} />
+                            <StatCard label="NIVEAU" value={user.level.toString()} />
+                            <StatCard label="SÉRIE" value={`${user.streak}J`} />
                         </div>
+                    </div>
 
-                        {loadingStats ? (
-                            <div className="flex justify-center py-10">
-                                <Loader2 className="w-8 h-8 text-accent animate-spin opacity-20" />
-                            </div>
-                        ) : stats && (
-                            <div className="grid grid-cols-3 gap-4 animate-in fade-in duration-700">
-                                <DeepStat label="modules valides" value={stats.modulesCompleted} variant="blue" />
-                                <DeepStat label="leçons lues" value={stats.lessonsCompleted} variant="emerald" />
-                                <DeepStat label="essais quiz" value={stats.quizAttempts} variant="amber" />
-                            </div>
-                        )}
-                    </section>
-
-                    <section className="space-y-6">
-                        <div className="flex items-center gap-3 ml-1">
-                            <Shield size={14} className="text-accent" />
-                            <h3 className="text-[10px] font-black text-text-muted/60 uppercase tracking-[0.3em]">configuration système</h3>
+                    {/* Roles Control */}
+                    <div className="space-y-6">
+                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] flex items-center gap-3">
+                            <Shield size={14} className="text-accent" /> Rôle de l'Utilisateur
+                        </h3>
+                        <div className="flex bg-background border border-border p-2 rounded-xl">
+                            {(['student', 'contributor', 'admin'] as const).map(role => (
+                                <button
+                                    key={role}
+                                    onClick={() => handleRoleChange(role)}
+                                    disabled={user.role === role || (isActionLoading !== null && isActionLoading.startsWith('role'))}
+                                    className={`flex-1 flex flex-col items-center gap-2 py-4 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${user.role === role ? 'bg-accent text-white' : 'text-text-muted hover:text-text hover:bg-surface'} disabled:opacity-30`}
+                                >
+                                    {role === 'admin' ? 'Admin' : role === 'contributor' ? 'Contrib.' : 'Étudiant'}
+                                </button>
+                            ))}
                         </div>
-                        
-                        <div className="bg-background/20 border border-border/40 rounded-[2.5rem] p-8 space-y-6">
-                            <MetaRow label="privilège d'accès" value={
-                                user.role === 'admin'
-                                    ? <span className="text-accent font-black flex items-center gap-2 uppercase tracking-widest text-[10px] bg-accent/10 px-3 py-1 rounded-full"><Shield className="w-3 h-3" /> administrateur</span>
-                                    : user.role === 'contributor'
-                                    ? <span className="text-purple-400 font-black flex items-center gap-2 uppercase tracking-widest text-[10px] bg-purple-400/10 px-3 py-1 rounded-full"><BookOpen className="w-3 h-3" /> contributeur</span>
-                                    : <span className="text-text-muted/40 font-black flex items-center gap-2 uppercase tracking-widest text-[10px] bg-background/60 px-3 py-1 rounded-full"><User className="w-3 h-3" /> étudiant</span>
-                            } />
-                            <MetaRow label="chronogramme d'inscription" value={new Date(user.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase()} />
-                            <MetaRow label="id unique (uuid)" value={user.id.substring(0, 18) + '...'} />
-                        </div>
-                    </section>
+                    </div>
 
-                    <section className="space-y-6">
-                        <div className="flex items-center gap-3 ml-1">
-                            <Target size={14} className="text-accent" />
-                            <h3 className="text-[10px] font-black text-text-muted/60 uppercase tracking-[0.3em]">centre d'opérations</h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4">
-                            <div className="flex bg-background/20 border border-border/40 p-2 rounded-[2rem]">
-                                {(['student', 'contributor', 'admin'] as const).map(role => (
-                                    <button
-                                        key={role}
-                                        onClick={() => handleRoleChange(role)}
-                                        disabled={user.role === role || (isActionLoading !== null && isActionLoading.startsWith('role'))}
-                                        className={`flex-1 flex flex-col items-center gap-2 py-4 rounded-[1.5rem] text-[9px] font-black uppercase tracking-widest transition-all ${user.role === role ? 'bg-accent text-white shadow-lg' : 'text-text-muted hover:text-text hover:bg-background/40'} disabled:opacity-30`}
-                                    >
-                                        {role === 'admin' ? <Shield size={16} /> : role === 'contributor' ? <BookOpen size={16} /> : <User size={16} />}
-                                        {role === 'student' ? 'étudiant' : role}
-                                    </button>
-                                ))}
-                            </div>
-
+                    {/* Critical Actions */}
+                    <div className="space-y-6">
+                        <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] flex items-center gap-3">
+                            <Target size={14} className="text-accent" /> Opérations Critiques
+                        </h3>
+                        <div className="space-y-3">
                             <AdminAction
-                                icon={<Key size={16} />}
-                                label="réinitialiser les accès"
-                                description="envoie un lien de récupération par email"
+                                label="Réinitialisation MDP"
+                                description="Envoyer un lien de reset par email"
                                 loading={isActionLoading === 'password'}
                                 onClick={handlePasswordReset}
-                                variant="nebula"
                             />
-
+                            
                             {confirm === 'reset' ? (
                                 <ActionConfirm
-                                    message="purger la progression et l'xp ?"
+                                    message="Confirmer la réinitialisation ?"
                                     onConfirm={handleResetProgress}
                                     onCancel={() => setConfirm(null)}
                                     loading={isActionLoading === 'reset'}
@@ -283,9 +236,8 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
                                 />
                             ) : (
                                 <AdminAction
-                                    icon={<RefreshCw size={16} />}
-                                    label="purger la progression"
-                                    description="réinitialise l'xp et les modules validés"
+                                    label="Reset Progress"
+                                    description="Réinitialiser XP et modules"
                                     onClick={() => setConfirm('reset')}
                                     variant="warning"
                                 />
@@ -293,7 +245,7 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
 
                             {confirm === 'delete' ? (
                                 <ActionConfirm
-                                    message="supprimer définitivement l'identité ?"
+                                    message="Confirmer la suppression ?"
                                     onConfirm={handleDelete}
                                     onCancel={() => setConfirm(null)}
                                     loading={isActionLoading === 'delete'}
@@ -301,28 +253,24 @@ export default function UserDetailModal({ user, onClose, onUserUpdated, onUserDe
                                 />
                             ) : (
                                 <AdminAction
-                                    icon={<Trash size={16} />}
-                                    label="supprimer le profil"
-                                    description="action irréversible sur la base de données"
+                                    label="Détruire le Profil"
+                                    description="Action irréversible sur l'identité"
                                     onClick={() => setConfirm('delete')}
                                     variant="danger"
                                 />
                             )}
                         </div>
-                    </section>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-const StatCard = ({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) => (
-    <div className="bg-background/20 border border-border/40 rounded-[1.8rem] p-6 group hover:border-accent/40 transition-all duration-500">
-        <div className="flex justify-between items-start mb-4">
-            <div className="p-2.5 bg-background border border-border/60 rounded-xl group-hover:scale-110 transition-transform">{ icon }</div>
-        </div>
-        <p className="text-2xl font-black text-text uppercase tracking-tighter mb-1">{ value }</p>
-        <p className="text-[9px] font-black text-text-muted/40 uppercase tracking-widest">{ label }</p>
+const StatCard = ({ label, value }: { label: string; value: string }) => (
+    <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+        <p className="text-lg font-black">{ value }</p>
+        <p className="text-[8px] font-black text-text-muted/60 uppercase tracking-widest">{ label }</p>
     </div>
 );
 
@@ -333,54 +281,48 @@ const DeepStat = ({ label, value, variant }: { label: string; value: number; var
         amber: 'text-amber-400 bg-amber-400/5 border-amber-400/20'
     };
     return (
-        <div className={`p-5 rounded-[1.5rem] border ${colors[variant]} space-y-1`}>
-            <p className="text-xl font-black">{ value }</p>
-            <p className="text-[8px] font-black uppercase tracking-widest opacity-60 leading-tight">{ label }</p>
+        <div className={`p-6 rounded-2xl border-2 ${colors[variant]} space-y-2 shadow-inner`}>
+            <p className="text-2xl font-black leading-none">{ value }</p>
+            <p className="text-[9px] font-black uppercase tracking-widest opacity-80 leading-snug">{ label }</p>
         </div>
     );
 };
 
 const MetaRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <div className="flex items-center justify-between gap-10">
-        <span className="text-[10px] font-black text-text-muted/40 uppercase tracking-widest italic">{ label }</span>
-        <div className="text-xs font-bold text-text-muted/80">{ value }</div>
+    <div className="flex items-center justify-between gap-12">
+        <span className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">{ label }</span>
+        <div className="text-[11px] font-black text-text">{ value }</div>
     </div>
 );
 
-const AdminAction = ({ icon, label, description, loading, onClick, variant }: any) => {
+const AdminAction = ({ label, description, loading, onClick, variant }: any) => {
     const styles = {
-        nebula: 'border-border/40 hover:border-accent/40 hover:bg-accent/5 text-text',
-        warning: 'border-orange-500/20 hover:border-orange-500/60 hover:bg-orange-500/5 text-orange-400',
-        danger: 'border-rose-500/20 hover:border-rose-500/60 hover:bg-rose-500/5 text-rose-500'
+        nebula: 'border-border/60 hover:border-accent/40 text-text',
+        warning: 'border-orange-500/20 hover:border-orange-500/40 text-orange-400',
+        danger: 'border-rose-500/20 hover:border-rose-500/40 text-rose-500'
     };
     return (
         <button
             onClick={onClick}
             disabled={loading}
-            className={`group w-full flex items-center gap-6 p-6 bg-background/20 border rounded-[2rem] transition-all text-left disabled:opacity-30 ${styles[variant as keyof typeof styles]}`}
+            className={`group w-full flex items-center justify-between p-6 bg-background border rounded-xl transition-all disabled:opacity-30 ${styles[variant as keyof typeof styles] || styles.nebula}`}
         >
-            <div className="shrink-0 p-3 bg-background border border-border/40 rounded-2xl group-hover:scale-110 transition-transform">
-                { loading ? <Loader2 className="w-5 h-5 animate-spin" /> : icon }
+            <div className="text-left">
+                <p className="text-[11px] font-black uppercase tracking-widest">{ label }</p>
+                <p className="text-[9px] font-bold opacity-40 uppercase">{ description }</p>
             </div>
-            <div className="flex-1">
-                <p className="text-[11px] font-black uppercase tracking-widest mb-1">{ label }</p>
-                <p className="text-[10px] font-bold text-text-muted/40 italic leading-none">{ description }</p>
-            </div>
-            <ChevronRight size={14} className="opacity-10 group-hover:opacity-40 group-hover:translate-x-1 transition-all" />
+            { loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronRight size={14} className="opacity-20" /> }
         </button>
     );
 };
 
 const ActionConfirm = ({ message, onConfirm, onCancel, loading, variant }: any) => (
-    <div className={`p-8 rounded-[2rem] border animate-in slide-in-from-bottom-4 ${variant === 'danger' ? 'bg-rose-500/5 border-rose-500/20' : 'bg-orange-500/5 border-orange-500/20'}`}>
-        <div className="flex items-start gap-4 mb-8">
-            <AlertTriangle className={`w-6 h-6 shrink-0 ${variant === 'danger' ? 'text-rose-500' : 'text-orange-400'}`} />
-            <p className="text-xs font-black uppercase tracking-widest leading-relaxed mt-1">{ message }</p>
-        </div>
+    <div className={`p-8 rounded-xl border animate-in slide-in-from-bottom-2 ${variant === 'danger' ? 'bg-rose-500/5 border-rose-500/20' : 'bg-orange-500/5 border-orange-500/20'}`}>
+        <p className="text-[10px] font-black uppercase tracking-widest mb-6 text-text/80">{ message }</p>
         <div className="grid grid-cols-2 gap-4">
-            <button onClick={onCancel} disabled={loading} className="py-4 bg-background/40 border border-border/40 text-text rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-surface active:scale-95">annuler</button>
-            <button onClick={onConfirm} disabled={loading} className={`py-4 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2 ${variant === 'danger' ? 'bg-rose-600 shadow-lg shadow-rose-600/20' : 'bg-orange-500 shadow-lg shadow-orange-500/20'}`}>
-                { loading && <Loader2 className="w-3 h-3 animate-spin" /> } confimer
+            <button onClick={onCancel} disabled={loading} className="py-3 bg-background border border-border text-text rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-surface">Annuler</button>
+            <button onClick={onConfirm} disabled={loading} className={`py-3 text-white rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 ${variant === 'danger' ? 'bg-rose-600' : 'bg-orange-600'}`}>
+                { loading && <Loader2 className="w-3 h-3 animate-spin" /> } Confirmer
             </button>
         </div>
     </div>

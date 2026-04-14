@@ -71,7 +71,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-10 bg-surface/40 backdrop-blur-3xl border border-border/80 p-10 md:p-14 rounded-[3rem] shadow-2xl relative overflow-hidden group">
+        <form onSubmit={handleSubmit} className="space-y-10 bg-surface border border-border/80 p-10 md:p-14 rounded-[3rem] shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none group-hover:scale-110 transition-transform duration-1000">
                 <Layout size={400} />
             </div>
@@ -86,7 +86,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                         required
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-8 py-6 bg-background/40 border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:bg-background transition-all font-black text-text text-xl uppercase tracking-tight placeholder:opacity-20"
+                        className="w-full px-8 py-6 bg-background border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all font-black text-text text-xl uppercase tracking-tight placeholder:opacity-20 shadow-sm"
                         placeholder="EX: ARCHITECTURE DISTRIBUÉE"
                     />
                 </div>
@@ -99,7 +99,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                         required
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="w-full px-8 py-6 bg-background/40 border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:bg-background transition-all min-h-[160px] text-text font-medium leading-relaxed italic placeholder:opacity-20"
+                        className="w-full px-8 py-6 bg-background border border-border/60 rounded-[2rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all min-h-[160px] text-text font-medium leading-relaxed italic placeholder:opacity-20 shadow-sm"
                         placeholder="décrivez succinctement les compétences visées par ce module..."
                     />
                 </div>
@@ -113,7 +113,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                             <select
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                className="w-full px-8 py-5 bg-background/40 border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px]"
+                                className="w-full px-8 py-5 bg-background border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 focus:ring-4 focus:ring-accent/5 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px] shadow-sm"
                             >
                                 <option value="Systèmes & réseaux">Systèmes & réseaux</option>
                                 <option value="Cybersécurité">Cybersécurité</option>
@@ -133,13 +133,13 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                         <label className="flex items-center gap-3 text-[10px] font-black tracking-[0.3em] text-text-muted/60 uppercase ml-1">
                             <Target className="w-3.5 h-3.5 text-accent" /> indice d'accréditation
                         </label>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-3">
                                 {(['Découverte', 'Fondamentaux', 'Avancé', 'Expert'] as const).map(lvl => (
                                     <button
                                         key={lvl}
                                         type="button"
                                         onClick={() => setDifficulty(lvl)}
-                                        className={`px-4 py-4 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] border transition-all ${difficulty === lvl ? 'bg-accent border-accent text-white shadow-lg shadow-accent/20 scale-[1.02]' : 'bg-background/20 border-border/40 text-text-muted/60 hover:border-border'}`}
+                                        className={`px-4 py-4 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] border transition-all ${difficulty === lvl ? 'bg-accent border-accent text-white shadow-xl shadow-accent/40 scale-[1.02]' : 'bg-background border-border/60 text-text-muted/60 hover:border-accent/40 hover:text-text'}`}
                                     >
                                         {lvl}
                                     </button>
@@ -147,7 +147,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                         </div>
                     </div>
 
-                    <div className="md:col-span-2 space-y-6 bg-background/30 p-8 rounded-[2.5rem] border border-border/40">
+                    <div className="md:col-span-2 space-y-6 bg-background p-8 rounded-[2.5rem] border border-border/60 shadow-inner">
                         <div className="space-y-4">
                             <label className="flex items-center gap-3 text-[10px] font-black tracking-[0.3em] text-text-muted/60 uppercase ml-1">
                                 <Shield className="w-3.5 h-3.5 text-accent" /> chaîne de dépendances (amont)
@@ -156,7 +156,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                                 <select
                                     value={prerequisiteId}
                                     onChange={(e) => setPrerequisiteId(e.target.value)}
-                                    className="w-full px-8 py-5 bg-background/60 border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px]"
+                                    className="w-full px-8 py-5 bg-surface border border-border/60 rounded-[1.8rem] outline-none focus:border-accent/40 transition-all appearance-none text-text font-black uppercase tracking-widest text-[11px]"
                                 >
                                     <option value="">accès immédiat (aucun prérequis)</option>
                                     {existingModules
@@ -165,7 +165,7 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                                             <option key={mod.id} value={mod.id}>{mod.title}</option>
                                         ))}
                                 </select>
-                                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 group-hover/select:translate-x-1 transition-transform">
                                     <Box size={14} />
                                 </div>
                             </div>
@@ -181,14 +181,13 @@ export default function ModuleForm({ initialData, onSubmit, isSubmitting, button
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="group relative flex items-center gap-4 px-12 py-5 bg-accent hover:bg-accent/90 text-white rounded-2xl font-black uppercase tracking-[0.3em] text-xs transition-all disabled:opacity-50 shadow-2xl shadow-accent/20 active:scale-95"
+                    className="group relative flex items-center gap-4 px-12 py-5 bg-accent hover:bg-accent/90 text-white rounded-2xl font-black uppercase tracking-[0.3em] text-xs transition-all disabled:opacity-50 shadow-2xl shadow-accent/30 active:scale-95"
                 >
                     <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%] group-hover:animate-[shimmer_2s_infinite]"></div>
                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />}
                     {buttonText.toUpperCase()}
                 </button>
             </div>
-
         </form>
     );
 }

@@ -82,7 +82,7 @@ export default function CreateLessonPage() {
                         <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/60">curriculum engineering toolkit</span>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter font-equinox leading-tight">nouvelle leçon</h1>
+                        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-tight">nouvelle leçon</h1>
                         <div className="flex items-center gap-3 opacity-20">
                             <Zap size={14} />
                             <p className="text-[9px] font-black uppercase tracking-[0.5em] italic">draft mode protocol</p>

@@ -159,33 +159,11 @@ export default function LessonPage() {
 
     return (
         <div className="min-h-screen bg-background text-text flex flex-col font-sans">
-            {/* barre latérale de navigation supérieure (header contextuel) */}
-            <header className="border-b border-border/60 bg-surface/40 px-8 py-5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-3xl shadow-sm">
-                <nav className="flex items-center gap-6">
-                    <Link 
-                        to={`/modules/${lesson.module_id}`} 
-                        className="p-2.5 bg-surface-hover/50 hover:bg-surface-hover rounded-2xl transition-all text-text-muted hover:text-text active:scale-90 border border-border/40"
-                        aria-label="retour au module"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </Link>
-                    <div className="flex flex-col">
-                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/60">module en cours</span>
-                        <h1 className="text-sm font-black uppercase tracking-widest text-text truncate max-w-[200px] md:max-w-md">
-                            {lesson.title}
-                        </h1>
-                    </div>
-                </nav>
-                <div className="bg-accent/10 px-5 py-2 rounded-full border border-accent/20 text-[10px] font-black text-accent uppercase tracking-widest shadow-sm animate-pulse">
-                    transmission active
-                </div>
-            </header>
-
-            <main className="flex-grow max-w-5xl mx-auto w-full px-8 py-16 md:py-24">
+            <main className="flex-grow max-w-5xl mx-auto w-full px-8 py-16 md:py-32">
                 <article className="prose prose-invert prose-indigo max-w-none animate-in fade-in slide-in-from-bottom-12 duration-1000 fill-mode-both">
-                    <header className="mb-16 md:mb-24 flex flex-col items-center text-center">
+                    <header className="mb-24 flex flex-col items-center text-center">
                         <div className="w-16 h-1 bg-accent/20 rounded-full mb-12" />
-                        <h2 className="text-4xl md:text-7xl font-black mb-6 tracking-tighter text-text leading-[1.05] uppercase font-equinox drop-shadow-2xl">
+                        <h2 className="text-4xl md:text-7xl font-black mb-6 tracking-tighter text-text leading-[1.05] uppercase drop-shadow-2xl">
                             {lesson.title}
                         </h2>
                     </header>
@@ -242,7 +220,7 @@ export default function LessonPage() {
                                         );
                                     }
 
-                                    return <blockquote className="border-l-4 border-accent/30 pl-10 my-16 italic text-text-muted text-2xl md:text-3xl leading-relaxed font-equinox lowercase">{children}</blockquote>;
+                                    return <blockquote className="border-l-4 border-accent/30 pl-10 my-16 italic text-text-muted text-2xl md:text-3xl leading-relaxed lowercase">{children}</blockquote>;
                                 },
                                 code: ({ className, children, ...props }: any) => <code className={`${className} bg-surface-hover/50 px-2 py-1 rounded-lg text-accent`} {...props}>{children}</code>
                             }}
@@ -250,36 +228,41 @@ export default function LessonPage() {
                             {processContent(lesson.content)}
                         </ReactMarkdown>
                     </div>
+
+                    {/* Actions de fin de leçon intégrées au flux */}
+                    <footer className="mt-32 pt-16 border-t border-border/40 flex flex-col items-center gap-10">
+                        <button
+                            onClick={handleComplete}
+                            disabled={isCompleting}
+                            className="w-full md:w-auto min-w-[320px] flex items-center justify-center gap-5 px-16 py-8 bg-accent hover:bg-accent/90 text-white rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xl transition-all transform hover:scale-[1.05] active:scale-95 shadow-[0_30px_70px_-15px_rgba(99,102,241,0.5)] disabled:opacity-50"
+                        >
+                            {isCompleting ? <Loader2 className="w-8 h-8 animate-spin" /> : (
+                                <>
+                                    <Sparkles className="w-6 h-6" />
+                                    <span>{nextLessonId ? "Continuer" : "Terminer le module"}</span>
+                                    <ChevronRight className="w-8 h-8 ml-2" />
+                                </>
+                            )}
+                        </button>
+
+                        <div className="flex items-center gap-12">
+                            <button 
+                                onClick={() => prevLessonId && navigate(`/lessons/${prevLessonId}`)}
+                                disabled={!prevLessonId} 
+                                className={`text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-text transition-all ${!prevLessonId ? 'opacity-0 pointer-events-none' : 'hover:translate-x-[-8px]'}`}
+                            >
+                                ← Leçon Précédente
+                            </button>
+                            <Link 
+                                to={`/modules/${lesson.module_id}`}
+                                className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-accent transition-all"
+                            >
+                                Revenir au module
+                            </Link>
+                        </div>
+                    </footer>
                 </article>
             </main>
-
-            {/* barre d'actions fixée en bas de page pour la validation du parcours */}
-            <footer className="border-t border-border/60 bg-surface/60 backdrop-blur-[48px] p-8 md:p-10 sticky bottom-0 z-50 shadow-[0_-20px_50px_rgba(0,0,0,0.3)]">
-                <div className="max-w-5xl mx-auto flex justify-between items-center gap-8">
-                    <button 
-                        onClick={() => prevLessonId && navigate(`/lessons/${prevLessonId}`)}
-                        disabled={!prevLessonId} 
-                        className={`p-5 rounded-3xl bg-surface-hover/50 text-text-muted border border-border/40 transition-all ${!prevLessonId ? 'opacity-20 cursor-not-allowed' : 'hover:bg-surface-hover hover:text-text active:scale-90'}`} 
-                        aria-label="leçon précédente"
-                    >
-                        <ChevronLeft className="w-8 h-8" />
-                    </button>
-
-                    <button
-                        onClick={handleComplete}
-                        disabled={isCompleting}
-                        className="flex-grow md:flex-grow-0 flex items-center justify-center gap-5 px-16 py-6 bg-accent hover:bg-accent/90 text-white rounded-[2rem] font-black uppercase tracking-[0.3em] text-lg transition-all transform hover:scale-[1.05] active:scale-95 shadow-[0_20px_60px_-10px_rgba(99,102,241,0.4)] disabled:opacity-50"
-                    >
-                        {isCompleting ? <Loader2 className="w-6 h-6 animate-spin" /> : (
-                            <>
-                                <Sparkles className="w-6 h-6" />
-                                <span>{nextLessonId ? "continuer" : "finaliser module"}</span>
-                                <ChevronRight className="w-8 h-8" />
-                            </>
-                        )}
-                    </button>
-                </div>
-            </footer>
         </div>
     );
 }

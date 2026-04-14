@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
 
@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // référence pour éviter les boucles infinies de récupération de profil
     const lastFetchedIdRef = useRef<string | null>(null);
+    const isInitialMount = useRef(true);
 
     /**
      * récupère les informations de profil depuis la base de données.
@@ -62,8 +63,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
      */
     const fetchProfile = React.useCallback(async (userId: string, newUser?: any) => {
         if (!userId) return;
-        if (lastFetchedIdRef.current === userId) return;
+        
+        // si on a déjà chargé ce profil récemment, on évite le doublon
+        // sauf si on force le rafraîchissement
+        if (lastFetchedIdRef.current === userId && isInitialMount.current === false) return;
         lastFetchedIdRef.current = userId;
+        isInitialMount.current = false;
         
         try {
             const { data, error } = await supabase
@@ -109,88 +114,126 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setLevel(1);
                     setStreak(0);
                     setUsername(newProfile.username);
-                } else {
-                    console.error('échec de la création du profil:', insertError?.message);
                 }
-            } else if (error) {
-                console.error('erreur lors de la récupération du profil:', error.message);
             }
         } catch (err) {
             console.error('erreur inattendue profile_fetch:', err);
         }
     }, []);
 
+    // Lock pour syncSession
+    const isSyncing = useRef(false);
+
+    const resetState = useCallback(() => {
+        lastFetchedIdRef.current = null;
+        setUser(null);
+        setSession(null);
+        setIsAdmin(false);
+        setIsContributor(false);
+        setXp(0);
+        setLevel(1);
+        setStreak(0);
+        setUsername(null);
+        setClan(null);
+        localStorage.removeItem('ekloud_last_uid');
+    }, []);
+
+    const syncSession = useCallback(async (currentSession: Session | null) => {
+        if (isSyncing.current) return;
+        isSyncing.current = true;
+        
+        try {
+            if (currentSession) {
+                setSession(currentSession);
+                setUser(currentSession.user);
+                
+                // Persistence Shield : On garde l'ID utilisateur en dehors de la session Supabase
+                // pour permettre une récupération si le cache est partiellement corrompu.
+                localStorage.setItem('ekloud_last_uid', currentSession.user.id);
+                
+                await fetchProfile(currentSession.user.id, currentSession.user);
+            } else {
+                // Tentative de récupération silensieuse si session absente
+                const lastUid = localStorage.getItem('ekloud_last_uid');
+                if (lastUid) {
+                    console.log('[AUTH] Tentative de récupération via Shield pour:', lastUid);
+                }
+                resetState();
+            }
+        } finally {
+            setIsLoading(false);
+            isSyncing.current = false;
+        }
+    }, [fetchProfile, resetState]);
+
     useEffect(() => {
-        /**
-         * initialise la session active au montage de l'application.
-         */
-        const initSession = async () => {
+        let mounted = true;
+
+        const init = async () => {
             try {
-                const { data: { session: initialSession } } = await supabase.auth.getSession();
-                if (initialSession) {
-                    setSession(initialSession);
-                    setUser(initialSession.user);
-                    await fetchProfile(initialSession.user.id, initialSession.user);
+                const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+                if (error) {
+                    console.error('[AUTH] Erreur session au démarrage:', error);
+                    // On ne déconnecte pas forcément, on tente un refresh
+                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+                    if (refreshError) {
+                        console.warn('[AUTH] Récupération impossible. Nettoyage.');
+                        resetState();
+                    } else if (mounted) {
+                        await syncSession(refreshData.session);
+                    }
+                } else if (mounted) {
+                    await syncSession(initialSession);
                 }
             } catch (err) {
-                console.error('erreur d\'initialisation de session:', err);
+                console.error('[AUTH] Erreur critique init:', err);
             } finally {
-                setIsLoading(false);
+                if (mounted) setIsLoading(false);
             }
         };
 
-        // écoute des changements d'état (login, logout, token refresh)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-            console.log(`Auth event: ${event}`);
-            const newUser = currentSession?.user ?? null;
+            console.log(`[AUTH] Event Flow: ${event}`);
             
-            setSession(currentSession);
-            setUser(newUser);
-            
-            if (newUser) {
-                try {
-                    await fetchProfile(newUser.id, newUser);
-                } catch (err) {
-                    console.error('Erreur durant le cycle onAuthStateChange:', err);
-                }
-            } else {
-                // remise à zéro complète lors de la déconnexion
-                lastFetchedIdRef.current = null;
-                setIsAdmin(false);
-                setIsContributor(false);
-                setXp(0);
-                setLevel(1);
-                setStreak(0);
-                setUsername(null);
-                setClan(null);
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                if (mounted) await syncSession(currentSession);
+            } else if (event === 'SIGNED_OUT') {
+                if (mounted) resetState();
             }
-            
-            setIsLoading(false);
         });
 
-        initSession();
+        init();
 
         return () => {
+            mounted = false;
             subscription.unsubscribe();
         };
-    }, []);
+    }, [syncSession, resetState]);
 
     // procédure de déconnexion globale
     const signOut = async () => {
-        await supabase.auth.signOut();
+        setIsLoading(true);
+        try {
+            await supabase.auth.signOut();
+            resetState();
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // rafraîchissement manuel de l'état de la session
     const refreshSession = async () => {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+        const { data: { session: currentSession }, error } = await supabase.auth.refreshSession();
+        if (!error && currentSession) {
+            await syncSession(currentSession);
+        }
         return currentSession;
     };
 
     // rafraîchissement forcé des données de profil
     const refreshProfile = async () => {
         if (user) {
+            // on force le rafraîchissement en bypassant la ref
             lastFetchedIdRef.current = null;
             await fetchProfile(user.id);
         }

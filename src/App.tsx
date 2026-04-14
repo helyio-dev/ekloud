@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // imports des contextes et utilitaires globaux
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -41,8 +41,9 @@ import EditQuestionPage from '@/app/admin/quizzes/[id]/edit/page';
 import SkillExamQuestionsPage from '@/app/admin/skills/[id]/exam/page';
 
 const AppContent = () => {
-    // vérification de l'état d'authentification pour la protection des routes
     const { isLoading, user } = useAuth();
+    const location = useLocation();
+    const isAdminRoute = location.pathname.startsWith('/admin');
 
     // affichage de l'écran de chargement initial
     if (isLoading && !user) {
@@ -60,7 +61,7 @@ const AppContent = () => {
 
     return (
         <div className="min-h-screen flex flex-col relative">
-            <Navbar />
+            {!isAdminRoute && <Navbar />}
             <ScrollToTop />
             <main className="flex-grow">
                 <Routes>
