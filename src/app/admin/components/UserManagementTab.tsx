@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Search, ChevronDown, ChevronUp, Shield, User, Loader2, BookOpen, GraduationCap, Flame, Target, Settings2, Sparkles } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Shield, User, Users, Loader2, BookOpen, GraduationCap, Flame, Target, Settings2, Sparkles } from 'lucide-react';
 import UserDetailModal from './UserDetailModal';
 
 /**

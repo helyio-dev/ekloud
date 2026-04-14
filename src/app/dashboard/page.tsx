@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, BookOpen, CheckCircle, X, Sparkles, Lock, Trophy, Target, Database } from 'lucide-react';
+import { Loader2, BookOpen, CheckCircle, X, Sparkles, Lock, Trophy, Target } from 'lucide-react';
 import { addXp } from '@/lib/gamification';
 
 /**
