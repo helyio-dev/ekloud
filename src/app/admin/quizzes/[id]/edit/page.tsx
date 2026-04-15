@@ -147,7 +147,7 @@ export default function EditQuestionPage() {
                 <Settings size={600} />
             </div>
 
-            <div className="max-w-5xl mx-auto space-y-12 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <div className="max-w-7xl mx-auto space-y-12 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                 <Link
                     to={backUrl}
                     className="inline-flex items-center gap-4 text-[10px] font-black text-text-muted hover:text-accent uppercase tracking-[0.3em] transition-all group"
