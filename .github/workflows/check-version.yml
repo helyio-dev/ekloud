@@ -1,0 +1,32 @@
+name: Semver Check
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  check-format:
+    name: check-format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 
+
+      - name: Vérifier le message du dernier commit
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+          echo "Message détecté : $COMMIT_MSG"
+          
+          REGEX="^v[0-9]+\.[0-9]+\.[0-9]+$"
+          
+          if [[ $COMMIT_MSG =~ $REGEX ]]; then
+            echo "✅ Format valide !"
+          else
+            echo "❌ ERREUR : Le titre du push doit respecter strictement le format vMAJEUR.MINEUR.PATCH (ex: v2.4.1)"
+            echo "Exemple valide : v2.4.2"
+            exit 1
+          fi
