@@ -1,38 +1,162 @@
-# ===== Dependencies =====
-/node_modules
+# =============================================================================
+# EKLOUD — .gitignore
+# Vite + React + TypeScript + Supabase + pnpm
+# =============================================================================
 
-# ===== Build output =====
-/dist
 
-# ===== TypeScript build cache =====
-tsconfig.tsbuildinfo
-*.tsbuildinfo
+# =============================================================================
+# DEPENDENCIES
+# =============================================================================
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
 
-# ===== Environment & Secrets =====
+
+# =============================================================================
+# BUILD OUTPUT
+# =============================================================================
+dist/
+dist-ssr/
+build/
+out/
+
+
+# =============================================================================
+# ENVIRONMENT & SECRETS
+# Never commit API keys, tokens or secrets
+# =============================================================================
 .env
 .env.local
+.env.development
+.env.production
+.env.staging
 .env.*.local
+*.secret
+*.secrets
 
-# ===== Supabase =====
-supabase/.temp
-supabase/.branches
 
-/.gemini
+# =============================================================================
+# TYPESCRIPT
+# =============================================================================
+*.tsbuildinfo
+tsconfig.tsbuildinfo
 
-# ===== Logs =====
+
+# =============================================================================
+# VITE
+# =============================================================================
+vite.config.ts.timestamp-*
+vite.config.js.timestamp-*
+
+
+# =============================================================================
+# SUPABASE
+# =============================================================================
+supabase/.temp/
+supabase/.branches/
+supabase/functions/.env
+
+
+# =============================================================================
+# AI / LLM CONTEXT FILES
+# Local AI workspace files — not for version control
+# =============================================================================
+.gemini/
+.cursor/
+.aider*
+.claude/
+
+
+# =============================================================================
+# LOGS
+# =============================================================================
+logs/
 *.log
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# ===== OS artifacts =====
+
+# =============================================================================
+# CACHE & TEMP
+# =============================================================================
+.cache/
+.tmp/
+.temp/
+*.tmp
+*.temp
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.prettiercache
+
+
+# =============================================================================
+# COVERAGE & TESTING
+# =============================================================================
+coverage/
+*.lcov
+.nyc_output/
+playwright-report/
+test-results/
+
+
+# =============================================================================
+# OS ARTIFACTS
+# =============================================================================
+# macOS
 .DS_Store
-Thumbs.db
-Desktop.ini
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
 
-# ===== Editor artifacts =====
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+
+# =============================================================================
+# EDITOR & IDE
+# =============================================================================
+# VSCode (keep settings but ignore local-only files)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# JetBrains (IntelliJ, WebStorm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim / Neovim
 *.swp
 *.swo
-.idea/
-.vscode/
+*.swn
+Session.vim
+.netrwhist
+
+# Emacs
+*#
+.#*
+
+
+# =============================================================================
+# OPTIONAL: LOCALLY RESOLVED PACKAGES
+# =============================================================================
+package-lock.json
+yarn.lock

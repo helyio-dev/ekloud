@@ -1,10 +1,7 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
+import React, { createContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
 
-/**
- * structure du contexte d'authentification ekloud.
- */
 type AuthContextType = {
     user: User | null;
     session: Session | null;
@@ -32,15 +29,11 @@ export const AuthContext = createContext<AuthContextType>({
     streak: 0,
     username: null,
     clan: null,
-    signOut: async () => { },
+    signOut: async () => {},
     refreshSession: async () => null,
-    refreshProfile: async () => { },
+    refreshProfile: async () => {},
 });
 
-/**
- * fournisseur du contexte d'authentification.
- * gère la session utilisateur, les droits et les données de gamification.
- */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
@@ -53,32 +46,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [username, setUsername] = useState<string | null>(null);
     const [clan, setClan] = useState<string | null>(null);
 
-    // référence pour éviter les boucles infinies de récupération de profil
-    const lastFetchedIdRef = useRef<string | null>(null);
-    const isInitialMount = useRef(true);
+    const fetchedUidRef = useRef<string | null>(null);
+    const isSyncing = useRef(false);
 
-    /**
-     * récupère les informations de profil depuis la base de données.
-     * crée un profil par défaut si l'utilisateur est nouveau.
-     */
-    const fetchProfile = React.useCallback(async (userId: string, newUser?: any) => {
-        if (!userId) return;
-        
-        // si on a déjà chargé ce profil récemment, on évite le doublon
-        // sauf si on force le rafraîchissement
-        if (lastFetchedIdRef.current === userId && isInitialMount.current === false) return;
-        lastFetchedIdRef.current = userId;
-        isInitialMount.current = false;
-        
+    // Fetch profile via fetch() direct — bypasse tout problème du client Supabase JS
+    const fetchProfile = useCallback(async (userId: string, accessToken: string) => {
+        if (fetchedUidRef.current === userId) return;
+        fetchedUidRef.current = userId;
+
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('role, xp, level, streak, username, clan')
-                .eq('id', userId)
-                .single();
+            const url = `${import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '')}/rest/v1/profiles?id=eq.${userId}&select=role,xp,level,streak,username,clan&limit=1`;
+            const res = await fetch(url, {
+                headers: {
+                    'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Accept': 'application/json',
+                },
+            });
 
-            if (!error && data) {
-                // mise à jour des droits et statistiques utilisateur
+            if (!res.ok) {
+                console.error('[AUTH] fetchProfile error:', res.status);
+                return;
+            }
+
+            const rows = await res.json();
+            const data = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+
+            if (data) {
                 setIsAdmin(data.role === 'admin');
                 setIsContributor(data.role === 'contributor');
                 setXp(data.xp || 0);
@@ -86,46 +80,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setStreak(data.streak || 0);
                 setUsername(data.username || null);
                 setClan(data.clan || null);
-            } else if (error && (error.code === 'PGRST116' || error.message?.includes('no rows'))) {
-                // génération d'une identité visuelle par défaut
-                console.log('profil manquant, initialisation pour:', userId);
-                
-                const meta = newUser?.user_metadata;
-                const baseName = meta?.user_name || meta?.full_name || newUser?.email?.split('@')[0] || 'explorateur';
+            } else {
+                // Profil inexistant — créer un profil par défaut
+                const meta = (user as any)?.user_metadata;
+                const baseName = meta?.user_name || meta?.full_name || 'explorateur';
                 const finalName = `${baseName.toLowerCase().substring(0, 15)}_${Math.floor(Math.random() * 1000)}`;
 
-                const { data: newProfile, error: insertError } = await supabase
-                    .from('profiles')
-                    .insert([{ 
-                        id: userId, 
-                        username: finalName,
-                        xp: 0,
-                        level: 1,
-                        streak: 0,
-                        role: 'student'
-                    }])
-                    .select()
-                    .single();
-
-                if (!insertError && newProfile) {
-                    setIsAdmin(false);
-                    setIsContributor(false);
-                    setXp(0);
-                    setLevel(1);
-                    setStreak(0);
-                    setUsername(newProfile.username);
-                }
+                await fetch(`${import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '')}/rest/v1/profiles`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal',
+                    },
+                    body: JSON.stringify({ id: userId, username: finalName, xp: 0, level: 1, streak: 0, role: 'student' }),
+                });
+                setUsername(finalName);
             }
         } catch (err) {
-            console.error('erreur inattendue profile_fetch:', err);
+            console.error('[AUTH] fetchProfile error:', err);
         }
-    }, []);
-
-    // Lock pour syncSession
-    const isSyncing = useRef(false);
+    }, [user]);
 
     const resetState = useCallback(() => {
-        lastFetchedIdRef.current = null;
+        fetchedUidRef.current = null;
         setUser(null);
         setSession(null);
         setIsAdmin(false);
@@ -135,114 +114,90 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setStreak(0);
         setUsername(null);
         setClan(null);
-        localStorage.removeItem('ekloud_last_uid');
+        setIsLoading(false);
     }, []);
 
-    const syncSession = useCallback(async (currentSession: Session | null) => {
+    const syncSession = useCallback(async (s: Session) => {
         if (isSyncing.current) return;
         isSyncing.current = true;
-        
         try {
-            if (currentSession) {
-                setSession(currentSession);
-                setUser(currentSession.user);
-                
-                // Persistence Shield : On garde l'ID utilisateur en dehors de la session Supabase
-                // pour permettre une récupération si le cache est partiellement corrompu.
-                localStorage.setItem('ekloud_last_uid', currentSession.user.id);
-                
-                await fetchProfile(currentSession.user.id, currentSession.user);
-            } else {
-                // Tentative de récupération silensieuse si session absente
-                const lastUid = localStorage.getItem('ekloud_last_uid');
-                if (lastUid) {
-                    console.log('[AUTH] Tentative de récupération via Shield pour:', lastUid);
-                }
-                resetState();
-            }
+            setSession(s);
+            setUser(s.user);
+            await fetchProfile(s.user.id, s.access_token);
         } finally {
-            setIsLoading(false);
             isSyncing.current = false;
+            setIsLoading(false);
         }
-    }, [fetchProfile, resetState]);
+    }, [fetchProfile]);
+
+    const syncRef = useRef(syncSession);
+    const resetRef = useRef(resetState);
+    useEffect(() => { syncRef.current = syncSession; }, [syncSession]);
+    useEffect(() => { resetRef.current = resetState; }, [resetState]);
 
     useEffect(() => {
         let mounted = true;
 
-        const init = async () => {
-            try {
-                const { data: { session: initialSession }, error } = await supabase.auth.getSession();
-                if (error) {
-                    console.error('[AUTH] Erreur session au démarrage:', error);
-                    // On ne déconnecte pas forcément, on tente un refresh
-                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-                    if (refreshError) {
-                        console.warn('[AUTH] Récupération impossible. Nettoyage.');
-                        resetState();
-                    } else if (mounted) {
-                        await syncSession(refreshData.session);
-                    }
-                } else if (mounted) {
-                    await syncSession(initialSession);
-                }
-            } catch (err) {
-                console.error('[AUTH] Erreur critique init:', err);
-            } finally {
-                if (mounted) setIsLoading(false);
-            }
-        };
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-            console.log(`[AUTH] Event Flow: ${event}`);
-            
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-                if (mounted) await syncSession(currentSession);
-            } else if (event === 'SIGNED_OUT') {
-                if (mounted) resetState();
+        // 1. Récupérer la session existante immédiatement (synchrone depuis localStorage)
+        supabase.auth.getSession().then(({ data: { session: s } }) => {
+            if (!mounted) return;
+            if (s) {
+                syncRef.current(s);
+            } else {
+                resetRef.current();
             }
         });
 
-        init();
+        // 2. Écouter les changements d'état auth pour les événements futurs
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            async (event, s) => {
+                if (!mounted) return;
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                    if (s) await syncRef.current(s);
+                } else if (event === 'SIGNED_OUT') {
+                    resetRef.current();
+                }
+            }
+        );
+
+        // Failsafe : si après 10s isLoading est encore true, on débloque
+        const failsafe = setTimeout(() => {
+            if (mounted) {
+                console.warn('[AUTH] failsafe timeout');
+                resetRef.current();
+            }
+        }, 10000);
 
         return () => {
             mounted = false;
             subscription.unsubscribe();
+            clearTimeout(failsafe);
         };
-    }, [syncSession, resetState]);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // procédure de déconnexion globale
     const signOut = async () => {
-        setIsLoading(true);
-        try {
-            await supabase.auth.signOut();
-            resetState();
-        } finally {
-            setIsLoading(false);
-        }
+        await supabase.auth.signOut();
+        resetState();
     };
 
-    // rafraîchissement manuel de l'état de la session
     const refreshSession = async () => {
-        const { data: { session: currentSession }, error } = await supabase.auth.refreshSession();
-        if (!error && currentSession) {
-            await syncSession(currentSession);
-        }
-        return currentSession;
+        const { data: { session: s } } = await supabase.auth.refreshSession();
+        if (s) await syncSession(s);
+        return s;
     };
 
-    // rafraîchissement forcé des données de profil
     const refreshProfile = async () => {
-        if (user) {
-            // on force le rafraîchissement en bypassant la ref
-            lastFetchedIdRef.current = null;
-            await fetchProfile(user.id);
+        if (session) {
+            fetchedUidRef.current = null;
+            await fetchProfile(session.user.id, session.access_token);
         }
     };
 
     return (
         <AuthContext.Provider value={{
-            user, session, isAdmin, isContributor, isLoading, xp, level, streak, username, clan,
-            signOut, refreshSession, refreshProfile
+            user, session, isAdmin, isContributor, isLoading,
+            xp, level, streak, username, clan,
+            signOut, refreshSession, refreshProfile,
         }}>
             {children}
         </AuthContext.Provider>

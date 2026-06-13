@@ -12,8 +12,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         persistSession: true,
         autoRefreshToken: true,
+        // detectSessionInUrl doit rester true (valeur par défaut) pour que Supabase
+        // puisse parser le token depuis l'URL lors du callback OAuth/PKCE
         detectSessionInUrl: true,
-        storageKey: 'ekloud-auth-token', // clé unique pour éviter les collisions
         storage: window.localStorage
     }
 });
+
+// Expose pour debug rapide en dev
+if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.supabase = supabase;
+}
