@@ -2,11 +2,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { BookOpen, CheckCircle, Lock as LockIcon, Loader2, Award, ChevronRight, ChevronDown } from 'lucide-react';
+import { BookOpen, CheckCircle, Lock, Loader2, Search, ChevronRight, Flame, Trophy, Zap } from 'lucide-react';
 
 type Module = {
     id: string;
-    name?: string; // certains modules pourraient utiliser name au lieu de title dans d'autres contextes, mais on garde title par cohérence
     title: string;
     description: string;
     category: string;
@@ -21,14 +20,21 @@ type UserModule = {
     completed: boolean;
 };
 
+const DIFFICULTY_CONFIG = {
+    Découverte:   { color: 'text-sky-400',     bg: 'bg-sky-400/10',     border: 'border-sky-400/20',     dot: 'bg-sky-400',     label: 'Débutant' },
+    Fondamentaux: { color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', dot: 'bg-emerald-400', label: 'Intermédiaire' },
+    Avancé:       { color: 'text-amber-400',   bg: 'bg-amber-400/10',   border: 'border-amber-400/20',   dot: 'bg-amber-400',   label: 'Avancé' },
+    Expert:       { color: 'text-rose-400',    bg: 'bg-rose-400/10',    border: 'border-rose-400/20',    dot: 'bg-rose-400',    label: 'Expert' },
+};
+
 export default function CoursesPage() {
     const { user, isLoading: authLoading } = useAuth();
     const [modules, setModules] = useState<Module[]>([]);
     const [userModules, setUserModules] = useState<Record<string, UserModule>>({});
+    const [lessonCounts, setLessonCounts] = useState<Record<string, number>>({});
     const [isLoading, setIsLoading] = useState(true);
-    const [filterCategory, setFilterCategory] = useState<string>('all');
-    const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
-    const [isDifficultyOpen, setIsDifficultyOpen] = useState(false);
+    const [filterCategory, setFilterCategory] = useState('all');
+    const [filterDifficulty, setFilterDifficulty] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
@@ -41,231 +47,248 @@ export default function CoursesPage() {
             if (!user) return;
             setIsLoading(true);
             try {
-                const [
-                    { data: modData },
-                    { data: userModData }
-                ] = await Promise.all([
+                const [{ data: modData }, { data: userModData }, { data: lessonData }] = await Promise.all([
                     supabase.from('modules').select('*').order('order_index', { ascending: true }),
-                    supabase.from('user_modules').select('*').eq('user_id', user.id)
+                    supabase.from('user_modules').select('*').eq('user_id', user.id),
+                    supabase.from('lessons').select('module_id'),
                 ]);
 
                 setModules(modData || []);
+
                 const userModMap: Record<string, UserModule> = {};
                 userModData?.forEach(um => { userModMap[um.module_id] = um; });
                 setUserModules(userModMap);
+
+                const counts: Record<string, number> = {};
+                lessonData?.forEach(l => { counts[l.module_id] = (counts[l.module_id] || 0) + 1; });
+                setLessonCounts(counts);
             } catch (err) {
-                console.error("Courses fetchData error:", err);
+                console.error('Courses fetch error:', err);
             } finally {
                 setIsLoading(false);
             }
         }
-
         if (!authLoading && user) fetchData();
-
-        const channel = supabase
-            .channel('courses-updates')
-            .on('postgres_changes', { 
-                event: '*', 
-                schema: 'public', 
-                table: 'user_modules', 
-                filter: `user_id=eq.${user?.id}` 
-            }, () => fetchData())
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
     }, [user?.id, authLoading]);
 
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
-            if (!target.closest('.difficulty-dropdown')) {
-                setIsDifficultyOpen(false);
-            }
-        };
-
-        if (isDifficultyOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isDifficultyOpen]);
-
-    const categories = Array.from(new Set(modules.map(m => m.category))).sort();
+    const categories = Array.from(new Set(modules.map(m => m.category).filter(Boolean))).sort();
     const difficulties = ['Découverte', 'Fondamentaux', 'Avancé', 'Expert'];
 
-    const filteredModules = modules.filter(mod => {
-        const matchesCategory = filterCategory === 'all' || mod.category === filterCategory;
-        const matchesDifficulty = filterDifficulty === 'all' || mod.difficulty === filterDifficulty;
-        const matchesSearch = mod.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              mod.description.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesDifficulty && matchesSearch;
+    const filtered = modules.filter(m => {
+        const matchCat  = filterCategory === 'all' || m.category === filterCategory;
+        const matchDiff = filterDifficulty === 'all' || m.difficulty === filterDifficulty;
+        const matchQ    = !searchQuery || m.title.toLowerCase().includes(searchQuery.toLowerCase()) || m.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchCat && matchDiff && matchQ;
     });
 
-    return (
-        <div className="min-h-screen bg-background text-text p-6 md:p-12">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-black mb-2 uppercase tracking-tight">Catalogue des Cours</h1>
-                        <p className="text-text-muted text-lg text-balance">Maîtrisez les technologies de demain avec nos parcours guidés.</p>
-                    </div>
-                </div>
+    const completedCount = modules.filter(m => userModules[m.id]?.completed).length;
+    const inProgressCount = modules.filter(m => userModules[m.id]?.unlocked && !userModules[m.id]?.completed).length;
 
-                <div className="mb-10 space-y-6">
-                    {/* ligne de recherche et difficulté */}
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1 group">
-                            <input 
-                                type="text"
-                                placeholder="Rechercher un cours..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-surface border border-border rounded-2xl outline-none focus:border-accent/50 focus:bg-surface-hover transition-all font-medium text-text placeholder:text-text-muted/50"
-                            />
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-accent transition-colors">
-                                <BookOpen size={20} />
+    return (
+        <div className="min-h-screen bg-background text-text font-sans">
+
+            {/* ── Hero ── */}
+            <div className="relative border-b border-border/40 bg-surface/30">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-purple-500/5 pointer-events-none" />
+                <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 relative">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-accent mb-3">catalogue</p>
+                            <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-3">
+                                Tous les cours
+                            </h1>
+                            <p className="text-text-muted text-lg max-w-xl">
+                                Maîtrisez les technologies cloud, DevOps et infrastructure avec des parcours structurés.
+                            </p>
+                        </div>
+
+                        {/* stats personnelles */}
+                        <div className="flex items-center gap-4 shrink-0">
+                            <div className="flex flex-col items-center px-6 py-4 bg-background border border-border/60 rounded-2xl">
+                                <div className="flex items-center gap-2 text-emerald-400 mb-1">
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span className="text-2xl font-black">{completedCount}</span>
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-text-muted">terminés</span>
+                            </div>
+                            <div className="flex flex-col items-center px-6 py-4 bg-background border border-border/60 rounded-2xl">
+                                <div className="flex items-center gap-2 text-accent mb-1">
+                                    <Zap className="w-4 h-4" />
+                                    <span className="text-2xl font-black">{inProgressCount}</span>
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-text-muted">en cours</span>
+                            </div>
+                            <div className="flex flex-col items-center px-6 py-4 bg-background border border-border/60 rounded-2xl">
+                                <div className="flex items-center gap-2 text-text-muted mb-1">
+                                    <BookOpen className="w-4 h-4" />
+                                    <span className="text-2xl font-black">{modules.length}</span>
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-text-muted">total</span>
                             </div>
                         </div>
-                        
-                        <div className="relative min-w-[240px] difficulty-dropdown">
-                            <button 
-                                onClick={() => setIsDifficultyOpen(!isDifficultyOpen)}
-                                className={`w-full pl-6 pr-12 py-4 bg-surface border rounded-2xl outline-none transition-all font-bold text-left text-sm flex items-center justify-between group
-                                    ${isDifficultyOpen ? 'border-accent/50 bg-surface-hover' : 'border-border'}`}
-                            >
-                                <span className={filterDifficulty === 'all' ? 'text-text-muted/50' : 'text-text'}>
-                                    {filterDifficulty === 'all' ? 'Toutes les difficultés' : filterDifficulty}
-                                </span>
-                                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isDifficultyOpen ? 'rotate-180 text-accent' : 'text-text-muted'}`} />
-                            </button>
+                    </div>
+                </div>
+            </div>
 
-                            {isDifficultyOpen && (
-                                <div className="absolute top-full left-0 right-0 mt-2 p-2 bg-surface border border-border rounded-2xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
-                                    <button
-                                        onClick={() => { setFilterDifficulty('all'); setIsDifficultyOpen(false); }}
-                                        className={`w-full px-4 py-3 rounded-xl text-left text-sm font-bold transition-colors mb-1
-                                            ${filterDifficulty === 'all' ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-surface-hover hover:text-text'}`}
-                                    >
-                                        Toutes les difficultés
-                                    </button>
-                                    {difficulties.map(d => (
-                                        <button
-                                            key={d}
-                                            onClick={() => { setFilterDifficulty(d); setIsDifficultyOpen(false); }}
-                                            className={`w-full px-4 py-3 rounded-xl text-left text-sm font-bold transition-colors mb-1
-                                                ${filterDifficulty === d ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-surface-hover hover:text-text'}`}
-                                        >
-                                            {d}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+            <div className="max-w-7xl mx-auto px-6 py-10">
+
+                {/* ── Filtres ── */}
+                <div className="flex flex-col gap-4 mb-10">
+                    {/* recherche */}
+                    <div className="relative group max-w-xl">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-accent transition-colors" />
+                        <input
+                            type="text"
+                            placeholder="Rechercher un cours..."
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3.5 bg-surface border border-border/80 rounded-2xl outline-none focus:border-accent/40 transition-all text-text placeholder:text-text-muted/50 font-medium"
+                        />
                     </div>
 
-                    {/* ligne de catégorie */}
-                    <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar pb-2">
-                        <button
-                            onClick={() => setFilterCategory('all')}
-                            className={`px-5 py-2.5 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all border
-                                ${filterCategory === 'all' 
-                                    ? 'bg-accent text-white border-accent shadow-[0_0_20px_rgba(66,202,237,0.3)]' 
-                                    : 'bg-surface border-border text-text-muted hover:text-text hover:bg-surface-hover'}`}
-                        >
-                            Tous
-                        </button>
-                        {categories.map(cat => (
+                    {/* catégories */}
+                    <div className="flex flex-wrap gap-2">
+                        {['all', ...categories].map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setFilterCategory(cat)}
-                                className={`px-5 py-2.5 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all border whitespace-nowrap
-                                    ${filterCategory === cat 
-                                        ? 'bg-accent text-white border-accent shadow-[0_0_20px_rgba(66,202,237,0.3)]' 
-                                        : 'bg-surface border-border text-text-muted hover:text-text hover:bg-surface-hover'}`}
+                                className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
+                                    filterCategory === cat
+                                        ? 'bg-accent text-white border-accent shadow-lg shadow-accent/20'
+                                        : 'bg-surface border-border text-text-muted hover:text-text hover:border-accent/30'
+                                }`}
                             >
-                                {cat}
+                                {cat === 'all' ? 'Tous' : cat}
                             </button>
                         ))}
+                        <div className="w-px h-8 bg-border/40 mx-1 self-center" />
+                        {difficulties.map(d => {
+                            const conf = DIFFICULTY_CONFIG[d as keyof typeof DIFFICULTY_CONFIG];
+                            return (
+                                <button
+                                    key={d}
+                                    onClick={() => setFilterDifficulty(filterDifficulty === d ? 'all' : d)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
+                                        filterDifficulty === d
+                                            ? `${conf.bg} ${conf.color} ${conf.border}`
+                                            : 'bg-surface border-border text-text-muted hover:text-text hover:border-border/60'
+                                    }`}
+                                >
+                                    <span className={`w-1.5 h-1.5 rounded-full ${conf.dot}`} />
+                                    {conf.label}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
+                {/* ── Grille ── */}
                 {isLoading ? (
-                    <div className="flex justify-center py-20">
-                        <Loader2 className="w-10 h-10 text-accent animate-spin" />
+                    <div className="flex justify-center py-24">
+                        <Loader2 className="w-10 h-10 text-accent animate-spin opacity-40" />
+                    </div>
+                ) : filtered.length === 0 ? (
+                    <div className="text-center py-24 bg-surface/20 rounded-3xl border border-dashed border-border">
+                        <Trophy className="w-12 h-12 text-text-muted/20 mx-auto mb-4" />
+                        <p className="text-text-muted font-medium">Aucun cours ne correspond à ta recherche.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredModules.map((mod, index) => {
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filtered.map(mod => {
                             const userMod = userModules[mod.id];
-                            const isUnlocked = userMod?.unlocked || !mod.prerequisite_id;
-                            const isCompleted = userMod?.completed;
-
-                            const difficultyColors = {
-                                'Découverte': 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-                                'Fondamentaux': 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-                                'Avancé': 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-                                'Expert': 'text-rose-400 bg-rose-400/10 border-rose-400/20'
-                            };
+                            const isCompleted = !!userMod?.completed;
+                            const isUnlocked = !!userMod?.unlocked || !mod.prerequisite_id;
+                            const isInProgress = isUnlocked && !isCompleted && !!userMod;
+                            const lessonCount = lessonCounts[mod.id] || 0;
+                            const conf = DIFFICULTY_CONFIG[mod.difficulty] || DIFFICULTY_CONFIG['Découverte'];
 
                             return (
                                 <Link
                                     key={mod.id}
                                     to={isUnlocked ? `/modules/${mod.id}` : '#'}
-                                    className={`group p-6 rounded-3xl border transition-all duration-300 relative overflow-hidden flex flex-col ${isUnlocked
-                                            ? 'bg-surface/50 border-border hover:border-accent/40 hover:bg-surface/80 hover:translate-y-[-4px]'
-                                            : 'bg-surface/10 border-border opacity-60 cursor-not-allowed'
-                                        }`}
+                                    className={`group flex flex-col rounded-3xl border overflow-hidden transition-all duration-300 ${
+                                        isUnlocked
+                                            ? 'bg-surface border-border hover:border-accent/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5'
+                                            : 'bg-surface/40 border-border/40 opacity-60 cursor-not-allowed'
+                                    }`}
                                 >
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className={`p-3 rounded-2xl bg-background border border-border ${isUnlocked ? 'text-accent' : 'text-text-muted'}`}>
-                                            <BookOpen className="w-6 h-6" />
+                                    {/* bande de couleur en haut selon difficulté */}
+                                    <div className={`h-1.5 w-full ${conf.dot} ${!isUnlocked ? 'opacity-30' : ''}`} />
+
+                                    <div className="flex flex-col flex-1 p-6 gap-4">
+                                        {/* header */}
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className={`p-3 rounded-2xl border ${conf.bg} ${conf.border}`}>
+                                                <BookOpen className={`w-5 h-5 ${conf.color}`} />
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {isCompleted && (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-wider">
+                                                        <CheckCircle className="w-3 h-3" /> Terminé
+                                                    </div>
+                                                )}
+                                                {isInProgress && (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-[9px] font-black uppercase tracking-wider">
+                                                        <Flame className="w-3 h-3" /> En cours
+                                                    </div>
+                                                )}
+                                                {!isUnlocked && <Lock className="w-4 h-4 text-text-muted/60" />}
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col items-end gap-2">
-                                            {isCompleted && (
-                                                <div className="flex items-center gap-1.5 text-green-400 text-[9px] font-black bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20 uppercase tracking-wider">
-                                                    <CheckCircle className="w-3 h-3" />
-                                                    Complété
+
+                                        {/* titre + description */}
+                                        <div className="flex-1">
+                                            <h3 className={`font-black text-lg leading-tight mb-2 transition-colors ${isUnlocked ? 'group-hover:text-accent' : ''}`}>
+                                                {mod.title}
+                                            </h3>
+                                            <p className="text-text-muted text-sm leading-relaxed line-clamp-2">
+                                                {mod.description}
+                                            </p>
+                                        </div>
+
+                                        {/* métadonnées */}
+                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-text-muted/60">
+                                            <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${conf.bg} ${conf.color} ${conf.border}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${conf.dot}`} />
+                                                {conf.label}
+                                            </span>
+                                            {lessonCount > 0 && (
+                                                <span>{lessonCount} leçon{lessonCount > 1 ? 's' : ''}</span>
+                                            )}
+                                            {mod.category && (
+                                                <span className="truncate">{mod.category}</span>
+                                            )}
+                                        </div>
+
+                                        {/* footer */}
+                                        <div className="pt-4 border-t border-border/40 flex items-center justify-between">
+                                            {isCompleted ? (
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                                                    Module maîtrisé ✓
+                                                </span>
+                                            ) : isInProgress ? (
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-accent">
+                                                    Continuer →
+                                                </span>
+                                            ) : isUnlocked ? (
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                                    Commencer
+                                                </span>
+                                            ) : (
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/40">
+                                                    Verrouillé
+                                                </span>
+                                            )}
+                                            {isUnlocked && (
+                                                <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all">
+                                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                                                 </div>
                                             )}
-                                            {!isUnlocked && <LockIcon className="w-4 h-4 text-text-muted" />}
-                                            <div className={`px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-wider ${difficultyColors[mod.difficulty] || 'text-text-muted border-border bg-surface-hover'}`}>
-                                                {mod.difficulty || 'Non défini'}
-                                            </div>
                                         </div>
-                                    </div>
-
-                                    <h3 className="text-xl font-bold mb-2 group-hover:text-accent transition-colors leading-tight">{mod.title}</h3>
-                                    <p className="text-text-muted text-sm mb-8 line-clamp-2 flex-grow leading-relaxed">{mod.description}</p>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black text-accent/60 uppercase tracking-widest">Domaine</span>
-                                            <span className="text-xs font-black text-text/90 tracking-widest uppercase">
-                                                {mod.category || 'GÉNÉRAL'}
-                                            </span>
-                                        </div>
-                                        {isUnlocked ? (
-                                            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all">
-                                                <ChevronRight className="w-5 h-5" />
-                                            </div>
-                                        ) : (
-                                            <div className="text-[10px] font-black text-text-muted uppercase tracking-wider">Verrouillé</div>
-                                        )}
                                     </div>
                                 </Link>
                             );
                         })}
-                    </div>
-                )}
-
-                {!isLoading && modules.length === 0 && (
-                    <div className="text-center py-20 bg-surface/20 rounded-3xl border border-dashed border-border">
-                        <Award className="w-12 h-12 text-text-muted mx-auto mb-4" />
-                        <p className="text-text-muted italic">Aucun cours disponible pour le moment.</p>
                     </div>
                 )}
             </div>

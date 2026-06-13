@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState, useRef, useCallback } from 'react';
+import { createContext, useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
 
@@ -46,26 +46,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [username, setUsername] = useState<string | null>(null);
     const [clan, setClan] = useState<string | null>(null);
 
+    // uid du dernier profil chargé — évite les double-fetch
     const fetchedUidRef = useRef<string | null>(null);
-    const isSyncing = useRef(false);
+    // indique si l'init() a terminé — onAuthStateChange attend ça avant d'agir
+    const initDoneRef = useRef(false);
+    // session courante en ref pour ne pas avoir de dépendances cycliques
+    const sessionRef = useRef<Session | null>(null);
 
-    // Fetch profile via fetch() direct — bypasse tout problème du client Supabase JS
+    // ── fetchProfile via fetch() direct (bypasse le client Supabase JS + RLS récursion) ──
     const fetchProfile = useCallback(async (userId: string, accessToken: string) => {
-        if (fetchedUidRef.current === userId) return;
-        fetchedUidRef.current = userId;
-
         try {
-            const url = `${import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '')}/rest/v1/profiles?id=eq.${userId}&select=role,xp,level,streak,username,clan&limit=1`;
-            const res = await fetch(url, {
-                headers: {
-                    'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Accept': 'application/json',
-                },
-            });
+            const base = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
+            const res = await fetch(
+                `${base}/rest/v1/profiles?id=eq.${userId}&select=role,xp,level,streak,username,clan&limit=1`,
+                {
+                    headers: {
+                        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+                        Authorization: `Bearer ${accessToken}`,
+                        Accept: 'application/json',
+                    },
+                }
+            );
 
             if (!res.ok) {
-                console.error('[AUTH] fetchProfile error:', res.status);
+                console.error('[AUTH] fetchProfile HTTP', res.status);
                 return;
             }
 
@@ -81,18 +85,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setUsername(data.username || null);
                 setClan(data.clan || null);
             } else {
-                // Profil inexistant — créer un profil par défaut
-                const meta = (user as any)?.user_metadata;
+                // nouveau compte sans profil — en créer un
+                const meta = sessionRef.current?.user?.user_metadata;
                 const baseName = meta?.user_name || meta?.full_name || 'explorateur';
                 const finalName = `${baseName.toLowerCase().substring(0, 15)}_${Math.floor(Math.random() * 1000)}`;
 
-                await fetch(`${import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '')}/rest/v1/profiles`, {
+                await fetch(`${base}/rest/v1/profiles`, {
                     method: 'POST',
                     headers: {
-                        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${accessToken}`,
+                        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+                        Authorization: `Bearer ${accessToken}`,
                         'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal',
+                        Prefer: 'return=minimal',
                     },
                     body: JSON.stringify({ id: userId, username: finalName, xp: 0, level: 1, streak: 0, role: 'student' }),
                 });
@@ -101,10 +105,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } catch (err) {
             console.error('[AUTH] fetchProfile error:', err);
         }
-    }, [user]);
+    }, []);
 
+    // ── resetState : tout remettre à zéro ──
     const resetState = useCallback(() => {
         fetchedUidRef.current = null;
+        sessionRef.current = null;
         setUser(null);
         setSession(null);
         setIsAdmin(false);
@@ -117,56 +123,61 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(false);
     }, []);
 
-    const syncSession = useCallback(async (s: Session) => {
-        if (isSyncing.current) return;
-        isSyncing.current = true;
-        try {
-            setSession(s);
-            setUser(s.user);
-            await fetchProfile(s.user.id, s.access_token);
-        } finally {
-            isSyncing.current = false;
-            setIsLoading(false);
-        }
-    }, [fetchProfile]);
+    // ── applySession : applique une session et charge le profil si besoin ──
+    const applySession = useCallback(async (s: Session) => {
+        sessionRef.current = s;
+        setSession(s);
+        setUser(s.user);
 
-    const syncRef = useRef(syncSession);
-    const resetRef = useRef(resetState);
-    useEffect(() => { syncRef.current = syncSession; }, [syncSession]);
-    useEffect(() => { resetRef.current = resetState; }, [resetState]);
+        // ne recharge le profil que si l'uid a changé
+        if (fetchedUidRef.current !== s.user.id) {
+            fetchedUidRef.current = s.user.id;
+            await fetchProfile(s.user.id, s.access_token);
+        }
+
+        setIsLoading(false);
+    }, [fetchProfile]);
 
     useEffect(() => {
         let mounted = true;
 
-        // 1. Récupérer la session existante immédiatement (synchrone depuis localStorage)
-        supabase.auth.getSession().then(({ data: { session: s } }) => {
+        // ── init : source de vérité au démarrage ──
+        const init = async () => {
+            const { data: { session: s } } = await supabase.auth.getSession();
             if (!mounted) return;
+
             if (s) {
-                syncRef.current(s);
+                await applySession(s);
             } else {
-                resetRef.current();
+                resetState();
+            }
+            initDoneRef.current = true;
+        };
+
+        // ── onAuthStateChange : gère uniquement les événements POST-init ──
+        // On ignore tout ce qui arrive avant la fin de init() pour éviter
+        // que INITIAL_SESSION ou un SIGNED_IN parasite n'écrase l'état.
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, s) => {
+            if (!mounted) return;
+            if (!initDoneRef.current) return; // init() n'a pas encore fini
+
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                if (s) await applySession(s);
+            } else if (event === 'SIGNED_OUT') {
+                resetState();
             }
         });
 
-        // 2. Écouter les changements d'état auth pour les événements futurs
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (event, s) => {
-                if (!mounted) return;
-                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-                    if (s) await syncRef.current(s);
-                } else if (event === 'SIGNED_OUT') {
-                    resetRef.current();
-                }
-            }
-        );
+        init();
 
-        // Failsafe : si après 10s isLoading est encore true, on débloque
+        // failsafe : débloquer l'UI au bout de 8s quoi qu'il arrive
         const failsafe = setTimeout(() => {
-            if (mounted) {
-                console.warn('[AUTH] failsafe timeout');
-                resetRef.current();
+            if (mounted && initDoneRef.current === false) {
+                console.warn('[AUTH] failsafe triggered');
+                resetState();
+                initDoneRef.current = true;
             }
-        }, 10000);
+        }, 8000);
 
         return () => {
             mounted = false;
@@ -175,6 +186,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // ── API publique ──
     const signOut = async () => {
         await supabase.auth.signOut();
         resetState();
@@ -182,14 +194,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const refreshSession = async () => {
         const { data: { session: s } } = await supabase.auth.refreshSession();
-        if (s) await syncSession(s);
+        if (s) await applySession(s);
         return s;
     };
 
     const refreshProfile = async () => {
-        if (session) {
+        if (sessionRef.current) {
             fetchedUidRef.current = null;
-            await fetchProfile(session.user.id, session.access_token);
+            await fetchProfile(sessionRef.current.user.id, sessionRef.current.access_token);
         }
     };
 

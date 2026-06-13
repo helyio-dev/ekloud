@@ -1,34 +1,142 @@
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useRef, useMemo, memo, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Loader2, AlertCircle, Info, Lightbulb, AlertTriangle, Sparkles } from 'lucide-react';
+import { ChevronRight, Loader2, AlertCircle, Info, Lightbulb, AlertTriangle, Sparkles } from 'lucide-react';
 import { addXp, XP_REWARDS } from '@/lib/gamification';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
-import { parseShortcodes } from '@/lib/shortcodes';
+import { splitContentSegments } from '@/lib/shortcodes';
+import InlineQuiz from '@/components/InlineQuiz';
 
-/**
- * structure d'une leçon ekloud.
- */
 type Lesson = {
     id: string;
     module_id: string;
     title: string;
     content: string;
     order_index: number;
-    module?: {
-        difficulty: string;
-    };
+    module?: { difficulty: string };
 };
 
-/**
- * page de visualisation d'une leçon individuelle.
- * moteur de rendu markdown enrichi avec support de shortcodes et alertes callout.
- * gère l'attribution dynamique d'xp basées sur la difficulté du module parent.
- */
+// Composants ReactMarkdown stables (définis en dehors pour éviter le remontage)
+const MD_COMPONENTS = {
+    blockquote: ({ children }: any) => {
+        const alertTypes: Record<string, { color: string; bg: string; border: string; icon: React.ReactNode }> = {
+            IMPORTANT: { color: 'text-rose-400',   bg: 'bg-rose-500/5',    border: 'border-rose-500/20',    icon: <AlertCircle className="w-6 h-6" /> },
+            NOTE:      { color: 'text-blue-400',    bg: 'bg-blue-500/5',    border: 'border-blue-500/20',    icon: <Info className="w-6 h-6" /> },
+            TIP:       { color: 'text-emerald-400', bg: 'bg-emerald-500/5', border: 'border-emerald-500/20', icon: <Lightbulb className="w-6 h-6" /> },
+            WARNING:   { color: 'text-amber-400',   bg: 'bg-amber-500/5',   border: 'border-amber-500/20',   icon: <AlertTriangle className="w-6 h-6" /> },
+            CAUTION:   { color: 'text-rose-400',    bg: 'bg-rose-500/5',    border: 'border-rose-500/20',    icon: <AlertCircle className="w-6 h-6" /> },
+        };
+        const getText = (n: any): string => {
+            if (!n) return '';
+            if (typeof n === 'string') return n;
+            if (Array.isArray(n)) return n.map(getText).join(' ');
+            if (n.props?.children) return getText(n.props.children);
+            return '';
+        };
+        const fullText = getText(children).trim();
+        const match = fullText.match(/\[!(IMPORTANT|NOTE|TIP|WARNING|CAUTION)\]/i);
+        if (match && fullText.indexOf(match[0]) < 5) {
+            const type = match[1].toUpperCase() as keyof typeof alertTypes;
+            const config = alertTypes[type];
+            const clean = (n: any): any => {
+                if (!n) return n;
+                if (typeof n === 'string') return n.replace(/^(\s*)\[!(IMPORTANT|NOTE|TIP|WARNING|CAUTION)\](\s*)/i, '$1');
+                if (Array.isArray(n)) return n.map(clean);
+                if (n?.props?.children) return { ...n, props: { ...n.props, children: clean(n.props.children) } };
+                return n;
+            };
+            return (
+                <div className={`my-8 p-6 md:p-8 rounded-2xl border ${config.border} ${config.bg} relative overflow-hidden`}>
+                    <div className={`flex items-center gap-3 mb-3 font-black text-xs uppercase tracking-[0.3em] ${config.color}`}>
+                        {config.icon}
+                        {type}
+                    </div>
+                    <div className="text-text/90 text-base md:text-lg leading-relaxed relative z-10">{clean(children)}</div>
+                </div>
+            );
+        }
+        return <blockquote className="border-l-4 border-accent/30 pl-6 my-6 italic text-text-muted text-lg leading-relaxed">{children}</blockquote>;
+    },
+    code: ({ className, children, ...props }: any) => (
+        <code className={`${className ?? ''} bg-surface-hover/50 px-2 py-1 rounded-lg text-accent`} {...props}>{children}</code>
+    ),
+};
+
+// =============================================================================
+// LessonContent — rendu stable du contenu + quizzes
+// =============================================================================
+interface LessonContentProps {
+    content: string;
+    contentRef: React.RefObject<HTMLDivElement>;
+    onQuizCountChange: (total: number) => void;
+    onAllAnswered: (done: boolean) => void;
+}
+
+const LessonContent = memo(({ content, contentRef, onQuizCountChange, onAllAnswered }: LessonContentProps) => {
+    const segments = useMemo(() => {
+        if (!content) return [];
+        const normalized = content
+            .replace(/^> ?\[!(IMPORTANT|NOTE|TIP|WARNING|CAUTION)\]\r?\n>\r?\n/gim, '> [!$1]\n> ')
+            .replace(/^> ?\[!/gim, '> [!');
+        return splitContentSegments(normalized);
+    }, [content]);
+
+    const quizSegments = useMemo(() => segments.filter(s => s.type === 'quiz'), [segments]);
+    const [answeredSet, setAnsweredSet] = useState<Set<string>>(new Set());
+
+    // notifier le parent du nombre de quizzes
+    useEffect(() => {
+        onQuizCountChange(quizSegments.length);
+        setAnsweredSet(new Set()); // reset quand le contenu change
+    }, [quizSegments.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const handleAnswered = useCallback((quizId: string) => {
+        setAnsweredSet(prev => {
+            const next = new Set(prev).add(quizId);
+            onAllAnswered(next.size >= quizSegments.length);
+            return next;
+        });
+    }, [quizSegments.length, onAllAnswered]);
+
+    return (
+        <div ref={contentRef} className="text-text/85 text-base md:text-lg leading-relaxed font-normal">
+            {segments.map((seg, i) => {
+                if (seg.type === 'markdown') {
+                    return (
+                        <ReactMarkdown
+                            key={i}
+                            remarkPlugins={[remarkGfm, remarkBreaks]}
+                            rehypePlugins={[rehypeRaw]}
+                            components={MD_COMPONENTS}
+                        >
+                            {seg.content}
+                        </ReactMarkdown>
+                    );
+                }
+                return (
+                    <InlineQuiz
+                        key={seg.data.id}
+                        question={seg.data.question}
+                        options={seg.data.options}
+                        correctIndex={seg.data.correctIndex}
+                        explanation={seg.data.explanation}
+                        onAnswered={() => handleAnswered(seg.data.id)}
+                    />
+                );
+            })}
+        </div>
+    );
+});
+
+LessonContent.displayName = 'LessonContent';
+
+// =============================================================================
+// LessonPage
+// =============================================================================
 export default function LessonPage() {
     const { id } = useParams();
     const { user, isLoading: authLoading, xp, streak } = useAuth();
@@ -37,107 +145,95 @@ export default function LessonPage() {
     const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isCompleting, setIsCompleting] = useState(false);
+    const [quizTotal, setQuizTotal] = useState(0);
+    const [allAnswered, setAllAnswered] = useState(true);
+
+    const [activeSection, setActiveSection] = useState(0);
+    const sectionRefs = useRef<HTMLElement[]>([]);
+    const contentRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
-    // redirection si session inexistante
+    const handleQuizCountChange = useCallback((total: number) => {
+        setQuizTotal(total);
+        setAllAnswered(total === 0);
+    }, []);
+
     useEffect(() => {
         if (!authLoading && !user) navigate('/login');
     }, [user, authLoading, navigate]);
 
-    /**
-     * récupère les données de la leçon actuelle et identifie la suivante dans l'ordre logique.
-     */
     useEffect(() => {
         async function fetchLessonData() {
             if (!user || !id) return;
             setIsLoading(true);
-
             try {
                 const { data: currentLesson } = await supabase
-                    .from('lessons')
-                    .select('*, module:modules(difficulty)')
-                    .eq('id', id)
-                    .single();
-
+                    .from('lessons').select('*, module:modules(difficulty)').eq('id', id).single();
                 if (currentLesson) {
                     setLesson(currentLesson);
-                    
-                    // recherche de la leçon suivante dans le même module
-                    const { data: nextLesson } = await supabase
-                        .from('lessons')
-                        .select('id')
-                        .eq('module_id', currentLesson.module_id)
-                        .gt('order_index', currentLesson.order_index)
-                        .order('order_index', { ascending: true })
-                        .limit(1);
-
-                    setNextLessonId(nextLesson && nextLesson.length > 0 ? nextLesson[0].id : null);
-
-                    // recherche de la leçon précédente dans le même module
-                    const { data: prevLesson } = await supabase
-                        .from('lessons')
-                        .select('id')
-                        .eq('module_id', currentLesson.module_id)
-                        .lt('order_index', currentLesson.order_index)
-                        .order('order_index', { ascending: false })
-                        .limit(1);
-
-                    setPrevLessonId(prevLesson && prevLesson.length > 0 ? prevLesson[0].id : null);
+                    const { data: next } = await supabase.from('lessons').select('id')
+                        .eq('module_id', currentLesson.module_id).gt('order_index', currentLesson.order_index)
+                        .order('order_index', { ascending: true }).limit(1);
+                    setNextLessonId(next?.[0]?.id ?? null);
+                    const { data: prev } = await supabase.from('lessons').select('id')
+                        .eq('module_id', currentLesson.module_id).lt('order_index', currentLesson.order_index)
+                        .order('order_index', { ascending: false }).limit(1);
+                    setPrevLessonId(prev?.[0]?.id ?? null);
                 }
             } catch (err) {
-                console.error("erreur de récupération de la leçon:", err);
+                console.error('erreur leçon:', err);
             } finally {
                 setIsLoading(false);
             }
         }
-
         fetchLessonData();
     }, [user?.id, id]);
 
-    /**
-     * valide la complétion de la leçon et attribue les récompenses xp.
-     */
+    useEffect(() => {
+        setActiveSection(0);
+        sectionRefs.current = [];
+    }, [id]);
+
+    useEffect(() => {
+        if (!contentRef.current) return;
+        const headings = Array.from(contentRef.current.querySelectorAll('h2, h3')) as HTMLElement[];
+        sectionRefs.current = headings;
+        if (!headings.length) return;
+        const observer = new IntersectionObserver(
+            entries => {
+                const visible = entries.filter(e => e.isIntersecting)
+                    .map(e => headings.indexOf(e.target as HTMLElement))
+                    .filter(i => i !== -1).sort((a, b) => a - b);
+                if (visible.length) setActiveSection(visible[0]);
+            },
+            { rootMargin: '-10% 0px -60% 0px', threshold: 0 }
+        );
+        headings.forEach(h => observer.observe(h));
+        return () => observer.disconnect();
+    }, [lesson, isLoading]);
+
     const handleComplete = async () => {
         if (!user || !lesson) return;
         setIsCompleting(true);
-
         try {
-            // enregistrement de la progression persistante
-            await supabase.from('user_lessons').upsert({
-                user_id: user.id,
-                lesson_id: lesson.id,
-                completed: true
-            }, { onConflict: 'user_id,lesson_id' });
-
-            // calcul des paliers de récompense
+            await supabase.from('user_lessons').upsert(
+                { user_id: user.id, lesson_id: lesson.id, completed: true },
+                { onConflict: 'user_id,lesson_id' }
+            );
             const difficulty = lesson.module?.difficulty || 'Découverte';
-            const xpToAdd = XP_REWARDS[difficulty] || 25;
-
-            await addXp(supabase, user.id, xp || 0, xpToAdd, streak || 0);
-
-            // navigation intelligente vers la suite du parcours
-            if (nextLessonId) {
-                navigate(`/lessons/${nextLessonId}`);
-            } else {
-                navigate(`/modules/${lesson.module_id}`);
-            }
+            await addXp(supabase, user.id, xp || 0, XP_REWARDS[difficulty] || 25, streak || 0);
+            if (nextLessonId) navigate(`/lessons/${nextLessonId}`);
+            else navigate(`/modules/${lesson.module_id}`);
         } catch (err) {
-            console.error('erreur lors de la validation de la leçon:', err);
+            console.error('erreur validation leçon:', err);
         } finally {
             setIsCompleting(false);
         }
     };
 
-    /**
-     * utilitaire de traitement du flux markdown pour normaliser les extensions de syntaxe (alertes).
-     */
-    const processContent = useCallback((content: string) => {
-        if (!content) return '';
-        const normalized = content
-            .replace(/^> ?\[!(IMPORTANT|NOTE|TIP|WARNING|CAUTION)\]\r?\n>\r?\n/gim, '> [!$1]\n> ')
-            .replace(/^> ?\[!/gim, '> [!');
-        return parseShortcodes(normalized);
-    }, []);
+    const totalSections = sectionRefs.current.length;
+    const progressPct = totalSections > 1 ? Math.round((activeSection / (totalSections - 1)) * 100) : 0;
+    const canComplete = !isCompleting && allAnswered;
 
     if (authLoading || (isLoading && !lesson)) {
         return (
@@ -159,104 +255,85 @@ export default function LessonPage() {
 
     return (
         <div className="min-h-screen bg-background text-text flex flex-col font-sans">
-            <main className="flex-grow max-w-5xl mx-auto w-full px-8 py-16 md:py-32">
-                <article className="prose prose-invert prose-indigo max-w-none animate-in fade-in slide-in-from-bottom-12 duration-1000 fill-mode-both">
-                    <header className="mb-24 flex flex-col items-center text-center">
-                        <div className="w-16 h-1 bg-accent/20 rounded-full mb-12" />
-                        <h2 className="text-4xl md:text-7xl font-black mb-6 tracking-tighter text-text leading-[1.05] uppercase drop-shadow-2xl">
-                            {lesson.title}
-                        </h2>
-                    </header>
-                    
-                    <div className="text-text/80 text-xl leading-relaxed font-medium md:text-2xl md:leading-[1.6]">
-                        <ReactMarkdown 
-                            remarkPlugins={[remarkGfm, remarkBreaks]}
-                            rehypePlugins={[rehypeRaw]}
-                            components={{
-                                blockquote: ({ children }) => {
-                                    const alertTypes = {
-                                        IMPORTANT: { color: 'text-rose-400', bg: 'bg-rose-500/5', border: 'border-rose-500/20', icon: <AlertCircle className="w-6 h-6" /> },
-                                        NOTE: { color: 'text-blue-400', bg: 'bg-blue-500/5', border: 'border-blue-500/20', icon: <Info className="w-6 h-6" /> },
-                                        TIP: { color: 'text-emerald-400', bg: 'bg-emerald-500/5', border: 'border-emerald-500/20', icon: <Lightbulb className="w-6 h-6" /> },
-                                        WARNING: { color: 'text-amber-400', bg: 'bg-amber-500/5', border: 'border-amber-500/20', icon: <AlertTriangle className="w-6 h-6" /> },
-                                        CAUTION: { color: 'text-rose-400', bg: 'bg-rose-500/5', border: 'border-rose-500/20', icon: <AlertCircle className="w-6 h-6" /> },
-                                    };
 
-                                    const getText = (nodes: any): string => {
-                                        if (!nodes) return '';
-                                        if (typeof nodes === 'string') return nodes;
-                                        if (Array.isArray(nodes)) return nodes.map(getText).join(' ');
-                                        if (nodes.props?.children) return getText(nodes.props.children);
-                                        return '';
-                                    };
-
-                                    const fullText = getText(children).trim();
-                                    const match = fullText.match(/\[!(IMPORTANT|NOTE|TIP|WARNING|CAUTION)\]/i);
-                                    
-                                    if (match && fullText.indexOf(match[0]) < 5) {
-                                        const type = match[1].toUpperCase() as keyof typeof alertTypes;
-                                        const config = alertTypes[type];
-                                        const cleanMarker = (nodes: any): any => {
-                                            if (!nodes) return nodes;
-                                            if (typeof nodes === 'string') return nodes.replace(/^(\s*)\[!(IMPORTANT|NOTE|TIP|WARNING|CAUTION)\](\s*)/i, '$1');
-                                            if (Array.isArray(nodes)) return nodes.map(node => cleanMarker(node));
-                                            if (nodes?.props?.children) return { ...nodes, props: { ...nodes.props, children: cleanMarker(nodes.props.children) } };
-                                            return nodes;
-                                        };
-
-                                        return (
-                                            <div className={`my-16 p-10 rounded-[3rem] border ${config.border} ${config.bg} backdrop-blur-3xl shadow-2xl relative overflow-hidden group`}>
-                                                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                                                    {config.icon}
-                                                </div>
-                                                <div className={`flex items-center gap-4 mb-6 font-black text-xs uppercase tracking-[0.4em] ${config.color}`}>
-                                                    <span className="w-6 h-[2px] bg-current opacity-30" />
-                                                    {type}
-                                                </div>
-                                                <div className="text-text italic text-xl md:text-2xl leading-relaxed relative z-10">
-                                                    {cleanMarker(children)}
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-
-                                    return <blockquote className="border-l-4 border-accent/30 pl-10 my-16 italic text-text-muted text-2xl md:text-3xl leading-relaxed lowercase">{children}</blockquote>;
-                                },
-                                code: ({ className, children, ...props }: any) => <code className={`${className} bg-surface-hover/50 px-2 py-1 rounded-lg text-accent`} {...props}>{children}</code>
-                            }}
-                        >
-                            {processContent(lesson.content)}
-                        </ReactMarkdown>
+            {/* Barre de progression sticky */}
+            {totalSections > 1 && (
+                <div className="sticky top-[73px] z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/40 px-6 py-3 flex items-center gap-4">
+                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/60 shrink-0 hidden sm:block">progression</span>
+                    <div className="flex-1 h-1.5 bg-border/30 rounded-full overflow-hidden">
+                        <div className="h-full bg-accent rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_var(--accent-glow)]"
+                            style={{ width: `${progressPct}%` }} />
                     </div>
+                    <span className="text-[9px] font-black text-text-muted/60 shrink-0 tabular-nums">{activeSection + 1} / {totalSections}</span>
+                </div>
+            )}
 
-                    {/* Actions de fin de leçon intégrées au flux */}
-                    <footer className="mt-32 pt-16 border-t border-border/40 flex flex-col items-center gap-10">
-                        <button
-                            onClick={handleComplete}
-                            disabled={isCompleting}
-                            className="w-full md:w-auto min-w-[320px] flex items-center justify-center gap-5 px-16 py-8 bg-accent hover:bg-accent/90 text-white rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xl transition-all transform hover:scale-[1.05] active:scale-95 shadow-[0_30px_70px_-15px_rgba(99,102,241,0.5)] disabled:opacity-50"
-                        >
-                            {isCompleting ? <Loader2 className="w-8 h-8 animate-spin" /> : (
+            <main className="flex-grow max-w-4xl mx-auto w-full px-6 md:px-8 py-8 md:py-12">
+                <article className="prose prose-invert prose-indigo max-w-none">
+
+                    {/* Header compact — titre + navigation visible sans scroller */}
+                    <header className="not-prose mb-8 pb-6 border-b border-border/40">
+                        <div className="flex items-center gap-3 mb-3">
+                            <Link
+                                to={`/modules/${lesson.module_id}`}
+                                className="text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-accent transition-colors flex items-center gap-1.5"
+                            >
+                                ← Module
+                            </Link>
+                            {prevLessonId && (
                                 <>
-                                    <Sparkles className="w-6 h-6" />
-                                    <span>{nextLessonId ? "Continuer" : "Terminer le module"}</span>
-                                    <ChevronRight className="w-8 h-8 ml-2" />
+                                    <span className="text-border/60">·</span>
+                                    <button
+                                        onClick={() => navigate(`/lessons/${prevLessonId}`)}
+                                        className="text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-text transition-colors"
+                                    >
+                                        Précédente
+                                    </button>
                                 </>
                             )}
-                        </button>
+                        </div>
+                        <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase leading-tight text-text">
+                            {lesson.title}
+                        </h1>
+                    </header>
 
+                    <LessonContent
+                        content={lesson.content}
+                        contentRef={contentRef}
+                        onQuizCountChange={handleQuizCountChange}
+                        onAllAnswered={setAllAnswered}
+                    />
+
+                    <footer className="mt-16 pt-8 border-t border-border/40 flex flex-col items-center gap-6">
+                        {quizTotal > 0 && !allAnswered && (
+                            <p className="text-sm font-black uppercase tracking-widest text-amber-400/80 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                réponds aux exercices avant de continuer
+                            </p>
+                        )}
+                        <button
+                            onClick={handleComplete}
+                            disabled={!canComplete}
+                            className={`w-full md:w-auto min-w-[320px] flex items-center justify-center gap-5 px-16 py-8 rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-xl transition-all active:scale-95 ${
+                                canComplete
+                                    ? 'bg-accent hover:bg-accent/90 text-white hover:scale-[1.05] shadow-[0_30px_70px_-15px_rgba(99,102,241,0.5)]'
+                                    : 'bg-surface border border-border/60 text-text-muted/40 cursor-not-allowed'
+                            }`}
+                        >
+                            {isCompleting
+                                ? <Loader2 className="w-8 h-8 animate-spin" />
+                                : <><Sparkles className="w-6 h-6" /><span>{nextLessonId ? 'Continuer' : 'Terminer le module'}</span><ChevronRight className="w-8 h-8 ml-2" /></>
+                            }
+                        </button>
                         <div className="flex items-center gap-12">
-                            <button 
+                            <button
                                 onClick={() => prevLessonId && navigate(`/lessons/${prevLessonId}`)}
-                                disabled={!prevLessonId} 
+                                disabled={!prevLessonId}
                                 className={`text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-text transition-all ${!prevLessonId ? 'opacity-0 pointer-events-none' : 'hover:translate-x-[-8px]'}`}
                             >
                                 ← Leçon Précédente
                             </button>
-                            <Link 
-                                to={`/modules/${lesson.module_id}`}
-                                className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-accent transition-all"
-                            >
+                            <Link to={`/modules/${lesson.module_id}`} className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-accent transition-all">
                                 Revenir au module
                             </Link>
                         </div>
