@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { ChevronRight, Loader2, Crown, Users, Zap, Terminal, Ghost, Cpu, ShieldCheck, Swords } from 'lucide-react';
+import WeeklyCompetition from './WeeklyCompetition';
 
 
 
@@ -275,7 +276,7 @@ export default function TechSquadPage() {
                     style={{ backgroundColor: userSquad?.hex ?? '#6366f1' }} />
 
                 <main className="flex-grow max-w-3xl mx-auto w-full px-6 py-12 relative z-10">
-                    {}
+                    {/* header clan */}
                     <div className="text-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <p className="text-xs font-bold text-text-muted uppercase tracking-widest mb-2">Ta TechSquad</p>
                         <h1 className={`text-6xl font-black mb-2 ${userSquad?.color ?? 'text-accent'}`}
@@ -285,20 +286,54 @@ export default function TechSquadPage() {
                         <p className="text-text-muted">{userSquad?.tagline}</p>
                     </div>
 
-                    {}
-                    <div className="bg-surface/50 border border-border rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl">
-                        <div className="p-5 border-b border-border flex items-center justify-between">
-                            <div>
-                                <h2 className="text-lg font-black">Classement des TechSquads</h2>
-                                <p className="text-xs text-text-muted mt-0.5">Classé par XP total accumulé</p>
+                    {/* ── Section 1 : Compétition Quiz — navigation vers pages dédiées ── */}
+                    <section className="mb-12">
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${userSquad?.bg ?? 'bg-accent/10'} border ${userSquad?.border ?? 'border-accent/20'}`}>
+                                <Swords className={`w-4 h-4 ${userSquad?.color ?? 'text-accent'}`} />
                             </div>
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-xl">
-                                <Zap className="w-3.5 h-3.5 text-accent" />
-                                <span className="text-xs font-bold text-accent">XP Total</span>
+                            <div>
+                                <h2 className="text-sm font-black uppercase tracking-widest">Bataille de clans</h2>
+                                <p className="text-[10px] text-text-muted/60 font-medium">Quiz inter-clans — une participation par période</p>
                             </div>
                         </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <a href="/clan-quiz/weekly"
+                                className={`flex flex-col gap-3 p-5 rounded-2xl border transition-all hover:-translate-y-0.5 hover:shadow-lg ${userSquad?.bg ?? 'bg-accent/5'} ${userSquad?.border ?? 'border-accent/20'}`}>
+                                <div className="flex items-center gap-2">
+                                    <Zap className={`w-4 h-4 ${userSquad?.color ?? 'text-accent'}`} />
+                                    <span className={`text-[10px] font-black uppercase tracking-widest ${userSquad?.color ?? 'text-accent'}`}>Hebdo</span>
+                                </div>
+                                <p className="font-black text-base">Quiz de la semaine</p>
+                            </a>
+                            <a href="/clan-quiz/monthly"
+                                className="flex flex-col gap-3 p-5 rounded-2xl border border-amber-400/20 bg-amber-400/5 transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                                <div className="flex items-center gap-2">
+                                    <Crown className="w-4 h-4 text-amber-400" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">Mensuel</span>
+                                </div>
+                                <p className="font-black text-base">Championnat du mois</p>
+                            </a>
+                        </div>
+                    </section>
 
-                        {isLoadingStats ? (
+                    {/* ── Séparateur ── */}
+                    <div className="flex items-center gap-4 mb-10">
+                        <div className="flex-1 h-px bg-border/40" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-text-muted/40">Classement global XP</span>
+                        <div className="flex-1 h-px bg-border/40" />
+                    </div>
+                    <section>
+                        <div className="flex items-center gap-3 mb-5">
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-400/10 border border-amber-400/20">
+                                <Crown className="w-4 h-4 text-amber-400" />
+                            </div>
+                            <div>
+                                <h2 className="text-sm font-black uppercase tracking-widest">Classement des TechSquads</h2>
+                                <p className="text-[10px] text-text-muted/60 font-medium">Classé par XP total accumulé par les membres</p>
+                            </div>
+                        </div>
+                    <div className="bg-surface/50 border border-border rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl">                        {isLoadingStats ? (
                             <div className="flex justify-center py-16">
                                 <Loader2 className="w-8 h-8 text-accent animate-spin" />
                             </div>
@@ -367,6 +402,7 @@ export default function TechSquadPage() {
                             </div>
                         )}
                     </div>
+                    </section>
                 </main>
             </div>
         );

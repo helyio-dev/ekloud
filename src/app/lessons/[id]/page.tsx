@@ -2,7 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState, useRef, useMemo, memo, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ChevronRight, Loader2, AlertCircle, Info, Lightbulb, AlertTriangle, Sparkles } from 'lucide-react';
+import { ChevronRight, Loader2, AlertCircle, Info, Lightbulb, AlertTriangle, Sparkles, Clock } from 'lucide-react';
 import { addXp, XP_REWARDS } from '@/lib/gamification';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -292,9 +292,30 @@ export default function LessonPage() {
                                 </>
                             )}
                         </div>
-                        <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase leading-tight text-text">
+                        <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase leading-tight text-text mb-3">
                             {lesson.title}
                         </h1>
+                        {/* estimation de lecture */}
+                        <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-text-muted/60">
+                            <span className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5" />
+                                {(() => {
+                                    const words = lesson.content?.replace(/[#*`\[\]()>]/g, '').split(/\s+/).filter(Boolean).length || 0;
+                                    const mins = Math.max(1, Math.round(words / 200));
+                                    return `${mins} min de lecture`;
+                                })()}
+                            </span>
+                            {lesson.module?.difficulty && (
+                                <>
+                                    <span className="w-1 h-1 rounded-full bg-border/60" />
+                                    <span className={
+                                        lesson.module.difficulty === 'Découverte' ? 'text-sky-400' :
+                                        lesson.module.difficulty === 'Fondamentaux' ? 'text-emerald-400' :
+                                        lesson.module.difficulty === 'Avancé' ? 'text-amber-400' : 'text-rose-400'
+                                    }>{lesson.module.difficulty}</span>
+                                </>
+                            )}
+                        </div>
                     </header>
 
                     <LessonContent
