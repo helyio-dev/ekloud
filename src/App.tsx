@@ -25,6 +25,8 @@ import SettingsPage from '@/app/settings/page';
 import PublicProfilePage from '@/app/u/[username]/page';
 import AuthCallbackPage from '@/app/auth/callback/page';
 import ClanQuizPage from '@/app/clan-quiz/page';
+import WeeklyPage from '@/app/clan-quiz/weekly/page';
+import MonthlyPage from '@/app/clan-quiz/monthly/page';
 import SupportPage from '@/app/support/page';
 import TermsPage from '@/app/terms/page';
 import CreditsPage from '@/app/credits/page';
@@ -85,6 +87,8 @@ const AppContent = () => {
                     <Route path="/courses" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
                     <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
                     <Route path="/clan-quiz" element={<ProtectedRoute><ClanQuizPage /></ProtectedRoute>} />
+                    <Route path="/clan-quiz/weekly" element={<ProtectedRoute><WeeklyPage /></ProtectedRoute>} />
+                    <Route path="/clan-quiz/monthly" element={<ProtectedRoute><MonthlyPage /></ProtectedRoute>} />
                     <Route path="/u/:username" element={<ProtectedRoute><PublicProfilePage /></ProtectedRoute>} />
                     <Route path="/account" element={<Navigate to="/settings" replace />} />
 
