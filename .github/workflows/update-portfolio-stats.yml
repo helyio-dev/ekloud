@@ -1,0 +1,53 @@
+name: portfolio stats
+on:
+  push:
+    branches: [ main ] 
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10 
+
+      - name: calculate sloc
+        run: |
+          pnpm dlx sloc src/ > raw-table.txt
+          
+          node -e "
+            const fs = require('fs');
+            try {
+              const content = fs.readFileSync('raw-table.txt', 'utf8');
+              console.log('Tableau reçu :\n', content);
+
+              const getVal = (regex) => {
+                const match = content.match(regex);
+                return match ? parseInt(match[1].trim(), 10) : 0;
+              };
+
+              const summary = {
+                physical: getVal(/Physical\s*:\s*(\d+)/),
+                source: getVal(/Source\s*:\s*(\d+)/),
+                comment: getVal(/Comment\s*:\s*(\d+)/),
+                files: getVal(/Number of files read\s*:\s*(\d+)/),
+                updated_at: new Date().toISOString()
+              };
+
+              console.log('JSON extrait :', summary);
+              fs.writeFileSync('ekloud-stats.json', JSON.stringify(summary, null, 2));
+            } catch (err) {
+              console.error('Erreur lors du parsing :', err);
+              process.exit(1);
+            }
+          "
+
+      - name: update gist
+        env:
+          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: |
+          gh gist edit $GIST_ID ekloud-stats.json
