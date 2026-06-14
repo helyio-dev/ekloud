@@ -89,7 +89,7 @@ const AppContent = () => {
                     <Route path="/clan-quiz" element={<ProtectedRoute><ClanQuizPage /></ProtectedRoute>} />
                     <Route path="/clan-quiz/weekly" element={<ProtectedRoute><WeeklyClanQuizPage /></ProtectedRoute>} />
                     <Route path="/clan-quiz/monthly" element={<ProtectedRoute><MonthlyClanQuizPage /></ProtectedRoute>} />
-                    <Route path="/u/:username" element={<ProtectedRoute><PublicProfilePage /></ProtectedRoute>} />
+                    <Route path="/u/:username" element={<PublicProfilePage />} />
                     <Route path="/account" element={<Navigate to="/settings" replace />} />
 
                     {/* routes administration */}
