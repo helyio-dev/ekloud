@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
-import { ChevronRight, Loader2, Crown, Users, Zap, Terminal, Ghost, Cpu, ShieldCheck, Swords } from 'lucide-react';
+import { ChevronRight, Loader2, Crown, Users, Zap, Terminal, Ghost, Cpu, ShieldCheck, Swords, Trophy, Calendar } from 'lucide-react';
 
 
 
@@ -184,28 +184,25 @@ export default function TechSquadPage() {
         const fetchStats = async () => {
             setIsLoadingStats(true);
             try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('clan, xp')
-                    .not('clan', 'is', null);
+                // get_clan_stats() est SECURITY DEFINER — bypasse la RLS
+                // qui sinon limite la vue aux seuls profils de l'utilisateur courant
+                const { data, error } = await supabase.rpc('get_clan_stats');
                 if (error) throw error;
 
-                const acc: Record<string, { totalXp: number; members: number }> = {};
-                (data || []).forEach((p: any) => {
-                    if (!acc[p.clan]) acc[p.clan] = { totalXp: 0, members: 0 };
-                    acc[p.clan].totalXp += (p.xp || 0);
-                    acc[p.clan].members += 1;
+                const all: SquadId[] = ['ROOT', 'VOID', 'CORE', 'CYPHER'];
+                const rows = (data || []) as { clan: string; total_xp: number; members: number }[];
+
+                const withDefaults = all.map(id => {
+                    const row = rows.find(r => r.clan === id);
+                    return {
+                        squad: id,
+                        totalXp: row ? Number(row.total_xp) : 0,
+                        members: row ? Number(row.members) : 0,
+                    };
                 });
 
-                const sorted = (Object.entries(acc) as [SquadId, { totalXp: number; members: number }][])
-                    .map(([squad, s]) => ({ squad, ...s }))
-                    .sort((a, b) => b.totalXp - a.totalXp);
-
-                
-                const all: SquadId[] = ['ROOT', 'VOID', 'CORE', 'CYPHER'];
-                const final = all.map(id => sorted.find(s => s.squad === id) ?? { squad: id, totalXp: 0, members: 0 });
-                final.sort((a, b) => b.totalXp - a.totalXp);
-                setSquadStats(final);
+                withDefaults.sort((a, b) => b.totalXp - a.totalXp);
+                setSquadStats(withDefaults);
             } catch (err) {
                 console.error('TechSquadPage: fetchStats error', err);
             } finally {
@@ -276,7 +273,7 @@ export default function TechSquadPage() {
 
                 <main className="flex-grow max-w-3xl mx-auto w-full px-6 py-12 relative z-10">
                     {}
-                    <div className="text-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <p className="text-xs font-bold text-text-muted uppercase tracking-widest mb-2">Ta TechSquad</p>
                         <h1 className={`text-6xl font-black mb-2 ${userSquad?.color ?? 'text-accent'}`}
                             style={{ textShadow: `0 0 60px ${userSquad?.hex ?? '#6366f1'}44` }}>
@@ -285,86 +282,171 @@ export default function TechSquadPage() {
                         <p className="text-text-muted">{userSquad?.tagline}</p>
                     </div>
 
-                    {}
-                    <div className="bg-surface/50 border border-border rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl">
-                        <div className="p-5 border-b border-border flex items-center justify-between">
+                    {/* ── Quiz hebdo + mensuel ── */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '100ms' }}>
+                        <Link
+                            to="/clan-quiz/weekly"
+                            className="group flex flex-col gap-3 p-5 bg-surface/50 border border-border hover:border-accent/40 rounded-3xl hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20">
+                                    <Swords className="w-5 h-5 text-accent" />
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-base group-hover:text-accent transition-colors">Quiz de la semaine</h3>
+                                <p className="text-text-muted text-xs mt-1">10 questions · 1 tentative · Contribue au classement mensuel</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 bg-accent/10 border border-accent/20 text-accent rounded-full">
+                                    Hebdomadaire
+                                </span>
+                            </div>
+                        </Link>
+
+                        <Link
+                            to="/clan-quiz/monthly"
+                            className="group flex flex-col gap-3 p-5 bg-surface/50 border border-border hover:border-accent/40 rounded-3xl hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="p-2.5 rounded-xl bg-yellow-400/10 border border-yellow-400/20">
+                                    <Trophy className="w-5 h-5 text-yellow-400" />
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-base group-hover:text-accent transition-colors">Classement mensuel</h3>
+                                <p className="text-text-muted text-xs mt-1">Classement des TechSquads basé sur les scores des quiz hebdo</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 rounded-full">
+                                    Mensuel
+                                </span>
+                            </div>
+                        </Link>
+                    </div>
+
+                    {/* ── Classement TechSquads ── */}
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '200ms' }}>
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-4">
                             <div>
                                 <h2 className="text-lg font-black">Classement des TechSquads</h2>
-                                <p className="text-xs text-text-muted mt-0.5">Classé par XP total accumulé</p>
+                                <p className="text-xs text-text-muted mt-0.5">XP total accumulé par tous les membres</p>
                             </div>
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-xl">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-surface/60 border border-border/60 rounded-xl">
                                 <Zap className="w-3.5 h-3.5 text-accent" />
-                                <span className="text-xs font-bold text-accent">XP Total</span>
+                                <span className="text-xs font-black text-accent uppercase tracking-widest">XP Total</span>
                             </div>
                         </div>
 
                         {isLoadingStats ? (
                             <div className="flex justify-center py-16">
-                                <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                                <Loader2 className="w-8 h-8 text-accent animate-spin opacity-40" />
                             </div>
                         ) : (
-                            <div className="p-4 space-y-3">
-                                {squadStats.map((s, index) => {
-                                    const sq = SQUADS[s.squad];
-                                    const isMySquad = s.squad === clan;
-                                    const maxXp = Math.max(...squadStats.map(x => x.totalXp), 1);
-                                    const pct = (s.totalXp / maxXp) * 100;
-
+                            <>
+                                {/* Top squad highlight */}
+                                {squadStats.length > 0 && (() => {
+                                    const top = squadStats[0];
+                                    const sq = SQUADS[top.squad];
+                                    const isMySquad = top.squad === clan;
                                     return (
-                                        <div
-                                            key={s.squad}
-                                            className={`p-5 rounded-2xl border transition-all ${isMySquad
-                                                ? `bg-gradient-to-br ${sq.bg} ${sq.border} ${sq.glow}`
-                                                : 'bg-background/40 border-border'
-                                                }`}
-                                        >
-                                            <div className="flex items-start sm:items-center justify-between gap-3 mb-3">
-                                                {}
-                                                <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-lg rounded-xl flex items-center justify-center font-black shrink-0 ${index === 0 ? 'bg-yellow-400/10 text-yellow-400' : 'bg-surface-hover/50 border border-border text-text-muted'}`}>
-                                                        {index === 0 ? <Crown className="w-4 h-4 sm:w-5 sm:h-5" /> : index + 1}
+                                        <div className={`relative overflow-hidden rounded-3xl border p-6 mb-4 ${sq.border} ${sq.glow} bg-gradient-to-br ${sq.bg}`}>
+                                            <div className="absolute top-3 right-4 opacity-[0.06] pointer-events-none">
+                                                <Crown className="w-28 h-28" />
+                                            </div>
+                                            <div className="relative flex items-center justify-between gap-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 rounded-2xl bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center shrink-0">
+                                                        <Crown className="w-6 h-6 text-yellow-400" />
                                                     </div>
-
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-0.5">
-                                                            <span className={`font-black text-sm sm:text-lg whitespace-nowrap ${sq.color}`}>{s.squad}</span>
-                                                            <sq.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-text-muted" />
+                                                    <div>
+                                                        <div className="flex items-center gap-2 mb-0.5">
+                                                            <sq.icon className={`w-4 h-4 ${sq.color}`} />
+                                                            <span className={`text-2xl font-black ${sq.color}`}>{top.squad}</span>
                                                             {isMySquad && (
-                                                                <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 whitespace-nowrap">
-                                                                    Ta squad
-                                                                </span>
+                                                                <span className="text-[9px] font-black px-2 py-0.5 bg-accent/10 border border-accent/20 text-accent rounded-full">ta squad</span>
                                                             )}
                                                         </div>
-                                                        <p className="text-[10px] sm:text-xs text-text-muted hidden sm:block truncate pr-2 w-full">{sq.tagline}</p>
+                                                        <p className="text-xs text-text-muted">{sq.tagline}</p>
                                                     </div>
                                                 </div>
-
-                                                {}
                                                 <div className="text-right shrink-0">
-                                                    <p className="font-black text-text text-sm sm:text-base whitespace-nowrap">{s.totalXp.toLocaleString()} XP</p>
-                                                    <div className="flex items-center justify-end gap-1 text-text-muted text-[10px] sm:text-xs mt-0.5">
+                                                    <p className={`text-3xl font-black ${sq.color}`}>{top.totalXp.toLocaleString()}</p>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">XP total</p>
+                                                    <div className="flex items-center justify-end gap-1 text-text-muted text-[10px] mt-1">
                                                         <Users className="w-3 h-3" />
-                                                        <span className="whitespace-nowrap">{s.members} mb.</span>
+                                                        <span>{top.members} membre{top.members > 1 ? 's' : ''}</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <p className="text-[10px] sm:hidden text-text-muted mb-3 opacity-80 leading-snug break-words">{sq.tagline}</p>
-
-                                            {}
-                                            <div className="h-1.5 w-full bg-background/60 rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full rounded-full transition-all duration-1000 ease-out"
-                                                    style={{ width: `${pct}%`, backgroundColor: sq.hex }}
-                                                />
+                                            <div className="mt-4 h-1.5 w-full bg-background/40 rounded-full overflow-hidden">
+                                                <div className="h-full w-full rounded-full" style={{ backgroundColor: sq.hex }} />
                                             </div>
                                         </div>
                                     );
-                                })}
+                                })()}
+
+                                {/* Remaining squads */}
+                                <div className="space-y-3">
+                                    {squadStats.slice(1).map((s, idx) => {
+                                        const index = idx + 1;
+                                        const sq = SQUADS[s.squad];
+                                        const isMySquad = s.squad === clan;
+                                        const maxXp = Math.max(...squadStats.map(x => x.totalXp), 1);
+                                        const pct = (s.totalXp / maxXp) * 100;
+
+                                        return (
+                                            <div
+                                                key={s.squad}
+                                                className={`p-4 rounded-2xl border transition-all ${isMySquad
+                                                    ? `bg-gradient-to-br ${sq.bg} ${sq.border} ${sq.glow}`
+                                                    : 'bg-surface/30 border-border/60'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    {/* Rank */}
+                                                    <div className="w-8 h-8 rounded-xl bg-surface border border-border flex items-center justify-center font-black text-sm text-text-muted shrink-0">
+                                                        {index + 1}
+                                                    </div>
+                                                    {/* Icon + name */}
+                                                    <sq.icon className={`w-4 h-4 ${sq.color} shrink-0`} />
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className={`font-black text-base ${sq.color}`}>{s.squad}</span>
+                                                            {isMySquad && (
+                                                                <span className="text-[9px] font-black px-2 py-0.5 bg-accent/10 border border-accent/20 text-accent rounded-full">ta squad</span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-[10px] text-text-muted truncate">{sq.tagline}</p>
+                                                    </div>
+                                                    {/* Stats */}
+                                                    <div className="text-right shrink-0">
+                                                        <p className="font-black text-sm whitespace-nowrap">{s.totalXp.toLocaleString()} <span className="text-text-muted font-normal">XP</span></p>
+                                                        <div className="flex items-center justify-end gap-1 text-text-muted text-[10px]">
+                                                            <Users className="w-3 h-3" />
+                                                            <span>{s.members} membre{s.members > 1 ? 's' : ''}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {/* Progress bar */}
+                                                <div className="h-1.5 w-full bg-background/60 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded-full transition-all duration-1000 ease-out"
+                                                        style={{ width: `${pct}%`, backgroundColor: sq.hex }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
 
                                 {squadStats.every(s => s.members === 0) && (
-                                    <p className="text-center text-text-muted py-8">Aucun membre dans les TechSquads pour le moment.</p>
+                                    <p className="text-center text-text-muted py-8 text-sm">Aucun membre dans les TechSquads pour le moment.</p>
                                 )}
-                            </div>
+                            </>
                         )}
                     </div>
                 </main>
