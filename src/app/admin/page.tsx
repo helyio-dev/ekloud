@@ -9,9 +9,8 @@ import {
 } from 'lucide-react';
 import UserManagementTab from './components/UserManagementTab';
 import SkillManagementTab from './components/SkillManagementTab';
-import ClanQuizAdmin from './components/ClanQuizAdmin';
 
-type TabType = 'modules' | 'users' | 'skills' | 'clanquiz';
+type TabType = 'modules' | 'users' | 'skills';
 
 export default function AdminDashboard() {
     const { user, isAdmin } = useAuth();
@@ -56,7 +55,6 @@ export default function AdminDashboard() {
         { id: 'modules', label: 'Modules' },
         { id: 'skills', label: 'Compétences' },
         { id: 'users', label: 'Utilisateurs' },
-        { id: 'clanquiz', label: 'Quiz Clan' },
     ];
 
     return (
@@ -158,8 +156,6 @@ export default function AdminDashboard() {
                             </div>
                         ) : activeTab === 'skills' ? (
                             <SkillManagementTab />
-                        ) : activeTab === 'clanquiz' ? (
-                            <ClanQuizAdmin />
                         ) : (
                             <UserManagementTab />
                         )}
