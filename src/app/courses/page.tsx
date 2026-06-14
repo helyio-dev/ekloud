@@ -212,7 +212,7 @@ export default function CoursesPage() {
                                             : 'bg-surface/40 border-border/40 opacity-60 cursor-not-allowed'
                                     }`}
                                 >
-                                    {/* bande de couleur en haut selon difficulté */}
+                                    {/* bande de couleur en haut selon difficulté (classification) */}
                                     <div className={`h-1.5 w-full ${conf.dot} ${!isUnlocked ? 'opacity-30' : ''}`} />
 
                                     <div className="flex flex-col flex-1 p-6 gap-4">
