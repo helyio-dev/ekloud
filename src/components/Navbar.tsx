@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Cloud, Layout, LogOut, Settings, Flame, Trophy, Menu, Users, BookOpen, Heart, MessageSquare, Mail, Check, Sun, Moon, Info, Shield, Hash } from 'lucide-react';
@@ -15,6 +15,7 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const path = useLocation().pathname
 
     // fermeture automatique du menu lors d'un clic en dehors de son conteneur
     useEffect(() => {
@@ -114,21 +115,21 @@ export default function Navbar() {
                                         
                                         {/* navigation par tuiles interactives */}
                                         <div className="grid grid-cols-3 gap-3">
-                                            <Link onClick={() => setIsMenuOpen(false)} to="/courses" className="group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/courses" className={`group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-emerald-500/5 hover:bg-emerald-500/10 border ${!path.startsWith('/courses') ? 'border-emerald-500/10' : ''}  rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
                                                 <div className="p-2.5 bg-emerald-500/10 rounded-xl group-hover/tile:scale-110 transition-transform shadow-inner">
                                                     <BookOpen size={20} className="text-emerald-500" />
                                                 </div>
                                                 <span className="text-[9px] font-black uppercase tracking-widest text-text-muted group-hover/tile:text-emerald-500">cours</span>
                                             </Link>
 
-                                            <Link onClick={() => setIsMenuOpen(false)} to="/dashboard" className="group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-accent/5 hover:bg-accent/10 border border-accent/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/dashboard" className={`group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-accent/5 hover:bg-accent/10 border ${!path.startsWith('/dashboard') ? 'border-border' : ''} border-accent/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
                                                 <div className="p-2.5 bg-accent/10 rounded-xl group-hover/tile:scale-110 transition-transform shadow-inner">
                                                     <Layout size={20} className="text-accent" />
                                                 </div>
                                                 <span className="text-[9px] font-black uppercase tracking-widest text-text-muted group-hover/tile:text-accent">progrès</span>
                                             </Link>
 
-                                            <Link onClick={() => setIsMenuOpen(false)} to="/clan-quiz" className="group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-surface/40 hover:bg-surface-hover border border-border rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/clan-quiz" className={`group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-surface/40 hover:bg-surface-hover border ${!path.startsWith('/clan-quiz') ? 'border-border' : ''} rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
                                                 <div className={`p-2.5 rounded-xl group-hover/tile:scale-110 transition-transform shadow-inner ${
                                                     clan === 'ROOT' ? 'bg-orange-500/20 text-orange-400' : 
                                                     clan === 'VOID' ? 'bg-violet-500/20 text-violet-400' : 
@@ -140,21 +141,21 @@ export default function Navbar() {
                                                 <span className="text-[9px] font-black uppercase tracking-widest text-text-muted group-hover/tile:text-text">squad</span>
                                             </Link>
 
-                                            <Link onClick={() => setIsMenuOpen(false)} to="/leaderboard" className="group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-yellow-600/5 hover:bg-yellow-600/10 border border-yellow-600/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/leaderboard" className={`group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-yellow-600/5 hover:bg-yellow-600/10 border ${!path.startsWith('/leaderboard') ? 'border-yellow-600/10' : ''} rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
                                                 <div className="p-2.5 bg-yellow-600/10 rounded-xl group-hover/tile:scale-110 transition-transform shadow-inner">
                                                     <Trophy size={20} className="text-yellow-600" />
                                                 </div>
                                                 <span className="text-[9px] font-black uppercase tracking-widest text-text-muted group-hover/tile:text-yellow-600">classe</span>
                                             </Link>
 
-                                            <Link onClick={() => setIsMenuOpen(false)} to="/friends" className="group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/10 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/friends" className={`group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-blue-500/5 hover:bg-blue-500/10 border ${!path.startsWith('/friends') ? 'border-blue-500/10' : ''} rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
                                                 <div className="p-2.5 bg-blue-500/10 rounded-xl group-hover/tile:scale-110 transition-transform shadow-inner">
                                                     <Users size={20} className="text-blue-500" />
                                                 </div>
                                                 <span className="text-[9px] font-black uppercase tracking-widest text-text-muted group-hover/tile:text-blue-500">amis</span>
                                             </Link>
 
-                                            <Link onClick={() => setIsMenuOpen(false)} to="/settings" className="group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-surface/40 hover:bg-surface-hover border border-border rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                            <Link onClick={() => setIsMenuOpen(false)} to="/settings" className={`group/tile flex flex-col items-center justify-center gap-2.5 p-4 bg-surface/40 hover:bg-surface-hover border ${!path.startsWith('/settings') ? 'border-border' : ''} rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
                                                 <div className="p-2.5 bg-surface-hover rounded-xl group-hover/tile:scale-110 transition-transform shadow-inner">
                                                     <Settings size={20} className="text-text-muted group-hover:rotate-90 transition-transform duration-700" />
                                                 </div>
