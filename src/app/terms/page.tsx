@@ -203,31 +203,39 @@ export default function TermsPage() {
                         </div>
                     </section>
 
-                    {/* Section 7 : Soutien & Dons */}
+                    {/* Section 7 : Boutique & produits numériques */}
                     <section id="support" className="scroll-mt-40 space-y-10 border-t border-border/30 pt-20">
                         <h2 className="text-3xl font-black text-text uppercase tracking-tight flex items-center gap-6 italic underline underline-offset-2 decoration-accent/20">
-                            07. Dons & Soutien
+                            07. Boutique & produits numériques
                         </h2>
                         <div className="pl-6 md:pl-16 border-l border-border hover:border-accent transition-colors space-y-6 text-base md:text-lg italic text-text-muted">
-                            <p>nous offrons la possibilité aux utilisateurs de soutenir la maintenance des infrastructures via des contributions volontaires.</p>
-                            <ul className="list-disc pl-6 space-y-2 text-sm md:text-base italic opacity-70">
-                                <li>les dons sont définitifs (non remboursables).</li>
-                                <li>ils ne constituent pas un achat de service commercial.</li>
-                                <li>ils ne confèrent aucun avantage de triche ou XP direct.</li>
-                            </ul>
+                            <p>Ekloud propose l'achat de consommables virtuels ("gels de série" et "récupérateurs de streak") pour personnaliser et protéger votre expérience d'apprentissage.</p>
+                            <div className="space-y-2">
+                                <p className="font-semibold text-sm md:text-base italic text-text-muted">Tarifs :</p>
+                                <p>les prix affichés sur la boutique sont indiqués hors taxes locales. les taxes applicables (notamment la TVA selon le pays de résidence de l'acheteur) sont calculées, affichées et ajustées automatiquement par notre prestataire Stripe directement sur la page de paiement avant la validation finale.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="font-semibold text-sm md:text-base italic text-text-muted">Livraison :</p>
+                                <p>la livraison des avantages numériques est instantanée et automatisée après validation du paiement par Stripe.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="font-semibold text-sm md:text-base italic text-text-muted">Absence de droit de rétractation :</p>
+                                <p>conformément à l'article L.221-28 du Code de la consommation, s'agissant de contenus numériques fournis sur un support immatériel et dont l'exécution commence immédiatement après le paiement, vous renoncez expressément à votre droit de rétractation de 14 jours. aucun remboursement ne sera accordé une fois le produit numérique crédité sur votre compte.</p>
+                            </div>
                         </div>
                     </section>
 
-                    {/* Section 8 : Propriété Intellectuelle */}
+                    {/* Section 8 : Propriété intellectuelle */}
                     <section id="propriete" className="scroll-mt-40 space-y-10 border-t border-border/30 pt-20">
                         <h2 className="text-3xl font-black text-text uppercase tracking-tight flex items-center gap-6 italic underline underline-offset-2 decoration-accent/20">
-                            08. Propriété Intellectuelle
+                            08. Propriété intellectuelle
                         </h2>
                         <div className="pl-6 md:pl-16 border-l border-border hover:border-accent transition-colors space-y-6 text-base md:text-lg italic text-text-muted">
-                            <p>sauf mention contraire, Ekloud Technology Group détient les droits de propriété intellectuelle sur tout le matériel (textes, graphismes, logos, codes sources front-end, structure de cours).</p>
+                            <p>sauf mention contraire, Kloud Team détient les droits de propriété intellectuelle sur tout le matériel (textes, graphismes, logos, codes sources front-end, structure de cours).</p>
                             <p>toute reproduction, redistribution ou exploitation commerciale est strictement interdite sans accord écrit préalable.</p>
                         </div>
                     </section>
+
 
                     {/* Section 9 : Vie Privée & RGPD */}
                     <section id="donnees" className="scroll-mt-40 space-y-10 border-t border-border/30 pt-20">
@@ -266,8 +274,8 @@ export default function TermsPage() {
                             <p>les présentes conditions sont régies exclusivement par le droit Français et Européen.</p>
                             <p>en cas de litige, après tentative de résolution à l'amiable via nos canaux de support officiels (Discord/Email), les parties soumettront le différend à la compétence exclusive des tribunaux territoriaux ou du siège légal de l'éditeur.</p>
                             <div className="py-20 text-center opacity-30 flex flex-col items-center">
-                                <p className="text-[10px] font-black uppercase tracking-[0.5em] mb-4">ekloud legal entity</p>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em]">dernière révision : 03/04/2026</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.5em] mb-4">Kloud Team</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em]">dernière révision : 29/06/2026</p>
                             </div>
                         </div>
                     </section>
