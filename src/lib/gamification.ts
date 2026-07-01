@@ -80,7 +80,7 @@ export async function addXp(
     // récupération des métadonnées temporelles du profil
     const { data: profile } = await supabase
         .from('profiles')
-        .select('last_streak_at')
+        .select('last_streak_at, freeze_gels')
         .eq('id', userId)
         .single();
 
@@ -99,7 +99,18 @@ export async function addXp(
             if (diffInHours <= 48) {
                 newStreak += 1;
             } else {
-                newStreak = 1;
+                // Check if user has freeze gels
+                if (profile?.freeze_gels && profile.freeze_gels > 0) {
+                    // Use a freeze gel to keep the streak
+                    await supabase
+                        .from('profiles')
+                        .update({ freeze_gels: profile.freeze_gels - 1 })
+                        .eq('id', userId);
+                    // Keep the same streak and update last_streak_at
+                    newStreak = currentStreak;
+                } else {
+                    newStreak = 1;
+                }
             }
         }
     }

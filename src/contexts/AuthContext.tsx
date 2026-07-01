@@ -11,6 +11,8 @@ type AuthContextType = {
     xp: number;
     level: number;
     streak: number;
+    lostStreak: number;
+    freezeGels: number;
     username: string | null;
     clan: string | null;
     signOut: () => Promise<void>;
@@ -27,6 +29,8 @@ export const AuthContext = createContext<AuthContextType>({
     xp: 0,
     level: 1,
     streak: 0,
+    lostStreak: 0,
+    freezeGels: 0,
     username: null,
     clan: null,
     signOut: async () => {},
@@ -43,6 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [xp, setXp] = useState(0);
     const [level, setLevel] = useState(1);
     const [streak, setStreak] = useState(0);
+    const [lostStreak, setLostStreak] = useState(0);
+    const [freezeGels, setFreezeGels] = useState(0);
     const [username, setUsername] = useState<string | null>(null);
     const [clan, setClan] = useState<string | null>(null);
 
@@ -58,8 +64,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             const base = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
             const res = await fetch(
-                `${base}/rest/v1/profiles?id=eq.${userId}&select=role,xp,level,streak,username,clan&limit=1`,
+                `${base}/rest/v1/profiles?id=eq.${userId}&select=role,xp,level,streak,lost_streak,username,clan,freeze_gels&limit=1`, 
                 {
+
                     headers: {
                         apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
                         Authorization: `Bearer ${accessToken}`,
@@ -82,6 +89,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setXp(data.xp || 0);
                 setLevel(data.level || 1);
                 setStreak(data.streak || 0);
+                setLostStreak(data.lost_streak || 0);
+                setFreezeGels(data.freeze_gels || 0);
                 setUsername(data.username || null);
                 setClan(data.clan || null);
             } else {
@@ -98,7 +107,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                         'Content-Type': 'application/json',
                         Prefer: 'return=minimal',
                     },
-                    body: JSON.stringify({ id: userId, username: finalName, xp: 0, level: 1, streak: 0, role: 'student' }),
+                    body: JSON.stringify({ id: userId, username: finalName, xp: 0, level: 1, streak: 0, role: 'student', freeze_gels: 0 }),
                 });
                 setUsername(finalName);
             }
@@ -118,6 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setXp(0);
         setLevel(1);
         setStreak(0);
+        setFreezeGels(0);
         setUsername(null);
         setClan(null);
         setIsLoading(false);
@@ -208,9 +218,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <AuthContext.Provider value={{
             user, session, isAdmin, isContributor, isLoading,
-            xp, level, streak, username, clan,
+            xp, level, streak, lostStreak, freezeGels, username, clan,
             signOut, refreshSession, refreshProfile,
         }}>
+
             {children}
         </AuthContext.Provider>
     );

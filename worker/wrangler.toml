@@ -1,0 +1,8 @@
+name = "ekloud-stripe-worker"
+main = "index.ts"
+compatibility_date = "2024-04-03"
+
+[vars]
+# Values must be injected via Cloudflare Variables/Secrets (do not commit secrets/keys)
+SUPABASE_URL = ""
+SUPABASE_ANON_KEY = ""

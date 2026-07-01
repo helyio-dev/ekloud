@@ -66,8 +66,15 @@ export default function LandingPage() {
                         <a href="https://discord.gg/WnwyMHm4Gc" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-accent transition-colors group">
                             discord <ExternalLink size={10} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                         </a>
-                        <Link to="/support" className="hover:text-accent transition-colors underline-offset-4 hover:underline">soutenir</Link>
+<Link to="/support" className="hover:text-accent transition-colors underline-offset-4 hover:underline">soutenir</Link>
                         <Link to="/terms" className="hover:text-accent transition-colors underline-offset-4 hover:underline">cgu</Link>
+                        <Link to="/legal" className="hover:text-accent transition-colors underline-offset-4 hover:underline">Mentions légals</Link>
+
+
+
+
+
+
                         <button 
                             onClick={(e) => {
                                 e.preventDefault();

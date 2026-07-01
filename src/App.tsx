@@ -22,6 +22,7 @@ import QuizPage from '@/app/quiz/[id]/page';
 import ExamPage from '@/app/exam/[id]/page';
 import CoursesPage from '@/app/courses/page';
 import SettingsPage from '@/app/settings/page';
+import ShopPage from '@/app/shop/page';
 import PublicProfilePage from '@/app/u/[username]/page';
 import AuthCallbackPage from '@/app/auth/callback/page';
 import ClanQuizPage from '@/app/clan-quiz/page';
@@ -29,7 +30,9 @@ import WeeklyClanQuizPage from '@/app/clan-quiz/weekly/page';
 import MonthlyClanQuizPage from '@/app/clan-quiz/monthly/page';
 import SupportPage from '@/app/support/page';
 import TermsPage from '@/app/terms/page';
+import LegalPage from '@/app/legal/page';
 import CreditsPage from '@/app/credits/page';
+
 
 // imports des pages administration
 import AdminDashboard from '@/app/admin/page';
@@ -69,8 +72,10 @@ const AppContent = () => {
                 <Routes>
                     {/* routes publiques */}
                     <Route path="/" element={<LandingPage />} />
-                    <Route path="/terms" element={<TermsPage />} />
+<Route path="/terms" element={<TermsPage />} />
+                    <Route path="/legal" element={<LegalPage />} />
                     <Route path="/support" element={<SupportPage />} />
+
                     <Route path="/credits" element={<CreditsPage />} />
                     <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
                     <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <SignupPage />} />
@@ -78,6 +83,7 @@ const AppContent = () => {
 
                     {/* routes utilisateur protégées */}
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/shop" element={<ProtectedRoute><ShopPage /></ProtectedRoute>} />
                     <Route path="/friends" element={<ProtectedRoute><FriendsPage /></ProtectedRoute>} />
                     <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
                     <Route path="/modules/:id" element={<ProtectedRoute><ModulePage /></ProtectedRoute>} />
